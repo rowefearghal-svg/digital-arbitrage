@@ -1,0 +1,12 @@
+# Developer environment for digital-arbitrage.
+#
+# Runtime dependencies are declared in pyproject.toml ([project].dependencies)
+# and are intentionally empty during bootstrap. This file installs the package
+# in editable mode plus the developer tooling for a reproducible dev setup.
+#
+# Usage:
+#   python -m venv .venv
+#   # activate it, then:
+#   pip install -r requirements.txt
+
+-e .[dev]

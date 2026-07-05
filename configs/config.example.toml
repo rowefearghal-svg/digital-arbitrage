@@ -1,0 +1,20 @@
+# Example configuration for digital-arbitrage.
+#
+# Copy this file to `configs/config.toml` (gitignored) and fill in real values.
+# NEVER commit secrets - keep API keys and credentials in a local `.env` or a
+# secrets manager, not in this file.
+
+[app]
+# Human-readable environment name: "dev", "staging", "prod".
+environment = "dev"
+# Logging level: DEBUG | INFO | WARNING | ERROR.
+log_level = "INFO"
+
+[data]
+# Local directory for datasets/artifacts (kept out of Git).
+data_dir = "data"
+
+# Placeholder sections for future use - no logic reads these yet.
+# [exchange.example]
+# base_url = "https://api.example.com"
+# api_key_env = "EXAMPLE_API_KEY"   # name of the env var holding the secret

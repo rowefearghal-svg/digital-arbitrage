@@ -1,0 +1,11 @@
+# Normalise line endings across platforms.
+* text=auto eol=lf
+
+# Treat common binary assets as binary (no EOL conversion / diffing).
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.zip binary
+*.parquet binary

@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "digital-arbitrage"
+version = "0.0.1"
+description = "Engineering foundation for the digital-arbitrage project (no logic yet)."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "TBD" }
+authors = [{ name = "Fearghal" }]
+keywords = ["arbitrage", "research"]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "Private :: Do Not Upload",
+]
+# Runtime dependencies are added here as the project grows. Empty on purpose:
+# this bootstrap has no application logic yet.
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.6",
+    "black>=24.8",
+    "mypy>=1.11",
+    "pytest>=8.3",
+    "pytest-cov>=5.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# A sensible, non-noisy default rule set. Expand as the codebase grows.
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+files = ["src"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra"
+testpaths = ["tests"]
