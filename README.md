@@ -4,6 +4,7 @@
 > This repository currently contains the **engineering foundation only** - no
 > arbitrage logic is implemented yet.
 
+[![CI](https://github.com/rowefearghal-svg/digital-arbitrage/actions/workflows/ci.yml/badge.svg)](https://github.com/rowefearghal-svg/digital-arbitrage/actions/workflows/ci.yml)
 [![status](https://img.shields.io/badge/status-bootstrapping-blue)](docs/ROADMAP.md)
 
 ## Overview
@@ -59,12 +60,33 @@ pytest
 
 ## Development
 
-- **Format / lint:** `ruff check .` and `ruff format .` (or `black .`).
-- **Type check:** `mypy src`.
-- **Tests:** `pytest` (coverage via `pytest --cov`).
-- **Branching:** trunk-based - short-lived branches off `main`, PR for every
-  change, squash-merge, protected `main`. See the workspace standards in the
-  `ai-infrastructure` repository.
+### Local checks
+
+Run these before pushing - they mirror exactly what CI runs:
+
+```bash
+ruff check .            # lint
+ruff format --check .   # formatting (use `ruff format .` to fix)
+mypy src                # type check
+pytest -q               # tests
+```
+
+### Continuous integration
+
+Every `push` and `pull_request` is validated by GitHub Actions
+([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) on **Python 3.12**.
+The pipeline fails if any of the four checks above fail, so a PR must be green
+before it is merged.
+
+### Workflow
+
+1. Branch off `main` (`feature/*`, `fix/*`, `infrastructure/*`, `docs/*`).
+2. Make focused commits; run the local checks above.
+3. Open a pull request - CI runs automatically.
+4. Merge only when CI is green (squash-merge, linear history, protected `main`).
+
+Trunk-based: short-lived branches, a PR for every change, no direct pushes to
+`main`. See the workspace standards in the `ai-infrastructure` repository.
 
 ## Configuration
 
@@ -92,4 +114,4 @@ license until one is chosen.
 
 ---
 
-_Last updated: bootstrap. This README will grow as the project takes shape._
+_Last updated: Sprint 9 (CI). This README will grow as the project takes shape._
