@@ -13,8 +13,9 @@
 
 - [ ] **Enable branch protection on `main`** - require PR + review, linear
   history, block force-push. `P1` `chore`
-- [ ] **Add CI workflow** - ruff + black --check, mypy, pytest on every PR.
-  `P1` `chore` `tests`
+- [x] **Add CI workflow** - ruff lint + ruff format --check, mypy, pytest on
+  every push/PR (Python 3.12). Done in `.github/workflows/ci.yml`. `P1` `chore`
+  `tests`
 - [ ] **Choose and add a LICENSE** - replace the placeholder; update
   `pyproject.toml` and README. `P1` `docs`
 - [ ] **Add PR + issue templates** and a `CODEOWNERS` file. `P2` `chore`
