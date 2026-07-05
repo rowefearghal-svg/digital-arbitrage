@@ -1,57 +1,95 @@
-﻿# 01 - Digital Arbitrage
+# digital-arbitrage
 
-<!--
-  Project folder README.
-  PURPOSE: Explain what this project folder is for so anyone opening it
-  understands its role. Keep it factual; use placeholders (TBD) for anything
-  not yet decided. Do not invent project details.
--->
+> Research and engineering project exploring digital arbitrage opportunities.
+> This repository currently contains the **engineering foundation only** - no
+> arbitrage logic is implemented yet.
 
-> _TBD - one-line description of this project._
+[![status](https://img.shields.io/badge/status-bootstrapping-blue)](docs/ROADMAP.md)
 
-## Purpose
+## Overview
 
-<!--
-  PURPOSE: One or two sentences on what this project is and why it exists.
--->
+`digital-arbitrage` is a long-lived Python project. This initial commit
+establishes a clean, professional structure so that future development has a
+solid base: packaging, tests, configuration, documentation, and a backlog.
 
-_TBD - the goal of this project._
+_A concise product description will be added as scope firms up (see
+[`docs/VISION.md`](docs/VISION.md))._
 
-## Scope
+## Repository Layout
 
-<!--
-  SCOPE: What belongs here vs. what does not. Helps keep the project focused.
--->
+```
+digital-arbitrage/
+|-- src/digital_arbitrage/   # importable Python package (application code)
+|-- tests/                   # test suite (pytest)
+|-- configs/                 # non-secret configuration + examples
+|-- scripts/                 # helper / operational scripts
+|-- docs/                    # project documentation
+|   |-- VISION.md            # why this project exists, long-term direction
+|   |-- ROADMAP.md           # planned milestones
+|   `-- DECISIONS.md         # architecture decision log
+|-- BACKLOG.md               # initial issue list / work items
+|-- pyproject.toml           # project metadata + tooling config
+|-- requirements.txt         # pinned developer tooling
+|-- .gitignore
+|-- .gitattributes
+`-- LICENSE                  # placeholder - license TBD
+```
 
-- **In scope:** _TBD_
-- **Out of scope:** _TBD_
+## Getting Started
 
-## Contents
+> Requires Python 3.12+.
 
-<!--
-  CONTENTS: List and describe sub-items (folders, docs) as they are added.
--->
+```bash
+# 1. Create and activate a virtual environment
+python -m venv .venv
+# Windows:  .\.venv\Scripts\Activate.ps1
+# macOS/Linux:  source .venv/bin/activate
 
-_TBD - describe contents as they are added._
+# 2. Install the package (editable) plus dev tooling
+pip install -r requirements.txt
 
-## Status
+# 3. Copy the example config and fill in values
+#    (Linux/macOS shown; on Windows use Copy-Item)
+cp configs/config.example.toml configs/config.toml
 
-<!--
-  STATUS: Current state (Planned / Active / Paused / Archived) and owner.
-  Mirror this in the root PROJECT_INDEX.md.
--->
+# 4. Run the checks
+ruff check .
+pytest
+```
 
-- **Status:** TBD
-- **Owner:** TBD
+## Development
 
-## Notes
+- **Format / lint:** `ruff check .` and `ruff format .` (or `black .`).
+- **Type check:** `mypy src`.
+- **Tests:** `pytest` (coverage via `pytest --cov`).
+- **Branching:** trunk-based - short-lived branches off `main`, PR for every
+  change, squash-merge, protected `main`. See the workspace standards in the
+  `ai-infrastructure` repository.
 
-<!--
-  NOTES: Any additional context, links, or decisions relevant to this project.
--->
+## Configuration
 
-_TBD_
+Runtime configuration lives in `configs/`. Never commit secrets - copy
+`config.example.toml` to `config.toml` (gitignored) and keep secrets in a local
+`.env` (see `.env` handling in `.gitignore`).
+
+## Data & Models
+
+Datasets, models, and checkpoints are **not** stored in Git. Keep them in a
+local `data/` directory (gitignored) or external object storage. See the
+`ai-infrastructure` GitHub architecture notes.
+
+## Documentation
+
+- [`docs/VISION.md`](docs/VISION.md) - long-term direction and principles.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) - planned milestones.
+- [`docs/DECISIONS.md`](docs/DECISIONS.md) - architecture decision log (ADR).
+- [`BACKLOG.md`](BACKLOG.md) - initial work items.
+
+## License
+
+License is **TBD** - see [`LICENSE`](LICENSE). Do not assume an open-source
+license until one is chosen.
 
 ---
 
-_Last updated: TBD_
+_Last updated: bootstrap. This README will grow as the project takes shape._

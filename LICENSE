@@ -1,0 +1,23 @@
+LICENSE - PLACEHOLDER (TO BE DECIDED)
+=====================================
+
+No license has been chosen for this project yet.
+
+Until a license is added here, all rights are reserved by the copyright holder.
+This means the code may not be copied, distributed, or reused without explicit
+permission.
+
+When ready, replace this file with the full text of the chosen license, for
+example:
+
+  - MIT License (permissive)
+  - Apache License 2.0 (permissive, patent grant)
+  - BSD 3-Clause (permissive)
+  - GNU GPL v3 (copyleft)
+  - A proprietary/commercial license
+
+Also update:
+  - pyproject.toml -> [project].license
+  - README.md -> License section
+
+Copyright (c) 2026 Fearghal. All rights reserved.
