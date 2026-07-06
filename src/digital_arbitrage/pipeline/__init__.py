@@ -16,12 +16,15 @@ Quick start::
 
 from __future__ import annotations
 
+from .config_file import ConfigError, load_pipeline_config
 from .models import PipelineItemResult, PipelineResult
 from .pipeline import ArbitragePipeline, PipelineConfig
 
 __all__ = [
     "ArbitragePipeline",
+    "ConfigError",
     "PipelineConfig",
     "PipelineItemResult",
     "PipelineResult",
+    "load_pipeline_config",
 ]

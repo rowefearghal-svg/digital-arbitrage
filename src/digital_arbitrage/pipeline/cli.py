@@ -11,7 +11,9 @@ import argparse
 import json
 import sys
 from collections.abc import Sequence
+from dataclasses import replace
 
+from .config_file import ConfigError, load_pipeline_config
 from .models import PipelineResult
 from .pipeline import ArbitragePipeline, PipelineConfig
 
@@ -76,11 +78,24 @@ def build_parser() -> argparse.ArgumentParser:
         "-f", "--format", choices=("table", "json"), default="table", help="Output format."
     )
     scan.add_argument("-l", "--limit", type=int, default=None, help="Max results per provider.")
+    scan.add_argument(
+        "-c",
+        "--config",
+        default=None,
+        help="Path to a TOML config file (see configs/default.toml).",
+    )
     return parser
 
 
 def _run_scan(args: argparse.Namespace) -> int:
-    config = PipelineConfig(scan_limit=args.limit)
+    try:
+        config = load_pipeline_config(args.config) if args.config else PipelineConfig()
+    except ConfigError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
+    if args.limit is not None:
+        config = replace(config, scan_limit=args.limit)
+
     try:
         result = ArbitragePipeline(config).analyze(args.query)
     except Exception as error:  # noqa: BLE001 - surface any failure cleanly to the CLI user

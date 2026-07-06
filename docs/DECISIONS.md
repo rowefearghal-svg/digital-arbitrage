@@ -207,3 +207,32 @@
   persistence, and async scanning are future additions on the same seam. The
   CLI intentionally has no third-party dependencies (stdlib `argparse` + manual
   table rendering).
+
+### ADR-010: TOML configuration files for the pipeline
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** Fee models and thresholds were only settable in code. Operators
+  need to tune the run (providers, strategy, cost assumptions) without editing
+  Python, and to keep tuned profiles under version control.
+- **Decision:** Add `load_pipeline_config(path) -> PipelineConfig` (stdlib
+  `tomllib`, no new deps) plus `arb scan ... --config file.toml`. The file has
+  one table per stage (`[pipeline]`, `[scanner]`, `[normalization]`,
+  `[matching]`, `[deduplication]`, `[market_pricing]`, `[opportunity]`); the
+  `[matching]` table nests into the deduplicator's `match_config`. A documented
+  `configs/default.toml` mirrors the code defaults. `--limit` overrides
+  `[pipeline].scan_limit`.
+- **Rationale:**
+  - *Fail loud, fail early* - a validating loader rejects unknown tables/keys,
+    wrong types (including `bool`-is-not-`int`), and out-of-range values, always
+    with a section-prefixed message. Dataclass `__post_init__` errors are
+    re-raised with the same prefix, so one `ConfigError` type covers everything.
+  - *Everything optional* - each table/key falls back to the stage default, so
+    partial files are valid and only omitted stages stay `None`.
+  - *No new surface area* - the loader maps onto the existing per-stage config
+    dataclasses rather than introducing a parallel schema; TOML matches the
+    stdlib parser and the format already used by `ScannerConfig`.
+- **Consequences:** A few rich fields are intentionally not file-configurable
+  yet (e.g. `condition_aliases`, custom strategy instances); they remain
+  code-only until needed. The file is the source of truth for a run, but CLI
+  flags still win for quick overrides.

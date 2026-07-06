@@ -66,6 +66,34 @@ The `arb` command runs the whole pipeline (installed via `pip install -e .`):
 arb scan "rtx 4090"                 # fixed-width table (default)
 arb scan "rtx 4090" --format json   # JSON report
 arb scan "rtx 4090" --limit 5       # cap results per provider
+arb scan "rtx 4090" --config configs/default.toml   # load stage config from TOML
+```
+
+Every stage is configurable from one TOML file (`--config`), with one table per
+stage; each table and key is optional and falls back to its code default.
+Unknown tables/keys or wrong types fail at load with a clear, section-prefixed
+error. `--limit` overrides `[pipeline].scan_limit`. See
+[`configs/default.toml`](configs/default.toml) for the full, documented example:
+
+```toml
+[pipeline]
+scan_limit = 10
+
+[scanner]
+providers = ["ebay", "donedeal"]
+
+[market_pricing]
+strategy = "median"      # median | trimmed_mean | weighted_average
+
+[opportunity]
+buy_roi = 0.15           # thresholds and the full fee/cost model
+```
+
+```python
+from digital_arbitrage.pipeline import ArbitragePipeline, load_pipeline_config
+
+config = load_pipeline_config("configs/default.toml")
+result = ArbitragePipeline(config).analyze("rtx 4090")
 ```
 
 ## Repository Layout
