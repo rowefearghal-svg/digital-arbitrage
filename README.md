@@ -37,21 +37,29 @@ _A concise product description will be added as scope firms up (see
   listings using deterministic, swappable strategies (median, trimmed mean,
   weighted average) with IQR outlier removal. Returns a `MarketPrice`
   (estimate, confidence, comparable count, min/max/median/mean). No AI/ML.
+- **`opportunity`** - turns an asking price + `MarketPrice` into a scored
+  arbitrage `Opportunity`: an itemized `CostBreakdown` (marketplace/payment/
+  shipping/packaging/buffer/tax), a `ProfitEstimate` (gross/net profit, ROI %,
+  margin %), and a `STRONG_BUY / BUY / WATCH / REJECT` recommendation with
+  reasons. Conservative by default, configurable. No scraping, AI, or APIs.
 
-Pipeline order:
-**Scanner -> Normalization -> Product Matching -> Deduplication -> Market Pricing.**
+Pipeline order: **Scanner -> Normalization -> Product Matching -> Deduplication
+-> Market Pricing -> Opportunity.**
 
 ```python
 from digital_arbitrage.product_scanner import build_scanner
 from digital_arbitrage.normalization import Normalizer
 from digital_arbitrage.deduplication import Deduplicator
 from digital_arbitrage.market_pricing import MarketPriceEstimator
+from digital_arbitrage.opportunity import OpportunityAnalyzer
 
 normalized = Normalizer().normalize_many(build_scanner().scan("rtx 4090"))
 estimator = MarketPriceEstimator()
+analyzer = OpportunityAnalyzer()
 for group in Deduplicator().deduplicate(normalized).groups:
     price = estimator.estimate_from_group(group)
-    print(group.canonical.title, price.estimated_market_price, price.currency, price.confidence_score)
+    opp = analyzer.analyze(group.canonical, price)
+    print(opp.recommendation, opp.net_profit, opp.roi_percentage, opp.reasons)
 ```
 
 ## Repository Layout

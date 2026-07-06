@@ -146,3 +146,34 @@
   configured) currency rather than converted - FX conversion and profit
   calculations remain out of scope. Confidence is a heuristic, not a calibrated
   probability.
+
+### ADR-008: Deterministic, conservative profit/opportunity scoring
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** The pipeline can now estimate a product's market price; the next
+  step is to decide whether a *specific* listing is a buy. This needs an
+  explicit, auditable cost and profit model - not a black box.
+- **Decision:** Add an `opportunity` stage (Scanner -> ... -> Market Pricing ->
+  Opportunity). `OpportunityAnalyzer.analyze(listing, market_price)` returns an
+  `Opportunity` containing a `ProfitEstimate` (gross/net profit, ROI %,
+  margin %) built from an itemized `CostBreakdown` (marketplace fee, payment fee,
+  shipping, packaging, risk buffer, VAT/tax placeholder) and a `Recommendation`
+  in {STRONG_BUY, BUY, WATCH, REJECT}. Recommendation is a pure function of ROI
+  thresholds gated by the market-price confidence; every result carries the
+  `reasons` behind it. All costs/thresholds live in `OpportunityConfig`.
+- **Rationale:**
+  - *Conservative by default* - default fees, a risk buffer, and confidence
+    gating bias toward REJECT/WATCH so marginal deals are not over-sold. A
+    positive recommendation must clear real, itemized costs.
+  - *Explainable & deterministic* - the decision is arithmetic over declared
+    inputs; `reasons` make each recommendation auditable, and identical inputs
+    always yield identical output.
+  - *No FX / no external calls* - listings whose currency differs from the market
+    estimate are rejected rather than silently converted, consistent with
+    ADR-007. VAT is a configurable placeholder (fraction of gross profit),
+    defaulting off.
+- **Consequences:** ROI is computed against the asking price (capital deployed);
+  the tax model is a simplified margin-scheme placeholder, not tax advice.
+  Actual marketplace/payment schedules and multi-currency handling are future
+  enhancements layered on the same `OpportunityConfig` seam.
