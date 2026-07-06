@@ -177,3 +177,33 @@
   the tax model is a simplified margin-scheme placeholder, not tax advice.
   Actual marketplace/payment schedules and multi-currency handling are future
   enhancements layered on the same `OpportunityConfig` seam.
+
+### ADR-009: Single orchestrator + thin CLI over the module stack
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** Six independent stages now exist but had to be wired by hand.
+  Users and demos need one entry point, and the system needs a place for
+  run-level configuration.
+- **Decision:** Add a `pipeline` package. `ArbitragePipeline.analyze(query)`
+  composes the stages in order (Scanner -> Normalization -> Product Matching ->
+  Deduplication -> Market Pricing -> Opportunity) and returns a `PipelineResult`
+  of `PipelineItemResult`s sorted by `(recommendation, ROI, confidence)`.
+  `PipelineConfig` nests each stage's config so everything is tunable from one
+  object. A thin `arb` CLI (`arb scan "<query>" --format table|json`) renders
+  the result; it is a `[project.scripts]` console entry point.
+- **Rationale:**
+  - *Composition, not reimplementation* - the orchestrator only sequences and
+    ranks; all logic stays in the tested stage modules. The CLI is a pure view
+    over `PipelineResult`.
+  - *Deterministic & offline* - built on the existing mock providers with stable
+    sorting (ties broken by `listing_id`), so runs are reproducible and
+    `to_dict()` output is stable for JSON snapshots.
+  - *Clean error handling* - provider failures are already isolated in the
+    scanner; the CLI additionally catches unexpected errors, prints to stderr,
+    and returns a non-zero exit code.
+- **Consequences:** Ranking currently treats unpriced/rejected items as lowest
+  (ROI `-inf`); richer filtering (e.g. `--min-recommendation`), result
+  persistence, and async scanning are future additions on the same seam. The
+  CLI intentionally has no third-party dependencies (stdlib `argparse` + manual
+  table rendering).
