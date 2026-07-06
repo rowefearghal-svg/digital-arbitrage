@@ -359,3 +359,48 @@
   more rows than the original filtered `arb scan` printed - intentional, as the
   saved run is the complete analysis. `arb compare` (diffing a query across runs)
   is a natural follow-up now that the data is captured.
+
+### ADR-014: Comparing two saved runs
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** Persistence (ADR-013) captures runs, but there was no way to see
+  *what changed* between two scans of the same query - which opportunities are
+  new, which vanished, and which got better or worse. We want a deterministic,
+  dependency-free diff over the stored snapshots.
+- **Decision:** Add a `comparison` package. `compare_runs(old_run, old_opps,
+  new_run, new_opps, config?) -> RunComparison` matches opportunities across the
+  two runs by a stable **identity key** and classifies each into a
+  `ChangeCategory`: `NEW` (only in the newer run), `DISAPPEARED` (only in the
+  older), `UNCHANGED`, `IMPROVED`, or `WORSENED`. Each `OpportunityDelta` carries
+  the matched snapshots plus a `MetricDelta` (old, new, signed delta) for every
+  key metric, and a human-readable `reason`.
+  - *Identity key* - `provider + "|" + normalized(title)`, where the title is
+    lower-cased and whitespace-collapsed. This uses the best stable fields a
+    snapshot has (there is no cross-provider product id), so the same listing
+    matches across runs while genuinely different listings stay distinct.
+  - *Improve/worsen decision* - a fixed metric priority is walked in order:
+    `recommendation_score` -> `roi_percentage` -> `net_profit` ->
+    `confidence_score` -> `risk_score`. The first metric whose change exceeds
+    `ComparisonConfig.epsilon` settles the verdict (risk is inverted: a decrease
+    is an improvement); the rest act as deterministic tie-breakers. If no metric
+    moves, the pair is `UNCHANGED`. `recommendation_score` leads because it
+    already blends the other signals (ADR-012).
+  - *Deterministic ordering* - deltas are sorted by category (new, improved,
+    worsened, unchanged, disappeared) then identity key, so output is stable.
+  - *CLI* - `arb compare <old_run_id> <new_run_id>` renders `table`, `json`,
+    `csv`, or `markdown` (metric columns show the new-minus-old delta); a missing
+    run id prints an error and exits non-zero.
+- **Rationale:** Standard library only, reads the existing snapshot schema
+  unchanged (no migration), and keeps the policy (identity + classification) in a
+  small pure module that is trivial to unit-test. Exposing per-metric deltas
+  (not just a verdict) keeps the result auditable and future-proof for a
+  weighted/scored diff later.
+- **Consequences:** Identity is heuristic: a retitled listing looks like a
+  `DISAPPEARED` + `NEW` pair rather than a change, and two distinct listings that
+  happen to share a provider+title collapse to one (the best-ranked is kept,
+  documented). `None` ROI/net-profit values are coalesced to `0.0` for the delta
+  math, so a rejected-then-priced opportunity reads as an improvement. Comparison
+  is symmetric only in structure, not meaning - callers pass old and new
+  explicitly. A stored, stable product id (if added upstream) would supersede the
+  title-based key.

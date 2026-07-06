@@ -55,6 +55,12 @@ _A concise product description will be added as scope firms up (see
   `PipelineResult` as a run plus its ranked opportunity snapshots, and reads them
   back as `StoredRun` / `StoredOpportunity`. Powers `arb scan --save`,
   `arb history`, and `arb show`. No external dependencies (ADR-013).
+- **`comparison`** - `compare_runs(...)` diffs two saved runs into a
+  `RunComparison`, matching opportunities by a stable identity key (provider +
+  normalized title) and categorising each as **new / disappeared / unchanged /
+  improved / worsened** from recommendation score, ROI, net profit, confidence,
+  and risk. Powers `arb compare`. Deterministic; standard library only
+  (ADR-014).
 
 Pipeline order: **Scanner -> Normalization -> Product Matching -> Deduplication
 -> Market Pricing -> Opportunity.**
@@ -109,6 +115,22 @@ arb show 3                                       # view run #3 (table | json | c
 Persistence uses only the standard-library `sqlite3` module - no ORM, no new
 dependencies. The schema is two small, additive tables (`runs`,
 `opportunities`); see [ADR-013](docs/DECISIONS.md).
+
+**Compare two runs.** `arb compare <old_run_id> <new_run_id>` diffs a query over
+time. Opportunities are matched by identity key (**provider + normalized title**)
+and each is categorised **new / disappeared / unchanged / improved / worsened**;
+metric columns show the new-minus-old delta:
+
+```bash
+arb compare 1 2                       # table (default)
+arb compare 1 2 --format markdown     # table | json | csv | markdown
+```
+
+A pair is *improved* / *worsened* by the first metric that changed, in priority
+order: recommendation score -> ROI -> net profit -> confidence -> risk (risk
+inverted, since lower is better); if none changed it is *unchanged*. Ordering is
+deterministic (new, improved, worsened, unchanged, disappeared, then by key). See
+[ADR-014](docs/DECISIONS.md) for the identity-key assumptions.
 
 Every stage is configurable from one TOML file (`--config`), with one table per
 stage; each table and key is optional and falls back to its code default.
