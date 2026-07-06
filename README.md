@@ -28,17 +28,23 @@ _A concise product description will be added as scope firms up (see
 - **`product_matching`** - deterministic engine estimating whether two
   `NormalizedListing`s are the same product, via token similarity + brand/model
   heuristics with configurable thresholds. Returns an explained `MatchResult`
-  (`score`, `decision`, `reasons`, matched/unmatched tokens). No AI, pricing, or
-  deduplication.
+  (`score`, `decision`, `reasons`, matched/unmatched tokens). No AI or pricing.
+- **`deduplication`** - groups duplicate/near-duplicate listings across
+  providers (reusing `product_matching`), selecting one canonical listing per
+  group and a deterministic fingerprint. Lossless (every input preserved) and
+  toggleable via config. No pricing, scraping, or AI.
+
+Pipeline order: **Scanner -> Normalization -> Product Matching -> Deduplication.**
 
 ```python
 from digital_arbitrage.product_scanner import build_scanner
 from digital_arbitrage.normalization import Normalizer
-from digital_arbitrage.product_matching import ProductMatcher
+from digital_arbitrage.deduplication import Deduplicator
 
 normalized = Normalizer().normalize_many(build_scanner().scan("rtx 4090"))
-result = ProductMatcher().match(normalized[0], normalized[1])
-print(result.decision, result.score, result.reasons)
+result = Deduplicator().deduplicate(normalized)
+for group in result.groups:
+    print(group.fingerprint, group.canonical.title, group.size, group.providers)
 ```
 
 ## Repository Layout
