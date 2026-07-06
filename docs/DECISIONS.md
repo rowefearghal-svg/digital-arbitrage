@@ -89,3 +89,31 @@
 - **Consequences:** Matching quality is bounded by heuristics (e.g. synonyms,
   spelling variants, missing brand tokens). Accepted for now; an AI matcher is a
   later, separately-reviewed enhancement layered on the same interface.
+
+### ADR-006: Lossless, deterministic cross-provider deduplication
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** The same product is listed on multiple marketplaces; downstream
+  logic needs a de-duplicated view without losing any source listing.
+- **Decision:** Add a `deduplication` stage (last in the pipeline: Scanner ->
+  Normalization -> Product Matching -> Deduplication). `Deduplicator` clusters
+  `NormalizedListing`s by reusing `ProductMatcher` (SAME_PRODUCT, optionally
+  POSSIBLE_MATCH), producing `DuplicateGroup`s each with one `canonical` listing
+  and a deterministic fingerprint. It is **lossless** (every input preserved in
+  exactly one group), **deterministic** (input sorted by a stable key; a frozen
+  invariant asserts no listings are lost), and **toggleable** (`enabled=False`
+  makes it a no-op of singleton groups).
+- **Rationale:**
+  - *Reuse over reinvention* - grouping is driven by the existing, tested,
+    explainable matcher rather than a second similarity implementation.
+  - *Lossless by construction* - `DeduplicationResult` refuses to be built if the
+    grouped count differs from the input count, so a bug cannot silently drop
+    listings. Canonicals are a view, not a destructive filter.
+  - *Deterministic* - stable ordering + content-derived fingerprints make output
+    reproducible across runs, machines, and input orderings.
+- **Consequences:** Greedy clustering compares each listing against a cluster
+  representative, so it favours simplicity over perfect transitive grouping;
+  adequate for current volumes. Canonical selection prefers the richest title
+  (and an optional provider priority); price-aware selection is deferred to the
+  future pricing layer.
