@@ -124,7 +124,7 @@ def test_result_to_dict_is_json_serializable() -> None:
 # --------------------------------------------------------------------------- #
 def test_render_table_has_header_and_columns() -> None:
     result = ArbitragePipeline().analyze("rtx 4090")
-    text = render_table(result)
+    text = render_table(result, result.items)
     assert "query: 'rtx 4090'" in text
     assert "RECOMMENDATION" in text
     assert "TITLE" in text
@@ -132,12 +132,12 @@ def test_render_table_has_header_and_columns() -> None:
 
 def test_render_json_roundtrips() -> None:
     result = ArbitragePipeline().analyze("rtx 4090")
-    assert json.loads(render_json(result))["query"] == "rtx 4090"
+    assert json.loads(render_json(result, result.items))["query"] == "rtx 4090"
 
 
 def test_render_table_empty_items() -> None:
     empty = PipelineResult(query="none", items=(), total_listings_scanned=0, total_groups=0)
-    assert "(no opportunities)" in render_table(empty)
+    assert "(no opportunities)" in render_table(empty, empty.items)
 
 
 # --------------------------------------------------------------------------- #

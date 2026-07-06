@@ -30,11 +30,16 @@ _RECOMMENDATION_RANK: dict[Recommendation, int] = {
 }
 
 
+def recommendation_rank(recommendation: Recommendation) -> int:
+    """Ordinal priority of a recommendation (STRONG_BUY highest, REJECT lowest)."""
+    return _RECOMMENDATION_RANK[recommendation]
+
+
 def _sort_key(item: PipelineItemResult) -> tuple[int, float, float, str]:
     """Rank by recommendation, then ROI, then confidence (all descending)."""
     roi = item.roi_percentage if item.roi_percentage is not None else float("-inf")
     return (
-        -_RECOMMENDATION_RANK[item.recommendation],
+        -recommendation_rank(item.recommendation),
         -roi,
         -item.confidence_score,
         item.group.canonical.listing_id,
