@@ -1,0 +1,74 @@
+# Default pipeline configuration for the digital-arbitrage CLI.
+#
+# Usage:
+#   arb scan "rtx 4090" --config configs/default.toml
+#
+# Every table and key below is OPTIONAL: anything omitted falls back to that
+# stage's built-in default. Unknown tables/keys or wrong types are rejected with
+# a clear, section-prefixed error at load time. The values here mirror the
+# code defaults, so this file is safe to copy and tweak.
+
+[pipeline]
+# Max results per provider passed to the scanner (--limit overrides this).
+scan_limit = 10
+
+[scanner]
+# Which mock providers to query. Remove entries to scan fewer marketplaces.
+providers = ["ebay", "facebook_marketplace", "adverts_ie", "donedeal"]
+max_results_per_provider = 10
+default_currency = "EUR"
+log_level = "INFO"
+
+[normalization]
+unicode_form = "NFKC"          # one of: NFC, NFD, NFKC, NFKD
+remove_emoji = true
+lowercase_title = true
+remove_filler_words = true
+default_currency = "EUR"
+# filler_words = ["brand", "new"]          # optional override
+# [normalization.currency_aliases]         # optional string -> ISO code map
+# "euro" = "EUR"
+
+[matching]
+# Token-similarity thresholds bounding the three match decisions.
+same_threshold = 0.72
+possible_threshold = 0.45
+overlap_weight = 0.35
+model_conflict_cap = 0.30
+brand_conflict_factor = 0.45
+shared_model_boost = 0.40
+shared_brand_boost = 0.15
+# brands = ["nvidia", "amd", "intel"]      # optional brand vocabulary override
+
+[deduplication]
+enabled = true
+include_possible_matches = false           # also collapse POSSIBLE_MATCH pairs
+provider_priority = []                      # e.g. ["ebay", "donedeal"] for canonical pick
+
+[market_pricing]
+strategy = "median"                         # one of: median, trimmed_mean, weighted_average
+trim_fraction = 0.1
+min_comparables = 3
+remove_outliers = true
+iqr_multiplier = 1.5
+confidence_full_count = 5
+# currency = "EUR"                          # force a currency instead of the dominant one
+
+[opportunity]
+# Resale cost model (conservative defaults). Rates are fractions of the sale price.
+marketplace_fee_rate = 0.10
+payment_fee_rate = 0.029
+payment_fee_flat = 0.35
+shipping_cost = 10.0
+packaging_cost = 2.0
+buffer_rate = 0.05
+buffer_flat = 0.0
+tax_rate = 0.0                              # VAT/tax on gross profit (0 = off)
+# Decision thresholds (ROI is a fraction, e.g. 0.30 == 30%).
+strong_buy_roi = 0.30
+buy_roi = 0.15
+watch_roi = 0.05
+min_net_profit = 0.0
+min_confidence = 0.40
+strong_buy_confidence = 0.60
+require_same_currency = true
