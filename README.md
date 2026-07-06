@@ -33,18 +33,25 @@ _A concise product description will be added as scope firms up (see
   providers (reusing `product_matching`), selecting one canonical listing per
   group and a deterministic fingerprint. Lossless (every input preserved) and
   toggleable via config. No pricing, scraping, or AI.
+- **`market_pricing`** - estimates the market price of a product from comparable
+  listings using deterministic, swappable strategies (median, trimmed mean,
+  weighted average) with IQR outlier removal. Returns a `MarketPrice`
+  (estimate, confidence, comparable count, min/max/median/mean). No AI/ML.
 
-Pipeline order: **Scanner -> Normalization -> Product Matching -> Deduplication.**
+Pipeline order:
+**Scanner -> Normalization -> Product Matching -> Deduplication -> Market Pricing.**
 
 ```python
 from digital_arbitrage.product_scanner import build_scanner
 from digital_arbitrage.normalization import Normalizer
 from digital_arbitrage.deduplication import Deduplicator
+from digital_arbitrage.market_pricing import MarketPriceEstimator
 
 normalized = Normalizer().normalize_many(build_scanner().scan("rtx 4090"))
-result = Deduplicator().deduplicate(normalized)
-for group in result.groups:
-    print(group.fingerprint, group.canonical.title, group.size, group.providers)
+estimator = MarketPriceEstimator()
+for group in Deduplicator().deduplicate(normalized).groups:
+    price = estimator.estimate_from_group(group)
+    print(group.canonical.title, price.estimated_market_price, price.currency, price.confidence_score)
 ```
 
 ## Repository Layout
