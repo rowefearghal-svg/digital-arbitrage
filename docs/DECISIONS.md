@@ -48,3 +48,20 @@
   domain/trading logic.
 - **Consequences:** A clean base to build on; domain logic arrives in later,
   separately-reviewed PRs.
+
+### ADR-004: Normalization as a configurable step pipeline
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** Raw listings from different providers vary in casing, unicode,
+  punctuation, currency notation, condition wording, and location format. The
+  rest of the system needs a single consistent shape.
+- **Decision:** Add a `normalization` package that turns a `Listing` into a
+  `NormalizedListing` via an ordered pipeline of independent `NormalizationStep`
+  objects (unicode -> text cleaning -> whitespace -> title cleanup -> currency
+  -> condition -> location). Steps are configurable/replaceable; domain mappings
+  (currency/condition/location) are small extensible registries. Normalization
+  keeps a reference to the source listing and does no pricing/FX/AI.
+- **Consequences:** Behaviour is tunable via `NormalizationConfig` or a custom
+  pipeline without touching the `Normalizer`; provider-agnostic; easy to unit
+  test each concern in isolation.
