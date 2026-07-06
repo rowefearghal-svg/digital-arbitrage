@@ -25,15 +25,20 @@ _A concise product description will be added as scope firms up (see
   internal `NormalizedListing` via a configurable, provider-agnostic pipeline
   (unicode + text/whitespace/title cleanup, currency/condition/location
   normalization). No pricing, FX, or AI.
+- **`product_matching`** - deterministic engine estimating whether two
+  `NormalizedListing`s are the same product, via token similarity + brand/model
+  heuristics with configurable thresholds. Returns an explained `MatchResult`
+  (`score`, `decision`, `reasons`, matched/unmatched tokens). No AI, pricing, or
+  deduplication.
 
 ```python
 from digital_arbitrage.product_scanner import build_scanner
 from digital_arbitrage.normalization import Normalizer
+from digital_arbitrage.product_matching import ProductMatcher
 
-listings = build_scanner().scan("rtx 4090")
-normalized = Normalizer().normalize_many(listings)
-for item in normalized:
-    print(item.provider, item.title, item.title_tokens, item.currency)
+normalized = Normalizer().normalize_many(build_scanner().scan("rtx 4090"))
+result = ProductMatcher().match(normalized[0], normalized[1])
+print(result.decision, result.score, result.reasons)
 ```
 
 ## Repository Layout
