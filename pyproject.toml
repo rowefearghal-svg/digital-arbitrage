@@ -19,6 +19,9 @@ classifiers = [
 # this bootstrap has no application logic yet.
 dependencies = []
 
+[project.scripts]
+arb = "digital_arbitrage.pipeline.cli:main"
+
 [project.optional-dependencies]
 dev = [
     "ruff>=0.6",
