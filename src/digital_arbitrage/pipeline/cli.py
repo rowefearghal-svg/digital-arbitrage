@@ -1,9 +1,13 @@
 """Command-line interface for the arbitrage pipeline.
 
-Exposes ``arb scan "<query>"`` with filtering, sorting, and multiple output
-formats (``table``, ``json``, ``csv``, ``markdown``). Output is built from
-:class:`ArbitragePipeline` results; no scraping or external calls (mock
-providers only).
+Exposes three commands, all built from :class:`ArbitragePipeline` results with no
+scraping or external calls (mock providers only):
+
+* ``arb scan "<query>"`` - run the pipeline with filtering, sorting, and multiple
+  output formats (``table``, ``json``, ``csv``, ``markdown``); ``--save`` also
+  persists the run to a SQLite history database.
+* ``arb history`` - list previously saved scan runs.
+* ``arb show <run_id>`` - view the opportunities stored for a previous run.
 """
 
 from __future__ import annotations
@@ -16,11 +20,16 @@ import sys
 import traceback
 from collections.abc import Callable, Sequence
 from dataclasses import replace
+from pathlib import Path
 
 from ..opportunity import Recommendation
+from ..persistence import ResultStore, StoredOpportunity, StoredRun
 from .config_file import load_pipeline_config
 from .models import PipelineItemResult, PipelineResult
 from .pipeline import ArbitragePipeline, PipelineConfig, recommendation_rank
+
+#: Default location for the scan-history database (override with --db).
+DEFAULT_DB_PATH = Path.home() / ".digital_arbitrage" / "history.db"
 
 # Columns shown in the fixed-width table and markdown output.
 _COLUMNS: tuple[tuple[str, str], ...] = (
@@ -182,6 +191,79 @@ _RENDERERS: dict[str, Callable[[PipelineResult, Sequence[PipelineItemResult]], s
 
 
 # --------------------------------------------------------------------------- #
+# history / show renderers
+# --------------------------------------------------------------------------- #
+def _fixed_table(headers: Sequence[str], rows: Sequence[Sequence[str]]) -> str:
+    grid = [list(headers), *[list(row) for row in rows]]
+    widths = [max(len(row[col]) for row in grid) for col in range(len(headers))]
+    lines = ["  ".join(cell.ljust(widths[col]) for col, cell in enumerate(row)) for row in grid]
+    lines.insert(1, "  ".join("-" * width for width in widths))
+    return "\n".join(lines)
+
+
+_RUN_COLUMNS: tuple[tuple[str, str], ...] = (
+    ("run_id", "RUN"),
+    ("created_at", "CREATED"),
+    ("query", "QUERY"),
+    ("total_listings_scanned", "SCANNED"),
+    ("total_groups", "GROUPS"),
+    ("total_opportunities", "OPPS"),
+    ("config_summary", "CONFIG"),
+)
+
+_SHOW_COLUMNS: tuple[tuple[str, str], ...] = (
+    ("rank", "RANK"),
+    ("recommendation", "RECOMMENDATION"),
+    ("recommendation_score", "SCORE"),
+    ("title", "TITLE"),
+    ("provider", "PROVIDER"),
+    ("asking_price", "ASKING"),
+    ("estimated_market_price", "MARKET"),
+    ("net_profit", "NET"),
+    ("roi_percentage", "ROI%"),
+    ("confidence_score", "CONF"),
+    ("risk_score", "RISK"),
+)
+
+
+def render_runs(runs: Sequence[StoredRun], fmt: str) -> str:
+    if fmt == "json":
+        return json.dumps([run.to_dict() for run in runs], indent=2)
+    if not runs:
+        return "(no saved runs)"
+    rows = [[_cell(run.to_dict()[key]) for key, _ in _RUN_COLUMNS] for run in runs]
+    return _fixed_table([label for _, label in _RUN_COLUMNS], rows)
+
+
+def render_stored_run(run: StoredRun, opportunities: Sequence[StoredOpportunity], fmt: str) -> str:
+    if fmt == "json":
+        return json.dumps(
+            {"run": run.to_dict(), "opportunities": [o.to_dict() for o in opportunities]},
+            indent=2,
+        )
+    if fmt == "csv":
+        buffer = io.StringIO()
+        writer = csv.writer(buffer, lineterminator="\n")
+        keys = [key for key, _ in _SHOW_COLUMNS]
+        writer.writerow(keys)
+        for opp in opportunities:
+            data = opp.to_dict()
+            writer.writerow([data[key] for key in keys])
+        return buffer.getvalue().rstrip("\n")
+
+    header = (
+        f"run {run.run_id}: {run.query!r} @ {run.created_at}\n"
+        f"scanned {run.total_listings_scanned} listings -> {run.total_groups} groups, "
+        f"{run.total_opportunities} opportunities ({run.config_summary})"
+    )
+    if not opportunities:
+        return header + "\n(no opportunities)"
+    rows = [[_cell(opp.to_dict()[key]) for key, _ in _SHOW_COLUMNS] for opp in opportunities]
+    table = _fixed_table([label for _, label in _SHOW_COLUMNS], rows)
+    return header + "\n\n" + table
+
+
+# --------------------------------------------------------------------------- #
 # argument parsing + dispatch
 # --------------------------------------------------------------------------- #
 def build_parser() -> argparse.ArgumentParser:
@@ -228,8 +310,51 @@ def build_parser() -> argparse.ArgumentParser:
         "--min-roi", type=float, default=None, help="Minimum ROI percentage (e.g. 15)."
     )
     scan.add_argument("--min-net-profit", type=float, default=None, help="Minimum net profit.")
+    scan.add_argument(
+        "--save",
+        action="store_true",
+        help="Persist the full scan result to the history database.",
+    )
+    scan.add_argument(
+        "--db",
+        default=None,
+        help=f"History database path (default: {DEFAULT_DB_PATH}).",
+    )
     scan.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
+
+    history = subparsers.add_parser("history", help="List previously saved scan runs.")
+    history.add_argument(
+        "-f", "--format", choices=("table", "json"), default="table", help="Output format."
+    )
+    history.add_argument(
+        "-l", "--limit", type=int, default=None, help="Show only the N newest runs."
+    )
+    history.add_argument(
+        "--db", default=None, help=f"History database path (default: {DEFAULT_DB_PATH})."
+    )
+    history.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
+
+    show = subparsers.add_parser("show", help="Show opportunities from a saved run.")
+    show.add_argument("run_id", type=int, help="Run id (see `arb history`).")
+    show.add_argument(
+        "-f",
+        "--format",
+        choices=("table", "json", "csv"),
+        default="table",
+        help="Output format.",
+    )
+    show.add_argument(
+        "--db", default=None, help=f"History database path (default: {DEFAULT_DB_PATH})."
+    )
+    show.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
     return parser
+
+
+def _config_summary(args: argparse.Namespace) -> str:
+    parts = [f"config={args.config}" if args.config else "config=defaults"]
+    if args.limit is not None:
+        parts.append(f"limit={args.limit}")
+    return ", ".join(parts)
 
 
 def _run_scan(args: argparse.Namespace) -> int:
@@ -240,18 +365,52 @@ def _run_scan(args: argparse.Namespace) -> int:
     result = ArbitragePipeline(config).analyze(args.query)
     items = _sort_items(_filter_items(result.items, args), args.sort)
     print(_RENDERERS[args.format](result, items))
+
+    if args.save:
+        db_path = args.db if args.db is not None else DEFAULT_DB_PATH
+        with ResultStore(db_path) as store:
+            run_id = store.save_run(result, config_summary=_config_summary(args))
+        print(f"saved run {run_id} to {db_path}", file=sys.stderr)
     return 0
+
+
+def _run_history(args: argparse.Namespace) -> int:
+    db_path = args.db if args.db is not None else DEFAULT_DB_PATH
+    with ResultStore(db_path) as store:
+        runs = store.list_runs(limit=args.limit)
+    print(render_runs(runs, args.format))
+    return 0
+
+
+def _run_show(args: argparse.Namespace) -> int:
+    db_path = args.db if args.db is not None else DEFAULT_DB_PATH
+    with ResultStore(db_path) as store:
+        run = store.get_run(args.run_id)
+        if run is None:
+            print(f"error: run {args.run_id} not found", file=sys.stderr)
+            return 1
+        opportunities = store.list_opportunities(args.run_id)
+    print(render_stored_run(run, opportunities, args.format))
+    return 0
+
+
+_COMMANDS: dict[str, Callable[[argparse.Namespace], int]] = {
+    "scan": _run_scan,
+    "history": _run_history,
+    "show": _run_show,
+}
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     """CLI entry point. Returns a process exit code."""
     parser = build_parser()
     args = parser.parse_args(argv)
-    if args.command != "scan":
+    handler = _COMMANDS.get(args.command)
+    if handler is None:
         parser.print_help()
         return 1
     try:
-        return _run_scan(args)
+        return handler(args)
     except Exception as error:  # noqa: BLE001 - top-level CLI boundary
         if args.debug:
             traceback.print_exc()

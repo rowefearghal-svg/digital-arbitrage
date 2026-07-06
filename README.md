@@ -51,6 +51,10 @@ _A concise product description will be added as scope firms up (see
   `PipelineItemResult`s ranked by recommendation, then ROI, then confidence
   (each item also carries its 0-100 `score`). Ships the `arb` CLI.
   Deterministic; mock providers only.
+- **`persistence`** - a standard-library `sqlite3` `ResultStore` that saves each
+  `PipelineResult` as a run plus its ranked opportunity snapshots, and reads them
+  back as `StoredRun` / `StoredOpportunity`. Powers `arb scan --save`,
+  `arb history`, and `arb show`. No external dependencies (ADR-013).
 
 Pipeline order: **Scanner -> Normalization -> Product Matching -> Deduplication
 -> Market Pricing -> Opportunity.**
@@ -89,6 +93,22 @@ arb scan "rtx 4090" --debug                        # full traceback on error (cl
 Every opportunity carries a **0-100 recommendation score** (the `SCORE` column /
 `recommendation_score` field), a single ranking number that blends ROI, net
 profit, confidence, and risk - use `--sort score` for the most holistic order.
+
+**Save and review history.** `--save` persists the full scan (all items, before
+display filters) to a SQLite database; `arb history` lists past runs and
+`arb show <run_id>` replays a run's opportunities. The database defaults to
+`~/.digital_arbitrage/history.db`; override it with `--db`:
+
+```bash
+arb scan "rtx 4090" --save                     # store this run
+arb scan "rtx 4090" --save --db runs.db        # ... in a specific database
+arb history                                     # list runs (table | json)
+arb show 3                                       # view run #3 (table | json | csv)
+```
+
+Persistence uses only the standard-library `sqlite3` module - no ORM, no new
+dependencies. The schema is two small, additive tables (`runs`,
+`opportunities`); see [ADR-013](docs/DECISIONS.md).
 
 Every stage is configurable from one TOML file (`--config`), with one table per
 stage; each table and key is optional and falls back to its code default.
