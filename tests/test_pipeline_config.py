@@ -69,6 +69,58 @@ def test_matching_section_nested_into_deduplication(tmp_path: Path) -> None:
     assert config.deduplication_config.match_config.same_threshold == 0.8
 
 
+def test_scoring_section_loads(tmp_path: Path) -> None:
+    path = write(
+        tmp_path,
+        "[scoring]\nroi_weight = 0.5\nrisk_weight = 0.0\nrisk_full_comparables = 8\n",
+    )
+    config = load_pipeline_config(path)
+    assert config.scoring_config is not None
+    assert config.scoring_config.roi_weight == 0.5
+    assert config.scoring_config.risk_weight == 0.0
+    assert config.scoring_config.risk_full_comparables == 8
+
+
+def test_shipped_default_config_has_scoring() -> None:
+    config = load_pipeline_config(DEFAULT_CONFIG)
+    assert config.scoring_config is not None
+    assert config.scoring_config.roi_reference == 30.0
+
+
+def test_scoring_unknown_key_rejected(tmp_path: Path) -> None:
+    path = write(tmp_path, "[scoring]\nroi_weight = 0.5\nbogus = 1\n")
+    with pytest.raises(ConfigError, match=r"\[scoring\].*bogus"):
+        load_pipeline_config(path)
+
+
+def test_scoring_invalid_value_rejected(tmp_path: Path) -> None:
+    path = write(tmp_path, "[scoring]\nroi_reference = 0.0\n")
+    with pytest.raises(ConfigError, match=r"\[scoring\]"):
+        load_pipeline_config(path)
+
+
+def test_scoring_config_changes_pipeline_score(tmp_path: Path) -> None:
+    # A config that weights only confidence must produce different scores than
+    # one weighting only ROI - proving the loaded config reaches the scorer.
+    conf_path = tmp_path / "conf_only.toml"
+    conf_path.write_text(
+        "[scoring]\nroi_weight = 0.0\nnet_profit_weight = 0.0\n"
+        "confidence_weight = 1.0\nrisk_weight = 0.0\n",
+        encoding="utf-8",
+    )
+    roi_path = tmp_path / "roi_only.toml"
+    roi_path.write_text(
+        "[scoring]\nroi_weight = 1.0\nnet_profit_weight = 0.0\n"
+        "confidence_weight = 0.0\nrisk_weight = 0.0\n",
+        encoding="utf-8",
+    )
+    conf_only = load_pipeline_config(conf_path)
+    roi_only = load_pipeline_config(roi_path)
+    conf_scores = [i.score for i in ArbitragePipeline(conf_only).analyze("rtx 4090").items]
+    roi_scores = [i.score for i in ArbitragePipeline(roi_only).analyze("rtx 4090").items]
+    assert conf_scores != roi_scores
+
+
 def test_list_coercions(tmp_path: Path) -> None:
     path = write(
         tmp_path,

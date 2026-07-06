@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from .analyzer import OpportunityAnalyzer, OpportunityConfig
 from .models import CostBreakdown, Opportunity, ProfitEstimate, Recommendation
+from .scoring import RecommendationScorer, ScoreBreakdown, ScoringConfig
 
 __all__ = [
     "CostBreakdown",
@@ -25,4 +26,7 @@ __all__ = [
     "OpportunityConfig",
     "ProfitEstimate",
     "Recommendation",
+    "RecommendationScorer",
+    "ScoreBreakdown",
+    "ScoringConfig",
 ]

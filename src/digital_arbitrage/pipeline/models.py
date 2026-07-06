@@ -23,6 +23,10 @@ class PipelineItemResult:
     group: DuplicateGroup
     market_price: MarketPrice
     opportunity: Opportunity
+    #: Continuous 0-100 quality score blending ROI, profit, confidence, risk.
+    score: float = 0.0
+    #: Estimated downside risk in [0, 1] (higher is riskier).
+    risk_score: float = 0.0
 
     @property
     def recommendation(self) -> Recommendation:
@@ -63,6 +67,8 @@ class PipelineItemResult:
             "roi_percentage": opp.roi_percentage,
             "margin_percentage": opp.margin_percentage,
             "confidence_score": round(opp.confidence_score, 4),
+            "recommendation_score": round(self.score, 2),
+            "risk_score": round(self.risk_score, 4),
             "comparable_count": self.market_price.comparable_count,
             "group_size": self.group.size,
             "fingerprint": self.group.fingerprint,

@@ -17,7 +17,13 @@ from dataclasses import dataclass
 from ..deduplication import DeduplicationConfig, Deduplicator
 from ..market_pricing import MarketPriceEstimator, MarketPricingConfig
 from ..normalization import NormalizationConfig, Normalizer
-from ..opportunity import OpportunityAnalyzer, OpportunityConfig, Recommendation
+from ..opportunity import (
+    OpportunityAnalyzer,
+    OpportunityConfig,
+    Recommendation,
+    RecommendationScorer,
+    ScoringConfig,
+)
 from ..product_scanner import ScannerConfig, build_scanner
 from .models import PipelineItemResult, PipelineResult
 
@@ -55,6 +61,7 @@ class PipelineConfig:
     deduplication_config: DeduplicationConfig | None = None
     pricing_config: MarketPricingConfig | None = None
     opportunity_config: OpportunityConfig | None = None
+    scoring_config: ScoringConfig | None = None
     #: Optional per-provider result cap passed to the scanner.
     scan_limit: int | None = None
 
@@ -69,6 +76,7 @@ class ArbitragePipeline:
         self._deduplicator = Deduplicator(self.config.deduplication_config)
         self._estimator = MarketPriceEstimator(self.config.pricing_config)
         self._analyzer = OpportunityAnalyzer(self.config.opportunity_config)
+        self._scorer = RecommendationScorer(self.config.scoring_config)
 
     def analyze(self, query: str) -> PipelineResult:
         """Scan, normalize, group, price, and score opportunities for ``query``."""
@@ -80,8 +88,15 @@ class ArbitragePipeline:
         for group in deduped.groups:
             market_price = self._estimator.estimate_from_group(group)
             opportunity = self._analyzer.analyze(group.canonical, market_price)
+            breakdown = self._scorer.score(opportunity, market_price)
             items.append(
-                PipelineItemResult(group=group, market_price=market_price, opportunity=opportunity)
+                PipelineItemResult(
+                    group=group,
+                    market_price=market_price,
+                    opportunity=opportunity,
+                    score=breakdown.score,
+                    risk_score=breakdown.risk_signal,
+                )
             )
 
         ranked = tuple(sorted(items, key=_sort_key))

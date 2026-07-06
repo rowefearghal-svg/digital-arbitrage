@@ -42,10 +42,15 @@ _A concise product description will be added as scope firms up (see
   shipping/packaging/buffer/tax), a `ProfitEstimate` (gross/net profit, ROI %,
   margin %), and a `STRONG_BUY / BUY / WATCH / REJECT` recommendation with
   reasons. Conservative by default, configurable. No scraping, AI, or APIs.
+- **`opportunity.scoring`** - a configurable `RecommendationScorer` that blends
+  ROI, net profit, confidence, and risk into a single deterministic **0-100
+  recommendation score** for ranking opportunities. All weights and reference
+  points live in one `ScoringConfig`. No AI/ML (see below).
 - **`pipeline`** - end-to-end orchestrator wiring every stage into
   `ArbitragePipeline.analyze(query)`, returning a `PipelineResult` of
-  `PipelineItemResult`s ranked by recommendation, then ROI, then confidence.
-  Ships the `arb` CLI. Deterministic; mock providers only.
+  `PipelineItemResult`s ranked by recommendation, then ROI, then confidence
+  (each item also carries its 0-100 `score`). Ships the `arb` CLI.
+  Deterministic; mock providers only.
 
 Pipeline order: **Scanner -> Normalization -> Product Matching -> Deduplication
 -> Market Pricing -> Opportunity.**
@@ -76,10 +81,14 @@ displayed rows; four output formats are supported:
 arb scan "rtx 4090" --actionable-only              # only BUY / STRONG_BUY
 arb scan "rtx 4090" --min-recommendation watch     # watch | buy | strong_buy | reject
 arb scan "rtx 4090" --min-roi 15 --min-net-profit 50
-arb scan "rtx 4090" --sort roi --format csv        # sort: recommendation | roi | net_profit | confidence
+arb scan "rtx 4090" --sort score --format csv      # sort: recommendation | score | roi | net_profit | confidence
 arb scan "rtx 4090" --format markdown > report.md
 arb scan "rtx 4090" --debug                        # full traceback on error (clean message otherwise)
 ```
+
+Every opportunity carries a **0-100 recommendation score** (the `SCORE` column /
+`recommendation_score` field), a single ranking number that blends ROI, net
+profit, confidence, and risk - use `--sort score` for the most holistic order.
 
 Every stage is configurable from one TOML file (`--config`), with one table per
 stage; each table and key is optional and falls back to its code default.
@@ -106,6 +115,38 @@ from digital_arbitrage.pipeline import ArbitragePipeline, load_pipeline_config
 
 config = load_pipeline_config("configs/default.toml")
 result = ArbitragePipeline(config).analyze("rtx 4090")
+```
+
+### Recommendation scoring
+
+The `Recommendation` (STRONG_BUY / BUY / WATCH / REJECT) is a *categorical*
+verdict; the **recommendation score** is a *continuous* 0-100 quality number for
+ranking. `RecommendationScorer` normalizes four signals to `[0, 1]` and combines
+them with weights from a single `ScoringConfig`:
+
+- **ROI** - `roi_percentage / roi_reference` (default reference 30%).
+- **Net profit** - `net_profit / net_profit_reference` (default 200).
+- **Confidence** - the market-price confidence, used directly.
+- **Risk** (a *penalty*) - derived from the market price: wide price spread
+  (`(max - min) / median`) and thin comparable coverage both raise it; an
+  unpriced product is maximally risky.
+
+```text
+weighted = w_roi*roi + w_profit*profit + w_conf*confidence - w_risk*risk
+score    = 100 * (weighted + w_risk) / (w_roi + w_profit + w_conf + w_risk)
+```
+
+The shift/normalize maps the worst case (no upside, full risk) to 0 and the best
+case (full upside, no risk) to 100. It is fully deterministic - identical inputs
+always yield an identical score - with no AI/ML. Tune it via `[scoring]` in a
+config file or `ScoringConfig` in code:
+
+```python
+from digital_arbitrage.opportunity import RecommendationScorer, ScoringConfig
+
+scorer = RecommendationScorer(ScoringConfig(roi_weight=0.5, risk_weight=0.2))
+breakdown = scorer.score(opportunity, market_price)
+print(breakdown.score, breakdown.risk_signal)
 ```
 
 ## Repository Layout

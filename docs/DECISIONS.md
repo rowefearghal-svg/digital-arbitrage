@@ -269,3 +269,47 @@
   run; only the `showing N of M` line and the rendered rows reflect the filtered
   subset, so users still see the whole breakdown. `--min-roi` is a percentage,
   not the fraction used in config thresholds - documented to avoid confusion.
+
+### ADR-012: Deterministic weighted recommendation scoring (pre-ML)
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** The pipeline emitted a categorical `Recommendation` plus separate
+  ROI/profit/confidence figures, and ranked by `(recommendation, ROI,
+  confidence)`. Comparing opportunities *within* a category (or trading off a
+  high-ROI/low-confidence deal against a safe/modest one) required eyeballing
+  several columns. We want one continuous, tunable, explainable quality number -
+  and a clean seam for a future ML-based scorer - without adding dependencies or
+  black-box behaviour.
+- **Decision:** Add `opportunity.scoring` with a `RecommendationScorer` that
+  produces a 0-100 `ScoreBreakdown` from four signals normalized to `[0, 1]`:
+  ROI (`roi_percentage / roi_reference`), net profit
+  (`net_profit / net_profit_reference`), confidence (used directly), and a risk
+  *penalty* estimated from the market price (price dispersion `(max-min)/median`
+  and comparable coverage; unpriced = maximal risk). The combination is
+  `100 * (Sum(w_i * s_i) - w_risk*risk + w_risk) / Sum(w)`, i.e. a weighted
+  average shifted so worst-case maps to 0 and best-case to 100. Every value -
+  the four weights and the reference points - lives in a single `ScoringConfig`
+  (also a `[scoring]` TOML table). The pipeline computes and stores `score` (and
+  `risk_score`) on each `PipelineItemResult`; the CLI shows a `SCORE` column in
+  every format and adds `--sort score`.
+- **Rationale:**
+  - *Single source of truth for weights* - all tunables are in `ScoringConfig`;
+    nothing is hard-coded across the codebase, so re-weighting is one edit.
+  - *Deterministic & explainable* - pure arithmetic over declared inputs; the
+    `ScoreBreakdown` exposes each normalized signal, so a score is auditable and
+    reproducible. No AI/ML, no external state (consistent with ADR-005/007/008).
+  - *Extensible toward ML* - `RecommendationScorer.score(opportunity,
+    market_price) -> ScoreBreakdown` is a narrow, stable interface. A learned
+    model can be dropped in behind it (or selected via config, like the pricing
+    strategies) without touching the pipeline, CLI, or result models. The
+    normalized `[0, 1]` signals are ready-made features.
+  - *Backward compatible* - `score`/`risk_score` default to `0.0` on
+    `PipelineItemResult`, the default pipeline ranking is unchanged
+    (`--sort score` is opt-in), and the score is additive to `to_dict()`.
+- **Consequences:** Weights need not sum to 1 (the score is normalized by their
+  total), but at least one must be positive. Risk is intentionally distinct from
+  confidence: it is a market-structure signal (dispersion + coverage), and only
+  falls back to `1 - confidence` when a scorer is used without a market price.
+  ROI/profit references are absolute anchors, so scores are comparable across
+  runs but should be re-tuned if the cost model or currency scale changes.

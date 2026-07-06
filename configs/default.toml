@@ -72,3 +72,16 @@ min_net_profit = 0.0
 min_confidence = 0.40
 strong_buy_confidence = 0.60
 require_same_currency = true
+
+[scoring]
+# Weights blended into the 0-100 recommendation score (need not sum to 1; the
+# score is normalized by their total). Risk is subtracted as a penalty.
+roi_weight = 0.35
+net_profit_weight = 0.25
+confidence_weight = 0.25
+risk_weight = 0.15
+# Reference points that map a raw figure to a full (1.0) signal.
+roi_reference = 30.0                        # ROI % that scores a perfect ROI signal
+net_profit_reference = 200.0               # net profit that scores a perfect profit signal
+risk_dispersion_reference = 1.0            # (max-min)/median that scores full dispersion risk
+risk_full_comparables = 5                  # comparables at/above which coverage adds no risk
