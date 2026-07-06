@@ -313,3 +313,49 @@
   falls back to `1 - confidence` when a scorer is used without a market price.
   ROI/profit references are absolute anchors, so scores are comparable across
   runs but should be re-tuned if the cost model or currency scale changes.
+
+### ADR-013: SQLite persistence for scan history
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** Every `arb scan` was ephemeral - results printed and vanished, so
+  there was no way to review an earlier run, compare a query over time, or keep a
+  record of opportunities. We want lightweight, local persistence that fits the
+  project's constraints: standard library only, no external services, no new
+  dependencies, deterministic, and simple to extend.
+- **Decision:** Add a `persistence` package built on the stdlib `sqlite3` module.
+  A `ResultStore(path)` opens (and creates) a database with two additive tables -
+  `runs` (one row per scan: query, timestamp, config summary, totals) and
+  `opportunities` (one row per ranked item: title, provider, price, estimated
+  resale value, ROI, net profit, confidence, risk score, recommendation score,
+  recommendation, plus its `rank`). `save_run(result) -> int` persists a
+  `PipelineResult` in a single transaction and returns the new run id;
+  `list_runs`, `get_run`, and `list_opportunities` read them back as typed
+  `StoredRun` / `StoredOpportunity` models. The CLI gains `arb scan --save`
+  (persists the *full*, unfiltered result), `arb history` (list runs), and
+  `arb show <run_id>` (view a run's opportunities), all honouring `--db` with a
+  default of `~/.digital_arbitrage/history.db`. `PRAGMA user_version` records the
+  schema version for future migrations.
+- **Rationale:**
+  - *Zero dependencies* - `sqlite3` ships with Python, so persistence adds no
+    install burden and works offline (consistent with the stdlib-only ethos of
+    ADR-009/010).
+  - *Right tool* - a single-file relational store gives durable, queryable
+    history with transactions and referential integrity (`opportunities.run_id`
+    -> `runs.id`, `ON DELETE CASCADE`) without a server or ORM.
+  - *Snapshots, not references* - opportunity fields are copied into the row, so
+    history is a faithful record even as the scoring/cost models evolve; runs
+    stay comparable over time.
+  - *Typed seam* - reads return dataclasses (never raw `sqlite3.Row`), keeping
+    the store's surface consistent with the rest of the codebase and easy to
+    render or serialize.
+  - *Backward compatible* - persistence is entirely opt-in (`--save`); default
+    scan behaviour, output, and the pipeline are unchanged.
+- **Consequences:** History accumulates until manually pruned (no retention
+  policy or `arb prune` yet - deferred). The stored snapshot is a subset of
+  `to_dict()` (the fields worth querying), not the full item, so re-deriving a
+  complete `PipelineResult` from history is out of scope. `save_run` records the
+  full result regardless of the CLI's display filters, so `arb show` may list
+  more rows than the original filtered `arb scan` printed - intentional, as the
+  saved run is the complete analysis. `arb compare` (diffing a query across runs)
+  is a natural follow-up now that the data is captured.
