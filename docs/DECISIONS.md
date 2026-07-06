@@ -117,3 +117,32 @@
   adequate for current volumes. Canonical selection prefers the richest title
   (and an optional provider priority); price-aware selection is deferred to the
   future pricing layer.
+
+### ADR-007: Deterministic statistical market pricing (no ML)
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** After deduplication we need a single market-price estimate per
+  product from its comparable listings. A regression/ML valuation model is
+  possible but premature and hard to trust or debug this early.
+- **Decision:** Add a `market_pricing` stage (Scanner -> Normalization ->
+  Product Matching -> Deduplication -> Market Pricing). `MarketPriceEstimator`
+  turns comparables (from a `DuplicateGroup`, normalized listings, or explicit
+  `ComparableListing`s) into a `MarketPrice` using a pluggable `PricingStrategy`
+  (median / trimmed mean / weighted average), with optional IQR outlier removal
+  and a deterministic confidence score derived from comparable count and price
+  dispersion. Strategies are swappable via name or instance in
+  `MarketPricingConfig`.
+- **Rationale:**
+  - *Explainable & deterministic* - the estimate is a documented statistic over
+    the inputs; the result carries min/max/median/mean, outlier count, and
+    confidence so it is fully auditable.
+  - *Robust by default* - median plus IQR trimming resist scam/typo prices
+    without any training data.
+  - *Replaceable* - the `PricingStrategy` seam lets an ML valuation slot in
+    later behind the same `estimate()` API and be benchmarked against this
+    baseline.
+- **Consequences:** Cross-currency comparables are reduced to the dominant (or a
+  configured) currency rather than converted - FX conversion and profit
+  calculations remain out of scope. Confidence is a heuristic, not a calibrated
+  probability.
