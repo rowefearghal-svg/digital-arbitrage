@@ -236,3 +236,36 @@
   yet (e.g. `condition_aliases`, custom strategy instances); they remain
   code-only until needed. The file is the source of truth for a run, but CLI
   flags still win for quick overrides.
+
+### ADR-011: CLI ergonomics - filtering, sorting, export, and debug
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** The `arb` CLI could only dump every opportunity as a table or
+  JSON. Users need to narrow results, reorder them, export to other tools, and
+  see real tracebacks when debugging.
+- **Decision:** Extend `arb scan` (no new command):
+  - *Filters* (combine with AND, applied to `PipelineResult.items`):
+    `--actionable-only`, `--min-recommendation`, `--min-roi` (a percentage,
+    matching the ROI% column), `--min-net-profit`.
+  - *Sorting*: `--sort {recommendation,roi,net_profit,confidence}`;
+    `recommendation` keeps the pipeline's existing ranking, the others sort
+    descending with a `listing_id` tie-break (`None` metrics sort last).
+  - *Formats*: add `csv` (stdlib `csv`, reasons joined by `;`) and `markdown`
+    (GitHub table) alongside `table`/`json`. Renderers take an explicit
+    `items` sequence so filtering/sorting is decoupled from the full result;
+    `table`/`json`/`markdown` also report `showing N of M`.
+  - *Errors*: a single top-level handler in `main` prints a clean
+    `error: <message>` by default and a full traceback with `--debug`.
+- **Rationale:**
+  - *View layer only* - all logic stays in the pipeline; filters/sorts operate
+    on the immutable result and renderers are pure functions of
+    `(result, items)`, keeping everything deterministic and easy to test.
+  - *No new dependencies* - CSV and Markdown use the stdlib and manual string
+    building, consistent with the existing table renderer.
+  - *Centralised error handling* - moving the try/except to `main` makes
+    `--debug` apply uniformly to config and runtime errors.
+- **Consequences:** The `counts` and scanned/groups lines always report the full
+  run; only the `showing N of M` line and the rendered rows reflect the filtered
+  subset, so users still see the whole breakdown. `--min-roi` is a percentage,
+  not the fraction used in config thresholds - documented to avoid confusion.

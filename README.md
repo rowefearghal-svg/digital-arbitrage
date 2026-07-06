@@ -64,9 +64,21 @@ The `arb` command runs the whole pipeline (installed via `pip install -e .`):
 
 ```bash
 arb scan "rtx 4090"                 # fixed-width table (default)
-arb scan "rtx 4090" --format json   # JSON report
+arb scan "rtx 4090" --format json   # table | json | csv | markdown
 arb scan "rtx 4090" --limit 5       # cap results per provider
 arb scan "rtx 4090" --config configs/default.toml   # load stage config from TOML
+```
+
+**Filter, sort, and export.** Filters combine with AND; `--sort` reorders the
+displayed rows; four output formats are supported:
+
+```bash
+arb scan "rtx 4090" --actionable-only              # only BUY / STRONG_BUY
+arb scan "rtx 4090" --min-recommendation watch     # watch | buy | strong_buy | reject
+arb scan "rtx 4090" --min-roi 15 --min-net-profit 50
+arb scan "rtx 4090" --sort roi --format csv        # sort: recommendation | roi | net_profit | confidence
+arb scan "rtx 4090" --format markdown > report.md
+arb scan "rtx 4090" --debug                        # full traceback on error (clean message otherwise)
 ```
 
 Every stage is configurable from one TOML file (`--config`), with one table per
