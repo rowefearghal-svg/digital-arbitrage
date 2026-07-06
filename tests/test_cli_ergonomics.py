@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+from dataclasses import replace
 
 import pytest
 
@@ -140,6 +141,16 @@ def test_sort_recommendation_is_identity() -> None:
     assert _sort_items(items, "recommendation") == items
 
 
+def test_sort_score_descending_with_listing_id_tiebreak() -> None:
+    items = [
+        replace(make_item(Recommendation.BUY, 20, 0.5, "b"), score=50.0),
+        replace(make_item(Recommendation.BUY, 20, 0.5, "a"), score=50.0),
+        replace(make_item(Recommendation.STRONG_BUY, 40, 0.7, "c"), score=80.0),
+    ]
+    ids = [i.opportunity.listing_id for i in _sort_items(items, "score")]
+    assert ids == ["c", "a", "b"]
+
+
 # --------------------------------------------------------------------------- #
 # renderers
 # --------------------------------------------------------------------------- #
@@ -190,6 +201,22 @@ def test_cli_json_includes_shown(capsys: pytest.CaptureFixture[str]) -> None:
     assert code == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["shown"] == len(payload["items"])
+
+
+def test_cli_table_shows_score_column(capsys: pytest.CaptureFixture[str]) -> None:
+    code = main(["scan", "rtx 4090", "--sort", "score", "--limit", "2"])
+    assert code == 0
+    assert "SCORE" in capsys.readouterr().out
+
+
+def test_cli_json_includes_recommendation_score(capsys: pytest.CaptureFixture[str]) -> None:
+    code = main(["scan", "rtx 4090", "--format", "json", "--limit", "1"])
+    assert code == 0
+    payload = json.loads(capsys.readouterr().out)
+    item = payload["items"][0]
+    assert "recommendation_score" in item
+    assert 0.0 <= item["recommendation_score"] <= 100.0
+    assert "risk_score" in item
 
 
 def test_cli_actionable_only_empty_table(capsys: pytest.CaptureFixture[str]) -> None:

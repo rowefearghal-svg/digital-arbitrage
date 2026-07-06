@@ -97,6 +97,14 @@ def test_analyze_is_deterministic() -> None:
     assert a.to_dict() == b.to_dict()
 
 
+def test_pipeline_populates_recommendation_score() -> None:
+    result = ArbitragePipeline().analyze("rtx 4090")
+    for item in result.items:
+        assert 0.0 <= item.score <= 100.0
+        assert 0.0 <= item.risk_score <= 1.0
+        assert item.to_dict()["recommendation_score"] == round(item.score, 2)
+
+
 def test_scan_limit_reduces_listings() -> None:
     full = ArbitragePipeline().analyze("rtx 4090")
     limited = ArbitragePipeline(PipelineConfig(scan_limit=1)).analyze("rtx 4090")

@@ -25,6 +25,7 @@ from .pipeline import ArbitragePipeline, PipelineConfig, recommendation_rank
 # Columns shown in the fixed-width table and markdown output.
 _COLUMNS: tuple[tuple[str, str], ...] = (
     ("recommendation", "RECOMMENDATION"),
+    ("recommendation_score", "SCORE"),
     ("title", "TITLE"),
     ("provider", "PROVIDER"),
     ("asking_price", "ASKING"),
@@ -37,6 +38,7 @@ _COLUMNS: tuple[tuple[str, str], ...] = (
 # Full column set for CSV export (one row per opportunity).
 _CSV_COLUMNS: tuple[str, ...] = (
     "recommendation",
+    "recommendation_score",
     "title",
     "provider",
     "currency",
@@ -47,12 +49,14 @@ _CSV_COLUMNS: tuple[str, ...] = (
     "roi_percentage",
     "margin_percentage",
     "confidence_score",
+    "risk_score",
     "comparable_count",
     "group_size",
     "reasons",
 )
 
 _SORTS: dict[str, Callable[[PipelineItemResult], tuple[float, str]]] = {
+    "score": lambda i: (-i.score, i.group.canonical.listing_id),
     "roi": lambda i: (-_or_ninf(i.roi_percentage), i.group.canonical.listing_id),
     "net_profit": lambda i: (-_or_ninf(i.net_profit), i.group.canonical.listing_id),
     "confidence": lambda i: (-i.confidence_score, i.group.canonical.listing_id),
@@ -198,7 +202,7 @@ def build_parser() -> argparse.ArgumentParser:
     scan.add_argument(
         "-s",
         "--sort",
-        choices=("recommendation", "roi", "net_profit", "confidence"),
+        choices=("recommendation", "score", "roi", "net_profit", "confidence"),
         default="recommendation",
         help="Sort order (default: recommendation).",
     )

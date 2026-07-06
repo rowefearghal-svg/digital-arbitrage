@@ -28,7 +28,7 @@ from ..deduplication import DeduplicationConfig
 from ..market_pricing import STRATEGY_NAMES, MarketPricingConfig
 from ..normalization import NormalizationConfig
 from ..normalization.text import UnicodeForm
-from ..opportunity import OpportunityConfig
+from ..opportunity import OpportunityConfig, ScoringConfig
 from ..product_matching import MatchConfig
 from ..product_scanner import ScannerConfig
 from .pipeline import PipelineConfig
@@ -44,6 +44,7 @@ _SECTIONS: Final[frozenset[str]] = frozenset(
         "deduplication",
         "market_pricing",
         "opportunity",
+        "scoring",
     }
 )
 
@@ -261,6 +262,26 @@ def _build_opportunity(data: dict[str, Any] | None) -> OpportunityConfig | None:
     return _construct(section, OpportunityConfig, kwargs)
 
 
+def _build_scoring(data: dict[str, Any] | None) -> ScoringConfig | None:
+    if data is None:
+        return None
+    section = _Section("scoring", data)
+    kwargs: dict[str, Any] = {}
+    for key in (
+        "roi_weight",
+        "net_profit_weight",
+        "confidence_weight",
+        "risk_weight",
+        "roi_reference",
+        "net_profit_reference",
+        "risk_dispersion_reference",
+    ):
+        _put(kwargs, key, section.number(key))
+    _put(kwargs, "risk_full_comparables", section.integer("risk_full_comparables"))
+    section.finish()
+    return _construct(section, ScoringConfig, kwargs)
+
+
 def _build_scan_limit(data: dict[str, Any] | None) -> Any:
     if data is None:
         return _MISSING
@@ -299,5 +320,6 @@ def load_pipeline_config(path: str | Path) -> PipelineConfig:
         deduplication_config=_build_deduplication(raw.get("deduplication"), match_config),
         pricing_config=_build_market_pricing(raw.get("market_pricing")),
         opportunity_config=_build_opportunity(raw.get("opportunity")),
+        scoring_config=_build_scoring(raw.get("scoring")),
         scan_limit=None if scan_limit is _MISSING else scan_limit,
     )
