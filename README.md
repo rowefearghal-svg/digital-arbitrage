@@ -16,6 +16,26 @@ solid base: packaging, tests, configuration, documentation, and a backlog.
 _A concise product description will be added as scope firms up (see
 [`docs/VISION.md`](docs/VISION.md))._
 
+## Modules
+
+- **`product_scanner`** - searches marketplaces through a common provider
+  interface and returns unified `Listing` objects (currently mocked providers:
+  eBay, Facebook Marketplace, Adverts.ie, DoneDeal).
+- **`normalization`** - converts raw `Listing` objects into a consistent
+  internal `NormalizedListing` via a configurable, provider-agnostic pipeline
+  (unicode + text/whitespace/title cleanup, currency/condition/location
+  normalization). No pricing, FX, or AI.
+
+```python
+from digital_arbitrage.product_scanner import build_scanner
+from digital_arbitrage.normalization import Normalizer
+
+listings = build_scanner().scan("rtx 4090")
+normalized = Normalizer().normalize_many(listings)
+for item in normalized:
+    print(item.provider, item.title, item.title_tokens, item.currency)
+```
+
 ## Repository Layout
 
 ```
