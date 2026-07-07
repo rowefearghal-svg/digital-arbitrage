@@ -8,6 +8,7 @@ scraping or external calls (mock providers only):
   persists the run to a SQLite history database.
 * ``arb history`` - list previously saved scan runs.
 * ``arb show <run_id>`` - view the opportunities stored for a previous run.
+* ``arb compare <old_run_id> <new_run_id>`` - diff two saved runs.
 """
 
 from __future__ import annotations
@@ -22,6 +23,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import replace
 from pathlib import Path
 
+from ..comparison import OpportunityDelta, RunComparison, compare_runs
 from ..opportunity import Recommendation
 from ..persistence import ResultStore, StoredOpportunity, StoredRun
 from .config_file import load_pipeline_config
@@ -264,6 +266,113 @@ def render_stored_run(run: StoredRun, opportunities: Sequence[StoredOpportunity]
 
 
 # --------------------------------------------------------------------------- #
+# compare renderer
+# --------------------------------------------------------------------------- #
+# Metric columns shown as new-minus-old deltas in the compare output.
+_COMPARE_METRICS: tuple[tuple[str, str], ...] = (
+    ("recommendation_score", "SCORE"),
+    ("roi_percentage", "ROI%"),
+    ("net_profit", "NET"),
+    ("confidence_score", "CONF"),
+    ("risk_score", "RISK"),
+)
+
+
+def _delta_cell(delta: OpportunityDelta, metric: str) -> str:
+    md = delta.metric(metric)
+    if md is None or md.delta == 0:
+        return "="
+    return f"{md.delta:+.2f}"
+
+
+def _compare_header(comparison: RunComparison) -> list[str]:
+    old, new = comparison.old_run, comparison.new_run
+    counts = comparison.counts_by_category()
+    return [
+        f"compare run {old.run_id} ({old.created_at}) -> run {new.run_id} ({new.created_at})",
+        f"old query: {old.query!r} | new query: {new.query!r}",
+        "counts: " + ", ".join(f"{k}={v}" for k, v in counts.items()),
+        "metric columns show new-minus-old delta ('=' means no change)",
+    ]
+
+
+def render_comparison_table(comparison: RunComparison) -> str:
+    header = "\n".join(_compare_header(comparison))
+    if not comparison.deltas:
+        return header + "\n(no opportunities in either run)"
+    headers = ["CATEGORY", "PROVIDER", "TITLE", *[label for _, label in _COMPARE_METRICS]]
+    rows = [
+        [
+            delta.category.value,
+            delta.provider,
+            delta.title,
+            *[_delta_cell(delta, metric) for metric, _ in _COMPARE_METRICS],
+        ]
+        for delta in comparison.deltas
+    ]
+    return header + "\n\n" + _fixed_table(headers, rows)
+
+
+def render_comparison_json(comparison: RunComparison) -> str:
+    return json.dumps(comparison.to_dict(), indent=2)
+
+
+def render_comparison_csv(comparison: RunComparison) -> str:
+    buffer = io.StringIO()
+    writer = csv.writer(buffer, lineterminator="\n")
+    metric_cols = [
+        f"{metric}_{suffix}" for metric, _ in _COMPARE_METRICS for suffix in ("old", "new", "delta")
+    ]
+    writer.writerow(["category", "key", "provider", "title", "reason", *metric_cols])
+    for delta in comparison.deltas:
+        values: list[object] = [
+            delta.category.value,
+            delta.key,
+            delta.provider,
+            delta.title,
+            delta.reason,
+        ]
+        for metric, _ in _COMPARE_METRICS:
+            md = delta.metric(metric)
+            values.extend((None, None, None) if md is None else (md.old, md.new, md.delta))
+        writer.writerow(values)
+    return buffer.getvalue().rstrip("\n")
+
+
+def render_comparison_markdown(comparison: RunComparison) -> str:
+    old, new = comparison.old_run, comparison.new_run
+    labels = ["CATEGORY", "PROVIDER", "TITLE", *[label for _, label in _COMPARE_METRICS]]
+    lines = [
+        f"# Comparison: run {old.run_id} -> run {new.run_id}",
+        "",
+        *[f"- {line}" for line in _compare_header(comparison)[1:]],
+        "",
+    ]
+    if not comparison.deltas:
+        lines.append("_No opportunities in either run._")
+        return "\n".join(lines)
+    lines.append("| " + " | ".join(labels) + " |")
+    lines.append("| " + " | ".join("---" for _ in labels) + " |")
+    for delta in comparison.deltas:
+        cells = [
+            delta.category.value,
+            delta.provider,
+            delta.title,
+            *[_delta_cell(delta, metric) for metric, _ in _COMPARE_METRICS],
+        ]
+        lines.append("| " + " | ".join(cells) + " |")
+    return "\n".join(lines)
+
+
+_COMPARE_RENDERERS: dict[str, Callable[[RunComparison], str]] = {
+    "table": render_comparison_table,
+    "json": render_comparison_json,
+    "csv": render_comparison_csv,
+    "markdown": render_comparison_markdown,
+}
+
+
+# --------------------------------------------------------------------------- #
 # argument parsing + dispatch
 # --------------------------------------------------------------------------- #
 def build_parser() -> argparse.ArgumentParser:
@@ -347,6 +456,21 @@ def build_parser() -> argparse.ArgumentParser:
         "--db", default=None, help=f"History database path (default: {DEFAULT_DB_PATH})."
     )
     show.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
+
+    compare = subparsers.add_parser("compare", help="Diff two saved runs.")
+    compare.add_argument("old_run_id", type=int, help="Older run id.")
+    compare.add_argument("new_run_id", type=int, help="Newer run id.")
+    compare.add_argument(
+        "-f",
+        "--format",
+        choices=tuple(_COMPARE_RENDERERS),
+        default="table",
+        help="Output format.",
+    )
+    compare.add_argument(
+        "--db", default=None, help=f"History database path (default: {DEFAULT_DB_PATH})."
+    )
+    compare.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
     return parser
 
 
@@ -394,10 +518,28 @@ def _run_show(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_compare(args: argparse.Namespace) -> int:
+    db_path = args.db if args.db is not None else DEFAULT_DB_PATH
+    with ResultStore(db_path) as store:
+        old_run = store.get_run(args.old_run_id)
+        new_run = store.get_run(args.new_run_id)
+        for run_id, run in ((args.old_run_id, old_run), (args.new_run_id, new_run)):
+            if run is None:
+                print(f"error: run {run_id} not found", file=sys.stderr)
+                return 1
+        assert old_run is not None and new_run is not None
+        old_opps = store.list_opportunities(args.old_run_id)
+        new_opps = store.list_opportunities(args.new_run_id)
+    comparison = compare_runs(old_run, old_opps, new_run, new_opps)
+    print(_COMPARE_RENDERERS[args.format](comparison))
+    return 0
+
+
 _COMMANDS: dict[str, Callable[[argparse.Namespace], int]] = {
     "scan": _run_scan,
     "history": _run_history,
     "show": _run_show,
+    "compare": _run_compare,
 }
 
 
