@@ -468,3 +468,56 @@
   compile-time-known providers); a dynamic/discovered capability set would need a
   small extension. The two-hierarchy choice means a future decision may unify
   mock and live providers, but only once a live provider actually exists.
+
+### ADR-016: First real provider — eBay Browse API (research & plan)
+
+- **Date:** 2026-07-07
+- **Status:** Accepted (plan only; no provider code this sprint)
+- **Context:** With the live-provider framework in place (ADR-015), the first
+  real, read-only marketplace integration is the eBay **Browse API**
+  (`buy/browse/v1/item_summary/search`). Before implementing, we researched its
+  auth, limits, endpoint, pagination, and response shape, and validated the fit
+  against the framework. Full detail lives in `docs/EBAY_PROVIDER_PLAN.md`; this
+  ADR records the decisions. Constraints unchanged: read-only, no scraping, stdlib
+  only, no secrets in repo/CI, mocks untouched.
+- **Decision:**
+  - *Provider name* — register as **`ebay_browse`**, not `ebay`, because the
+    existing mock provider already owns `"ebay"` in `PROVIDER_REGISTRY` and
+    `register_provider` rejects duplicates. Distinct name lets mock and live
+    coexist during rollout.
+  - *API surface* — Browse `item_summary/search` with an **Application** OAuth
+    token (client-credentials grant, scope `.../oauth/api_scope`, ~2h TTL). No
+    user login. Marketplace selected via `X-EBAY-C-MARKETPLACE-ID` (default
+    `EBAY_IE`, EUR). Offset/limit pagination (`limit` ≤ 200, `offset` < 10,000).
+  - *Model mapping* — response maps 1:1 onto `Listing` (`itemId`→`listing_id`,
+    `title`, `itemWebUrl`→`url`, `price.value`/`price.currency`, `itemLocation`→
+    `location`, `condition`/`conditionId`→`Condition`); image/seller/buying
+    options/raw condition id go into `Listing.extra`. **No schema change.**
+    `posted_at` is unavailable on summaries and stays `None`.
+  - *Config & secrets* — an `EbayBrowseConfig(LiveProviderConfig)` adding
+    `marketplace_id` + `oauth_token_url`, loaded from `[providers.ebay_browse]`
+    TOML; credentials come only from secrets `EBAY_CLIENT_ID` /
+    `EBAY_CLIENT_SECRET` (never the file/CI). `requires_api_key=True` fails fast
+    when absent.
+  - *One framework addition* — a small, additive **`AuthProvider`** seam so
+    `HttpClient` can source a *minted, cached, auto-refreshed* bearer token
+    (`OAuthClientCredentialsAuth`) instead of today's static `config.api_key`.
+    This is the only real gap; existing providers are unaffected.
+  - *Tests/CI* — sanitised recorded JSON fixtures replayed through a
+    `FixtureTransport`; **CI uses the mocked transport only** (no network, no
+    secrets). A live smoke test is opt-in, gated by env-var presence and always
+    skipped in CI.
+- **Rationale:** Browse is the officially supported, read-only, app-token search
+  surface — no scraping, no user consent, and it fits the framework's
+  transport/retry/rate-limit/pagination/validation seams almost entirely as-is.
+  Keeping credentials in secrets and CI on a mocked transport preserves the "no
+  secrets, deterministic CI" posture from prior sprints. Putting eBay-only fields
+  on a `LiveProviderConfig` subclass keeps the generic config lean.
+- **Consequences:** Implementation is deferred to the next sprint and will need
+  the `AuthProvider` seam plus a config-aware registry factory (today's
+  `create_provider(name)` calls `cls()` with no args, which cannot construct a
+  config-taking `LiveProvider`). The per-second rate limiter does not enforce
+  eBay's **5,000 calls/day** quota — a daily budget guard is deferred debt.
+  Affiliate/EPN commissions are out of scope (we use the plain `itemWebUrl`).
+  Production volume requires accepting the eBay API License Agreement / passing
+  the free Application Growth Check.
