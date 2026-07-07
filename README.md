@@ -61,6 +61,14 @@ _A concise product description will be added as scope firms up (see
   improved / worsened** from recommendation score, ROI, net profit, confidence,
   and risk. Powers `arb compare`. Deterministic; standard library only
   (ADR-014).
+- **`providers.live`** - a production-quality **framework** for onboarding real
+  marketplaces (no scraping yet). Provides a `LiveProvider` base (a strict
+  superset of the mock `Provider`) plus reusable infrastructure: an `HttpClient`
+  over a swappable `Transport` (stdlib `urllib`), a `RetryPolicy` with
+  exponential backoff + jitter, a `TokenBucketRateLimiter`, a typed
+  `ProviderError` hierarchy, declarative `ProviderCapabilities`, response
+  validation helpers, generic `paginate`, and structured logging. Standard
+  library only; existing mock providers are untouched (ADR-015).
 
 Pipeline order: **Scanner -> Normalization -> Product Matching -> Deduplication
 -> Market Pricing -> Opportunity.**
@@ -190,6 +198,83 @@ scorer = RecommendationScorer(ScoringConfig(roi_weight=0.5, risk_weight=0.2))
 breakdown = scorer.score(opportunity, market_price)
 print(breakdown.score, breakdown.risk_signal)
 ```
+
+### Live provider framework
+
+`digital_arbitrage.providers.live` is the infrastructure for the first *real*
+marketplace integration. **This sprint ships the framework only** - there is no
+scraping, no live API call, and no concrete provider; standard library only, no
+new dependencies. A real provider is added later by subclassing `LiveProvider`
+and implementing two small hooks:
+
+```python
+from digital_arbitrage.providers.live import (
+    HttpClient, HttpRequest, HttpResponse, LiveProvider, LiveProviderConfig,
+    Page, ProviderCapabilities, ensure_mapping, parse_json, require, resolve_url,
+)
+from digital_arbitrage.product_scanner.models import Listing
+
+
+class ExampleProvider(LiveProvider):
+    name = "example"
+    capabilities = ProviderCapabilities(supports_pagination=True, max_page_size=50)
+
+    def build_request(self, query, *, page, page_size):
+        return HttpRequest(
+            method="GET",
+            url=resolve_url(self.config.base_url, "/search"),
+            params={"q": query, "page": str(page), "size": str(page_size)},
+        )
+
+    def parse_response(self, response, *, query):
+        payload = ensure_mapping(parse_json(response, provider=self.name))
+        items = tuple(
+            Listing(
+                listing_id=require(it, "id", str),
+                title=require(it, "title", str),
+                provider=self.name,
+                url=require(it, "url", str),
+                price=float(it["price"]),
+                currency=self.config.default_currency,
+            )
+            for it in payload["items"]  # validated in real code
+        )
+        return Page(items=items, has_more=bool(payload.get("has_more")))
+
+
+provider = ExampleProvider(LiveProviderConfig(base_url="https://api.example.com"))
+listings = provider.search("rtx 4090", limit=25)  # same Provider contract as mocks
+```
+
+The base class handles the production concerns so providers stay declarative:
+
+- **HTTP** - `HttpClient` composes a swappable `Transport` (the stdlib
+  `UrllibTransport`; fakes are trivial in tests) with default headers,
+  auth, timeouts, retries, and rate limiting.
+- **Retries** - `RetryPolicy` retries only transient failures (timeouts,
+  connection errors, and configurable 5xx/429 statuses) with **exponential
+  backoff + equal jitter**, honouring a `Retry-After` hint when present.
+- **Rate limiting** - `TokenBucketRateLimiter` smooths outbound request rate to
+  a provider's quota (sustained rate + burst); the clock and sleep are
+  injectable for deterministic tests.
+- **Pagination** - `paginate` drives page fetching up to `max_results`, stopping
+  when a `Page` reports no more results (used only if the provider's
+  `capabilities` advertise pagination).
+- **Capabilities** - `ProviderCapabilities` declares what a provider supports
+  (pagination, price/condition filters, sorting, api-key requirement, page/result
+  caps, currencies) so the framework adapts without provider-specific branching.
+- **Errors** - a typed `ProviderError` hierarchy
+  (`ProviderConfigError`, `ProviderTimeoutError`, `ProviderConnectionError`,
+  `ProviderHTTPError`, `ProviderRateLimitError`, `ProviderResponseError`) lets
+  callers react precisely; each carries the provider name for logs.
+- **Validation** - small helpers (`parse_json`, `ensure_mapping/list`, `require`,
+  `require_number`, `optional`) turn untrusted JSON into typed values, failing
+  with a context-prefixed `ProviderResponseError`.
+- **Logging** - structured `key=value` fields under the
+  `digital_arbitrage.providers` namespace.
+
+`LiveProvider` subclasses `product_scanner.providers.Provider`, so live providers
+are drop-in compatible with the existing scanner and registry. See ADR-015.
 
 ## Repository Layout
 
