@@ -67,8 +67,11 @@ _A concise product description will be added as scope firms up (see
   over a swappable `Transport` (stdlib `urllib`), a `RetryPolicy` with
   exponential backoff + jitter, a `TokenBucketRateLimiter`, a typed
   `ProviderError` hierarchy, declarative `ProviderCapabilities`, response
-  validation helpers, generic `paginate`, and structured logging. Standard
-  library only; existing mock providers are untouched (ADR-015).
+  validation helpers, generic `paginate`, and structured logging. Pluggable
+  `AuthProvider` strategies (none / static bearer / OAuth client-credentials)
+  and a config-aware factory (`create_live_provider`) support authenticated
+  providers. Standard library only; existing mock providers are untouched
+  (ADR-015, ADR-017).
 
 Pipeline order: **Scanner -> Normalization -> Product Matching -> Deduplication
 -> Market Pricing -> Opportunity.**
@@ -275,6 +278,43 @@ The base class handles the production concerns so providers stay declarative:
 
 `LiveProvider` subclasses `product_scanner.providers.Provider`, so live providers
 are drop-in compatible with the existing scanner and registry. See ADR-015.
+
+#### Authentication
+
+Auth is pluggable via an `AuthProvider`, which supplies the `Authorization`
+header per request. Three strategies ship (ADR-017):
+
+- **`NoAuthProvider`** - public endpoints (no header).
+- **`StaticBearerTokenAuthProvider`** - a fixed, pre-issued token.
+- **`OAuthClientCredentialsAuthProvider`** - mints an *application* token via the
+  OAuth 2.0 client-credentials grant, then **caches and refreshes it safely
+  before expiry** (as required by e.g. the eBay Browse API). Credentials are
+  never logged; token minting failures raise a typed `ProviderAuthError`.
+
+```python
+from digital_arbitrage.providers.live import (
+    LiveProviderConfig, OAuthClientCredentialsAuthProvider, create_live_provider,
+)
+
+auth = OAuthClientCredentialsAuthProvider(
+    client_id=os.environ["EBAY_CLIENT_ID"],       # from a secret, never the repo
+    client_secret=os.environ["EBAY_CLIENT_SECRET"],
+    token_url="https://api.ebay.com/identity/v1/oauth2/token",
+    scope="https://api.ebay.com/oauth/api_scope",
+)
+config = LiveProviderConfig(base_url="https://api.ebay.com")
+provider = create_live_provider("ebay_browse", config, auth=auth)  # once registered
+```
+
+When no `AuthProvider` is given, the client falls back to a static
+`config.api_key` as a `Bearer` token (backward compatible).
+
+Because a `LiveProvider` needs a config (and usually auth), it cannot be built by
+the mock registry's zero-arg `create_provider`. A **separate, config-aware**
+registry (`LIVE_PROVIDER_REGISTRY` + `register_live_provider`) and factory
+(`create_live_provider(name, config, *, auth=...)`, or
+`LiveProvider.create(config, *, auth=...)`) handle this. The mock registry is
+unchanged. No concrete live provider is registered yet.
 
 ## Repository Layout
 

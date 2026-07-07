@@ -22,10 +22,17 @@ Quick shape::
 
 from __future__ import annotations
 
+from .auth import (
+    AuthProvider,
+    NoAuthProvider,
+    OAuthClientCredentialsAuthProvider,
+    StaticBearerTokenAuthProvider,
+)
 from .base import LiveProvider
 from .capabilities import ProviderCapabilities
 from .config import LiveProviderConfig
 from .errors import (
+    ProviderAuthError,
     ProviderConfigError,
     ProviderConnectionError,
     ProviderError,
@@ -34,6 +41,11 @@ from .errors import (
     ProviderRequestError,
     ProviderResponseError,
     ProviderTimeoutError,
+)
+from .factory import (
+    LIVE_PROVIDER_REGISTRY,
+    create_live_provider,
+    register_live_provider,
 )
 from .http import (
     HttpClient,
@@ -59,12 +71,17 @@ from .validation import (
 
 __all__ = [
     "DEFAULT_RETRY_STATUS",
+    "LIVE_PROVIDER_REGISTRY",
+    "AuthProvider",
     "HttpClient",
     "HttpRequest",
     "HttpResponse",
     "LiveProvider",
     "LiveProviderConfig",
+    "NoAuthProvider",
+    "OAuthClientCredentialsAuthProvider",
     "Page",
+    "ProviderAuthError",
     "ProviderCapabilities",
     "ProviderConfigError",
     "ProviderConnectionError",
@@ -75,9 +92,12 @@ __all__ = [
     "ProviderResponseError",
     "ProviderTimeoutError",
     "RetryPolicy",
+    "StaticBearerTokenAuthProvider",
     "TokenBucketRateLimiter",
     "Transport",
     "UrllibTransport",
+    "create_live_provider",
+    "register_live_provider",
     "ensure_list",
     "ensure_mapping",
     "ensure_type",

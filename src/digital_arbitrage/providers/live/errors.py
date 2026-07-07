@@ -10,6 +10,7 @@ carries the offending provider name for structured logging.
 
     ProviderError
     +-- ProviderConfigError
+    +-- ProviderAuthError
     +-- ProviderRequestError
     |   +-- ProviderTimeoutError
     |   +-- ProviderConnectionError
@@ -40,6 +41,16 @@ class ProviderConfigError(ProviderError):
 
     Raised at construction/validation time, never mid-request; it is not
     retryable and should surface to the operator.
+    """
+
+
+class ProviderAuthError(ProviderError):
+    """Authentication could not be established (e.g. minting an OAuth token
+    failed, or the token endpoint returned an unexpected/invalid response).
+
+    Not retryable by the request retry policy: a bad credential or malformed
+    token response will not fix itself on retry, and blindly re-hammering an
+    auth endpoint is undesirable. Credentials are never included in the message.
     """
 
 
