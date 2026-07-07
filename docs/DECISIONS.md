@@ -404,3 +404,67 @@
   is symmetric only in structure, not meaning - callers pass old and new
   explicitly. A stored, stable product id (if added upstream) would supersede the
   title-based key.
+
+### ADR-015: Live-provider framework (before any live integration)
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** Every provider so far is a deterministic mock. Before wiring the
+  first *real* marketplace we need the production concerns a network integration
+  demands - HTTP, timeouts, retries, rate limiting, pagination, capability
+  metadata, typed errors, and structured logging - built once and shared, so a
+  concrete provider is small and declarative. The framework must not add scraping,
+  live API calls, or dependencies, and must not disturb the existing mock
+  providers or the pipeline.
+- **Decision:** Add a `digital_arbitrage.providers.live` package containing the
+  reusable infrastructure **only** (no concrete provider ships this sprint):
+  - *Two hierarchies, not one* - `LiveProvider` **subclasses** the existing
+    `product_scanner.providers.Provider` rather than modifying it. A live provider
+    is therefore drop-in compatible with the scanner/registry, but the simple mock
+    interface stays free of HTTP/retry/rate-limit noise. Backwards compatibility
+    is structural, not just behavioural.
+  - *Layered HTTP* - `HttpRequest`/`HttpResponse` DTOs; a `Transport` seam whose
+    stdlib implementation is `UrllibTransport` (tests inject fakes - no network);
+    and an `HttpClient` that composes transport + retries + rate limiting +
+    default headers/auth + logging. Only `urllib`/`http.client` are used.
+  - *Resilience as data* - `RetryPolicy` is a frozen config that decides *what* is
+    retryable (timeouts, connection errors, and a configurable set of 5xx/429
+    statuses) and computes exponential backoff with **equal jitter**;
+    `run_with_retries` applies it, honouring a server `Retry-After` as a delay
+    floor. `TokenBucketRateLimiter` gates outbound rate (sustained rate + burst).
+    Clock, sleep, and jitter sources are all injectable, so every timing path is
+    unit-tested deterministically without real waiting.
+  - *Declarative capabilities* - `ProviderCapabilities` (frozen) states what a
+    provider supports (pagination, filters, sorting, api-key requirement, page/
+    result caps, currencies). The base uses these to gate pagination and clamp
+    result counts, so the framework adapts without provider-specific branching.
+  - *Typed errors* - a `ProviderError` tree
+    (`ProviderConfigError`; `ProviderRequestError` ->
+    `ProviderTimeoutError`/`ProviderConnectionError`/`ProviderHTTPError` ->
+    `ProviderRateLimitError`; `ProviderResponseError`) lets callers react
+    precisely and carries the provider name (and url/status/retry-after where
+    relevant) for structured logs.
+  - *Validation + pagination + logging* - small `validation` helpers turn
+    untrusted JSON into typed values with context-prefixed errors; a generic
+    `paginate` drives page fetching up to `max_results`; logs use `key=value`
+    fields under the `digital_arbitrage.providers` namespace.
+  - *Provider hooks* - a concrete provider implements just `build_request(query,
+    *, page, page_size)` and `parse_response(response, *, query) -> Page[Listing]`;
+    the base handles execution, resilience, pagination, and capping via the
+    inherited `Provider.search`/`fetch` contract.
+- **Rationale:** Standard library only and additive - no change to existing
+  modules, schema, or the mock providers (verified by a test asserting the global
+  registry is unchanged and the mock scanner still runs). Dependency injection of
+  transport/clock/sleep keeps the suite fast and deterministic while still
+  covering real behaviour via a loopback `http.server` integration test for the
+  `UrllibTransport` (200/404/500/429/timeout mapping). Splitting policy (config
+  dataclasses) from mechanism (client/limiter/pagination) mirrors the conventions
+  used elsewhere in the codebase.
+- **Consequences:** No live data is fetched yet - this is scaffolding, and the
+  first real provider (plus its API-key secret handling and record-parsing) is a
+  later sprint. `UrllibTransport` is synchronous and per-request; a connection
+  pool or async transport can be added behind the `Transport` seam without
+  touching providers. Capabilities are static class attributes (fine for
+  compile-time-known providers); a dynamic/discovered capability set would need a
+  small extension. The two-hierarchy choice means a future decision may unify
+  mock and live providers, but only once a live provider actually exists.
