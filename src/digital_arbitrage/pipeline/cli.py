@@ -1,7 +1,10 @@
 """Command-line interface for the arbitrage pipeline.
 
-Exposes three commands, all built from :class:`ArbitragePipeline` results with no
-scraping or external calls (mock providers only):
+Exposes four commands, all built from :class:`ArbitragePipeline` results. Scans
+use the mock providers by default (no scraping or external calls); selecting a
+live provider such as ``ebay_browse`` (via ``--provider`` or config) runs a real,
+read-only marketplace search with credentials read only from the environment
+(ADR-019/ADR-020):
 
 * ``arb scan "<query>"`` - run the pipeline with filtering, sorting, and multiple
   output formats (``table``, ``json``, ``csv``, ``markdown``); ``--save`` also
@@ -378,7 +381,12 @@ _COMPARE_RENDERERS: dict[str, Callable[[RunComparison], str]] = {
 # --------------------------------------------------------------------------- #
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="arb", description="Digital arbitrage analysis pipeline (mock providers)."
+        prog="arb",
+        description=(
+            "Digital arbitrage analysis pipeline. Uses mock providers by default; "
+            "select a live provider (e.g. --provider ebay_browse) for a real, "
+            "read-only marketplace scan."
+        ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 

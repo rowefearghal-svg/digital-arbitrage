@@ -691,3 +691,57 @@
   The shared `transport`/`token_transport` injection assumes a single live
   provider per scan (true today); per-provider transport wiring is deferred until
   a second live provider exists.
+
+### ADR-020: First live end-to-end scan — pipeline seam, sample config, and tests
+
+- **Date:** 2026-07-08
+- **Status:** Accepted
+- **Context:** ADR-019 wired `ebay_browse` into the scanner and CLI, so a live
+  scan already ran end to end. Sprint 26 makes that first *real* end-to-end scan a
+  first-class, documented capability: a copy-and-run config, a proof that live
+  listings flow through **every** pipeline stage (Scanner -> Normalization ->
+  Matching -> Deduplication -> Market Pricing -> Opportunity) producing real
+  opportunities, and hermetic integration tests — all while keeping CI fully
+  offline. Constraints unchanged: stdlib only, no scraping, no secrets in the
+  repo, no live calls in automated tests, backward compatible, mock path
+  untouched.
+- **Decision:**
+  - *Injectable scanner seam* — `ArbitragePipeline.__init__` gains an optional
+    keyword-only `scanner: Scanner | None`. When supplied it is used verbatim;
+    otherwise the scanner is built from config as before. This lets the whole
+    pipeline be exercised end to end against a `Scanner` wired to a fake
+    `Transport` (via the existing `build_scanner_from_config(..., transport=...)`
+    seam) without mutating global registries. It is additive and fully backward
+    compatible — the default path is byte-for-byte unchanged.
+  - *Sample config* — `configs/ebay_browse.toml` is a small, secret-free config
+    users copy and run directly. It lists `ebay_browse` in `[scanner].providers`
+    and carries a documented `[providers.ebay_browse]` table, so both
+    `arb scan "rtx 4090" --provider ebay_browse --config configs/ebay_browse.toml`
+    and the same command without `--provider` run the live scan.
+    `configs/ebay_browse.example.toml` remains the exhaustive key reference.
+  - *No new credential surface* — credentials are still read only from
+    `EBAY_CLIENT_ID`/`EBAY_CLIENT_SECRET` at scan time; missing or empty values
+    fail fast with the existing helpful message and a non-zero exit code. Nothing
+    partial is persisted on failure.
+  - *Docs accuracy* — CLI/pipeline docstrings and the `arb` parser description no
+    longer claim "mock providers only"; they state that a live provider is an
+    opt-in that performs a real, read-only call.
+  - *Tests* — `tests/test_live_end_to_end_scan.py` drives the real
+    `ArbitragePipeline` end to end through the ADR-018 fake `Transport` + fake
+    `env` (asserting listings become scored opportunities, prices/currencies/
+    condition and eBay-only `extra` fields survive, and pagination + one token
+    mint occur), validates the committed sample config, and runs the exact
+    documented CLI command. Sprint 25's `test_local_ebay_scan.py` (assembly,
+    registries, TOML parsing) is complementary and unchanged.
+- **Rationale:** An injectable scanner is the minimal, enterprise-clean seam for a
+  hermetic full-pipeline test — it mirrors the framework's existing preference for
+  dependency injection over monkeypatching and keeps test-only transports out of
+  production `PipelineConfig`. Shipping a copy-and-run config plus complete README
+  steps turns "it can run live" into "here is exactly how", without ever putting a
+  secret in the repo.
+- **Consequences:** `ArbitragePipeline` has one new optional parameter; all other
+  behaviour is identical. There is still, by design, no live smoke test in CI —
+  the end-to-end coverage is fixture-driven. Known debt carried from ADR-018/019
+  is unchanged: eBay's daily quota is not enforced by the per-second limiter, and
+  price/condition filters and sorting are advertised as capabilities but not yet
+  mapped into the request.

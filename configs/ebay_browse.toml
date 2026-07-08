@@ -1,0 +1,41 @@
+# Ready-to-run sample config for a live, read-only eBay Browse scan.
+#
+# Copy this file and run, for example:
+#
+#     export EBAY_CLIENT_ID="your-app-client-id"
+#     export EBAY_CLIENT_SECRET="your-app-client-secret"
+#     arb scan "rtx 4090" --provider ebay_browse --config configs/ebay_browse.toml
+#
+# The [scanner] table below also makes `ebay_browse` the only provider, so
+# `arb scan "rtx 4090" --config configs/ebay_browse.toml` (without --provider)
+# runs the same live scan. See configs/ebay_browse.example.toml for every
+# available key, and the README "Local live eBay scanning" section for setup.
+#
+# NEVER commit secrets. The OAuth application credentials are read only from the
+# EBAY_CLIENT_ID / EBAY_CLIENT_SECRET environment variables - never from a file.
+
+[scanner]
+# Query only the live eBay Browse provider. Add mock providers (e.g. "ebay") to
+# this list to compare live and mock results in one scan.
+providers = ["ebay_browse"]
+
+[providers.ebay_browse]
+# Master switch: set false to keep this config but skip the live provider.
+enabled = true
+
+# Use the eBay sandbox host while developing to avoid touching production quota:
+#   base_url        = "https://api.sandbox.ebay.com"
+#   oauth_token_url = "https://api.sandbox.ebay.com/identity/v1/oauth2/token"
+base_url = "https://api.ebay.com"
+oauth_token_url = "https://api.ebay.com/identity/v1/oauth2/token"
+
+# eBay marketplace to search (X-EBAY-C-MARKETPLACE-ID). Examples: EBAY_IE,
+# EBAY_GB, EBAY_US, EBAY_DE.
+marketplace_id = "EBAY_IE"
+
+# Currency assumed when an item omits price.currency.
+default_currency = "EUR"
+
+# Request sizing (Browse caps limit at 200 and offset below 10,000).
+page_size = 50
+max_results = 100

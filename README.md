@@ -359,9 +359,11 @@ unchanged; the live registry holds the `ebay_browse` provider (ADR-018).
 #### Local live eBay scanning
 
 `arb scan` can run a real eBay Browse search locally against your own eBay
-developer credentials (ADR-019). It stays **opt-in**: the default scan is
-mock-only, and a live provider runs only when you select it. No secrets are ever
-committed and CI makes no live calls.
+developer credentials, driving the **entire pipeline** (Scanner -> Normalization
+-> Matching -> Deduplication -> Market Pricing -> Opportunity) on live listings
+(ADR-019/ADR-020). It stays **opt-in**: the default scan is mock-only, and a live
+provider runs only when you select it. No secrets are ever committed and CI makes
+no live calls.
 
 **1. Get eBay application credentials.** Create an application in the
 [eBay Developer Program](https://developer.ebay.com/) and copy its OAuth
@@ -375,16 +377,26 @@ export EBAY_CLIENT_ID="your-app-client-id"
 export EBAY_CLIENT_SECRET="your-app-client-secret"
 ```
 
-**3. Run a live scan.** Select the provider on the command line - this overrides
-the configured provider list for that scan:
+**3. Run a live scan** with the ready-to-use sample config
+[`configs/ebay_browse.toml`](configs/ebay_browse.toml):
 
 ```bash
-arb scan "rtx 4090" --provider ebay_browse
-arb scan "rtx 4090" --provider ebay_browse --provider ebay   # live + a mock, together
+arb scan "rtx 4090" --provider ebay_browse --config configs/ebay_browse.toml
 ```
 
-If the credentials are missing the scan fails fast with a clear
-`EBAY_CLIENT_ID and EBAY_CLIENT_SECRET must be set` error.
+The sample already lists `ebay_browse` in `[scanner].providers`, so `--config`
+alone runs the same live scan; `--provider` selects it explicitly and can be
+repeated to mix in mock providers:
+
+```bash
+arb scan "rtx 4090" --config configs/ebay_browse.toml          # config selects ebay_browse
+arb scan "rtx 4090" --provider ebay_browse                     # no config: built-in defaults
+arb scan "rtx 4090" --provider ebay_browse --provider ebay     # live + a mock, together
+```
+
+If the credentials are missing (or invalid) the scan fails fast with a clear
+`EBAY_CLIENT_ID and EBAY_CLIENT_SECRET must be set` error and a non-zero exit
+code - nothing partial is written.
 
 **Enable/disable from config instead of the CLI.** Add `ebay_browse` to
 `[scanner].providers` and configure it under a `[providers.ebay_browse]` table in
