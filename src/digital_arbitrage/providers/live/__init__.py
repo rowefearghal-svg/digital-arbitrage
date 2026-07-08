@@ -1,11 +1,15 @@
 """Live-provider framework: production-quality building blocks for real
 marketplace integrations.
 
-This sprint delivers the reusable infrastructure only - **no scraping, no live
-API calls, no concrete live provider**. Subclass :class:`LiveProvider` and
-implement ``build_request`` / ``parse_response`` to add a real marketplace; the
-base handles HTTP, retries with exponential backoff, rate limiting, pagination,
-capability metadata, typed errors, and structured logging.
+The reusable infrastructure handles HTTP, retries with exponential backoff, rate
+limiting, pagination, capability metadata, typed errors, pluggable auth, and
+structured logging - so a concrete provider stays small and declarative. The
+first real integration, :class:`EbayBrowseProvider` (read-only eBay Browse API),
+ships here; add another marketplace by subclassing :class:`LiveProvider` and
+implementing ``build_request`` / ``parse_response``.
+
+**No scraping, standard library only.** Automated tests never make live calls -
+a fake :class:`Transport` is injected instead.
 
 Quick shape::
 
@@ -31,6 +35,14 @@ from .auth import (
 from .base import LiveProvider
 from .capabilities import ProviderCapabilities
 from .config import LiveProviderConfig
+from .ebay_browse import (
+    DEFAULT_OAUTH_SCOPE,
+    DEFAULT_OAUTH_TOKEN_URL,
+    EbayBrowseConfig,
+    EbayBrowseProvider,
+    build_ebay_browse_provider,
+    build_ebay_browse_provider_from_env,
+)
 from .errors import (
     ProviderAuthError,
     ProviderConfigError,
@@ -70,9 +82,13 @@ from .validation import (
 )
 
 __all__ = [
+    "DEFAULT_OAUTH_SCOPE",
+    "DEFAULT_OAUTH_TOKEN_URL",
     "DEFAULT_RETRY_STATUS",
     "LIVE_PROVIDER_REGISTRY",
     "AuthProvider",
+    "EbayBrowseConfig",
+    "EbayBrowseProvider",
     "HttpClient",
     "HttpRequest",
     "HttpResponse",
@@ -96,6 +112,8 @@ __all__ = [
     "TokenBucketRateLimiter",
     "Transport",
     "UrllibTransport",
+    "build_ebay_browse_provider",
+    "build_ebay_browse_provider_from_env",
     "create_live_provider",
     "register_live_provider",
     "ensure_list",

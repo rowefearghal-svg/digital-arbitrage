@@ -1,0 +1,34 @@
+{
+  "href": "https://api.ebay.com/buy/browse/v1/item_summary/search?q=rtx+4090&limit=2&offset=0",
+  "total": 4,
+  "limit": 2,
+  "offset": 0,
+  "next": "https://api.ebay.com/buy/browse/v1/item_summary/search?q=rtx+4090&limit=2&offset=2",
+  "itemSummaries": [
+    {
+      "itemId": "v1|110000000001|0",
+      "title": "NVIDIA GeForce RTX 4090 Founders Edition 24GB",
+      "itemWebUrl": "https://www.ebay.ie/itm/110000000001",
+      "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1%7C110000000001%7C0",
+      "price": {"value": "1799.99", "currency": "EUR"},
+      "condition": "New",
+      "conditionId": "1000",
+      "itemLocation": {"city": "Dublin", "stateOrProvince": "Leinster", "postalCode": "D01", "country": "IE"},
+      "image": {"imageUrl": "https://i.ebayimg.com/images/g/example0001/s-l225.jpg"},
+      "buyingOptions": ["FIXED_PRICE"],
+      "seller": {"username": "example_seller_ie"}
+    },
+    {
+      "itemId": "v1|110000000002|0",
+      "title": "RTX 4090 Gaming OC 24GB (Certified Refurbished)",
+      "itemWebUrl": "https://www.ebay.de/itm/110000000002",
+      "price": {"value": "1499.00", "currency": "EUR"},
+      "condition": "Certified - Refurbished",
+      "conditionId": "2000",
+      "itemLocation": {"country": "DE"},
+      "image": {"imageUrl": "https://i.ebayimg.com/images/g/example0002/s-l225.jpg"},
+      "buyingOptions": ["FIXED_PRICE", "BEST_OFFER"],
+      "seller": {"username": "example_refurb"}
+    }
+  ]
+}

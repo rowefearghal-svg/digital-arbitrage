@@ -580,3 +580,55 @@
   background timer) and is not re-attempted mid-retry — acceptable for ~2h tokens.
   Auth failures are non-retryable by design; a transient token-endpoint blip
   surfaces immediately rather than being retried.
+
+### ADR-018: eBay Browse provider implementation (`ebay_browse`)
+
+- **Date:** 2026-07-08
+- **Status:** Accepted
+- **Context:** ADR-016 planned the eBay Browse integration and ADR-017 shipped
+  the auth abstraction + config-aware factory it needs. This sprint implements
+  the first **real, read-only** provider on that framework. Constraints
+  unchanged: stdlib only, no scraping, no live calls in CI, no secrets in the
+  repo, mock providers untouched, backward compatible.
+- **Decision:**
+  - *Shape* — `EbayBrowseProvider(LiveProvider)` registered as **`ebay_browse`**
+    in `LIVE_PROVIDER_REGISTRY` (never the mock `PROVIDER_REGISTRY`). It supplies
+    only the two declarative hooks; the framework owns HTTP, retries, rate
+    limiting, pagination, and logging.
+  - *Config* — `EbayBrowseConfig(LiveProviderConfig)` adds `marketplace_id`
+    (default `EBAY_IE`), `oauth_token_url`, and `oauth_scope`, validated in
+    `__post_init__`. Because `from_dict` keys off `fields(cls)`, the eBay keys are
+    accepted transparently and unknown keys still rejected. (An explicit
+    `super(EbayBrowseConfig, self)` call is required — `@dataclass(slots=True)`
+    rebuilds the class, breaking zero-arg `super()`.)
+  - *Auth* — `OAuthClientCredentialsAuthProvider` (ADR-017) mints/caches/refreshes
+    the application token. `build_ebay_browse_provider(...)` and
+    `build_ebay_browse_provider_from_env(...)` wire it up; credentials come only
+    from `EBAY_CLIENT_ID`/`EBAY_CLIENT_SECRET` and are never committed or logged.
+  - *Request* — `GET /buy/browse/v1/item_summary/search` with `q` (truncated to
+    100 chars), `limit`, and `offset = (page-1)*page_size`, plus the
+    `X-EBAY-C-MARKETPLACE-ID` header. Capabilities advertise `max_page_size=200`
+    and `max_results=10_000` (eBay's offset ceiling).
+  - *Response → `Listing`* — `itemId→listing_id`, `title`, `itemWebUrl→url`,
+    `price.value`(+`currency`, defaulting to `default_currency`), a composed
+    `itemLocation` string, and a `Condition` derived from `conditionId` (a fixed
+    lookup table) with the free-text `condition` as fallback. eBay-only fields
+    (`image_url`, `buying_options`, `seller`, `condition_id`) go into
+    `Listing.extra`. Auction-only items with no `price` map to `price=None`.
+  - *Pagination* — offset-based; `has_more` is true when the payload has a `next`
+    link, else when `offset + limit < total`.
+  - *Tests* — a fake `Transport` replays sanitised, committed JSON fixtures
+    (`tests/fixtures/ebay/`); every path (mapping, condition table, pagination,
+    empty, malformed JSON, HTTP/429 errors, config validation, OAuth mint+cache)
+    is exercised without network or secrets. A live smoke test is intentionally
+    **not** added to CI.
+- **Rationale:** Keeping the provider a thin mapping over the framework means the
+  hard concerns (resilience, auth, pagination) stay in one tested place and the
+  next marketplace is cheap to add. Fixture-driven tests make the whole flow
+  deterministic and secret-free, satisfying the "no live calls in CI" constraint.
+- **Consequences:** `LIVE_PROVIDER_REGISTRY` now has one entry (`ebay_browse`);
+  the mock registry and zero-arg `create_provider` are unchanged. Real end-to-end
+  use requires the two eBay secrets in the environment. eBay's daily call quota
+  (5,000/day) is not yet enforced by the per-second limiter — deferred as known
+  debt (see `docs/EBAY_PROVIDER_PLAN.md`); price/condition **filter** parameters
+  and sorting are advertised as capabilities but not yet mapped into the request.
