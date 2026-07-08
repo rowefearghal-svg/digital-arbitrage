@@ -204,11 +204,11 @@ print(breakdown.score, breakdown.risk_signal)
 
 ### Live provider framework
 
-`digital_arbitrage.providers.live` is the infrastructure for the first *real*
-marketplace integration. **This sprint ships the framework only** - there is no
-scraping, no live API call, and no concrete provider; standard library only, no
-new dependencies. A real provider is added later by subclassing `LiveProvider`
-and implementing two small hooks:
+`digital_arbitrage.providers.live` is the infrastructure for *real* marketplace
+integrations, and now ships the first concrete one: the read-only
+[eBay Browse provider](#ebay-browse-provider). Standard library only, no scraping,
+no new dependencies, and **no live API call in automated tests**. A new provider
+is added by subclassing `LiveProvider` and implementing two small hooks:
 
 ```python
 from digital_arbitrage.providers.live import (
@@ -309,12 +309,46 @@ provider = create_live_provider("ebay_browse", config, auth=auth)  # once regist
 When no `AuthProvider` is given, the client falls back to a static
 `config.api_key` as a `Bearer` token (backward compatible).
 
+#### eBay Browse provider
+
+`EbayBrowseProvider` (`"ebay_browse"`) is the first real, **read-only** provider
+(ADR-018). It calls the officially supported eBay Browse API
+(`GET /buy/browse/v1/item_summary/search`) with an application OAuth token and
+maps each item summary onto the shared `Listing` model - eBay-only fields
+(`image_url`, `buying_options`, `seller`, `condition_id`) land in `Listing.extra`.
+Credentials come only from the `EBAY_CLIENT_ID` / `EBAY_CLIENT_SECRET`
+environment variables and are never committed or logged.
+
+```python
+import os
+from digital_arbitrage.providers.live import (
+    EbayBrowseConfig, build_ebay_browse_provider_from_env,
+)
+
+config = EbayBrowseConfig(base_url="https://api.ebay.com", marketplace_id="EBAY_IE")
+provider = build_ebay_browse_provider_from_env(config)  # reads EBAY_CLIENT_ID/SECRET
+listings = provider.search("rtx 4090", limit=50)  # same Provider contract as mocks
+```
+
+See `configs/ebay_browse.example.toml` for a documented, secret-free config
+(loadable via `EbayBrowseConfig.from_dict`). The provider registers itself in the
+live registry, so it can also be built by name:
+
+```python
+from digital_arbitrage.providers.live import create_live_provider
+provider = create_live_provider("ebay_browse", config, auth=auth)
+```
+
+The entire request/response/pagination/OAuth flow is unit-tested against
+sanitised JSON fixtures through a fake `Transport` - no network, no secrets in
+CI. There is no live smoke test in the automated suite by design.
+
 Because a `LiveProvider` needs a config (and usually auth), it cannot be built by
 the mock registry's zero-arg `create_provider`. A **separate, config-aware**
 registry (`LIVE_PROVIDER_REGISTRY` + `register_live_provider`) and factory
 (`create_live_provider(name, config, *, auth=...)`, or
 `LiveProvider.create(config, *, auth=...)`) handle this. The mock registry is
-unchanged. No concrete live provider is registered yet.
+unchanged; the live registry holds the `ebay_browse` provider (ADR-018).
 
 ## Repository Layout
 

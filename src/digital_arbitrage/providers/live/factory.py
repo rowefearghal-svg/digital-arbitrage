@@ -8,9 +8,10 @@ cannot be built that way: it needs a :class:`LiveProviderConfig` and usually an
 working unchanged), this module adds a *separate*, config-aware registry and
 factory for live providers.
 
-Nothing is registered here yet - no concrete live provider ships. Real providers
-register with :func:`register_live_provider` and are built with
-:func:`create_live_provider`.
+Providers register with :func:`register_live_provider` and are built with
+:func:`create_live_provider`. The first real provider,
+:class:`~digital_arbitrage.providers.live.ebay_browse.EbayBrowseProvider`,
+registers itself on import.
 """
 
 from __future__ import annotations

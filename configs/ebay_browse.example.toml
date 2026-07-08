@@ -1,0 +1,38 @@
+# Example configuration for the read-only eBay Browse provider ("ebay_browse").
+#
+# This is a *provider* config (consumed by EbayBrowseConfig.from_dict), NOT the
+# pipeline config in configs/default.toml - keep the two separate.
+#
+# NEVER commit secrets. The OAuth application credentials are read only from the
+# environment (EBAY_CLIENT_ID / EBAY_CLIENT_SECRET); they never live in a file.
+
+[providers.ebay_browse]
+# Base URL for the Browse API (use the sandbox host while developing:
+# "https://api.sandbox.ebay.com").
+base_url = "https://api.ebay.com"
+
+# eBay marketplace to search; sent as the X-EBAY-C-MARKETPLACE-ID header.
+# Examples: EBAY_IE, EBAY_GB, EBAY_US, EBAY_DE.
+marketplace_id = "EBAY_IE"
+
+# OAuth 2.0 client-credentials token endpoint (sandbox variant swaps the host).
+oauth_token_url = "https://api.ebay.com/identity/v1/oauth2/token"
+# OAuth scope sufficient for item_summary/search.
+oauth_scope = "https://api.ebay.com/oauth/api_scope"
+
+# ISO-4217 currency assumed when an item omits price.currency.
+default_currency = "EUR"
+
+# Request sizing / pagination. Browse caps limit at 200 and offset below 10,000.
+page_size = 100
+max_results = 200
+timeout = 10.0
+
+# Client-side rate limiting (token bucket) to stay well under eBay's daily quota.
+rate_limit_per_second = 5.0
+rate_limit_burst = 10
+
+# Transient-failure retry policy (exponential backoff + jitter).
+[providers.ebay_browse.retry]
+max_attempts = 3
+retry_on_status = [429, 500, 502, 503, 504]

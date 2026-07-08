@@ -1,0 +1,11 @@
+{
+  "errors": [
+    {
+      "errorId": 12001,
+      "domain": "API_BROWSE",
+      "category": "REQUEST",
+      "message": "The call is missing a required 'q' or 'category_ids' parameter.",
+      "longMessage": "A required parameter is missing from the request."
+    }
+  ]
+}
