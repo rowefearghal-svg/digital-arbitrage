@@ -25,10 +25,11 @@ from typing import ClassVar
 
 from ...product_scanner.models import Listing
 from ...product_scanner.providers.base import Provider
+from .auth import AuthProvider
 from .capabilities import ProviderCapabilities
 from .config import LiveProviderConfig
 from .errors import ProviderConfigError
-from .http import HttpClient, HttpRequest, HttpResponse
+from .http import HttpClient, HttpRequest, HttpResponse, Transport
 from .logging_utils import format_fields, get_logger
 from .pagination import Page, paginate
 
@@ -44,16 +45,37 @@ class LiveProvider(Provider):
         config: LiveProviderConfig,
         *,
         http_client: HttpClient | None = None,
+        auth: AuthProvider | None = None,
     ) -> None:
         super().__init__()
         self._config = config
         self._live_log = get_logger(self.name)
-        if self.capabilities.requires_api_key and not config.api_key:
+        if self.capabilities.requires_api_key and not (config.api_key or auth):
             raise ProviderConfigError(
-                "provider requires an api_key but none was configured",
+                "provider requires an api_key or auth provider but none was configured",
                 provider=self.name,
             )
-        self._client = http_client or HttpClient(config, provider=self.name)
+        self._client = http_client or HttpClient(config, provider=self.name, auth=auth)
+
+    @classmethod
+    def create(
+        cls,
+        config: LiveProviderConfig,
+        *,
+        auth: AuthProvider | None = None,
+        transport: Transport | None = None,
+        http_client: HttpClient | None = None,
+    ) -> LiveProvider:
+        """Config-aware constructor that wires auth/transport into the client.
+
+        Unlike the mock registry's zero-arg ``create_provider``, a live provider
+        needs a :class:`LiveProviderConfig` and (usually) an
+        :class:`AuthProvider`. When ``http_client`` is given it is used verbatim;
+        otherwise one is built from ``config`` with ``auth`` and ``transport``.
+        """
+        if http_client is None:
+            http_client = HttpClient(config, provider=cls.name, transport=transport, auth=auth)
+        return cls(config, http_client=http_client, auth=auth)
 
     @property
     def config(self) -> LiveProviderConfig:

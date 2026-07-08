@@ -22,7 +22,7 @@ import urllib.request
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field, replace
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .config import LiveProviderConfig
 from .errors import (
@@ -35,6 +35,9 @@ from .errors import (
 from .logging_utils import format_fields, get_logger
 from .rate_limit import TokenBucketRateLimiter
 from .retry import run_with_retries
+
+if TYPE_CHECKING:
+    from .auth import AuthProvider
 
 
 @dataclass(frozen=True, slots=True)
@@ -177,6 +180,7 @@ class HttpClient:
         *,
         provider: str | None = None,
         transport: Transport | None = None,
+        auth: AuthProvider | None = None,
         rate_limiter: TokenBucketRateLimiter | None = None,
         sleep: Callable[[float], None] = time.sleep,
         monotonic: Callable[[], float] = time.monotonic,
@@ -185,6 +189,7 @@ class HttpClient:
         self._config = config
         self._provider = provider
         self._transport = transport or UrllibTransport(provider=provider)
+        self._auth = auth
         self._sleep = sleep
         self._random_fn = random_fn
         self._log = get_logger(provider or "http")
@@ -204,13 +209,26 @@ class HttpClient:
     def config(self) -> LiveProviderConfig:
         return self._config
 
+    def _authorization(self) -> str | None:
+        """Resolve the ``Authorization`` header value for a request.
+
+        An injected :class:`AuthProvider` takes precedence; otherwise fall back
+        to the static ``config.api_key`` (preserving pre-auth behaviour).
+        """
+        if self._auth is not None:
+            return self._auth.authorization()
+        if self._config.api_key:
+            return f"Bearer {self._config.api_key}"
+        return None
+
     def _default_headers(self) -> dict[str, str]:
         headers = {
             "User-Agent": self._config.user_agent,
             "Accept": "application/json",
         }
-        if self._config.api_key:
-            headers["Authorization"] = f"Bearer {self._config.api_key}"
+        authorization = self._authorization()
+        if authorization:
+            headers["Authorization"] = authorization
         headers.update(self._config.extra_headers)
         return headers
 

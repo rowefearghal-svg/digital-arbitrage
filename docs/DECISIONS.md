@@ -521,3 +521,62 @@
   Affiliate/EPN commissions are out of scope (we use the plain `itemWebUrl`).
   Production volume requires accepting the eBay API License Agreement / passing
   the free Application Growth Check.
+
+### ADR-017: Live-provider auth abstraction & config-aware factory
+
+- **Date:** 2026-07-05
+- **Status:** Accepted
+- **Context:** ADR-016 surfaced two framework gaps blocking a real authenticated
+  provider (eBay Browse): (1) auth was a single static `config.api_key` Bearer
+  token, but eBay needs a **minted, cached, auto-refreshed** OAuth
+  application token; and (2) the provider registry constructs providers with no
+  arguments (`create_provider(name)` → `cls()`), which cannot build a
+  config-taking `LiveProvider`. This sprint closes both gaps generically — **no
+  eBay code, no live calls, no real secrets, stdlib only, fully backward
+  compatible.**
+- **Decision:**
+  - *Auth abstraction* — introduce an `AuthProvider` ABC with a single
+    `authorization() -> str | None` method returning the full `Authorization`
+    header value (or `None`). `HttpClient` calls it **once per request** in
+    `_default_headers`, so caching/refresh is transparent. Three implementations:
+    `NoAuthProvider` (no header), `StaticBearerTokenAuthProvider` (fixed token,
+    optional scheme), and `OAuthClientCredentialsAuthProvider`.
+  - *OAuth provider* — client-credentials grant: POSTs `grant_type=client_credentials`
+    (+ optional `scope`) with an HTTP **Basic** header built from
+    `client_id:client_secret` to a validated `token_url`, over an **injectable
+    `Transport`** (so tests never touch the network). Tokens are cached with a
+    monotonic-clock expiry and re-minted once within `refresh_leeway` (default
+    60s) of expiry — a request never travels with an about-to-expire token.
+    Thread-safe via a lock. Construction validates credentials/URL/timeout.
+  - *Typed errors* — add `ProviderAuthError(ProviderError)`. Every token-mint
+    failure (non-2xx, invalid/JSON-less body, missing `access_token`, bad
+    `expires_in`, wrapped transport error) raises it. It is **not** in the retry
+    policy's retryable set, so a bad credential or malformed token response is
+    not blindly re-hammered.
+  - *No secret logging* — credentials are never logged or placed in exception
+    messages; the mint log records only `expires_in`/`refresh_leeway`. Wrapped
+    transport errors surface only the error *type name*.
+  - *HttpClient wiring* — new optional `auth: AuthProvider | None`. Precedence:
+    injected `AuthProvider` → else static `config.api_key` as `Bearer` → else no
+    header. With `auth=None` behaviour is byte-identical to before (backward
+    compatible).
+  - *Config-aware creation* — `LiveProvider` gains an optional `auth` param and a
+    `create(config, *, auth=..., transport=..., http_client=...)` classmethod
+    that wires auth into the client. A **separate** `LIVE_PROVIDER_REGISTRY` +
+    `register_live_provider` + `create_live_provider(name, config, *, auth=...)`
+    handle name-based construction. `requires_api_key` is now satisfied by
+    *either* an `api_key` *or* an `auth` provider.
+- **Rationale:** A one-method `AuthProvider` keeps `HttpClient` agnostic to auth
+  mechanics and makes OAuth caching/refresh an implementation detail. Sourcing
+  the token round trip through the existing `Transport` seam means the whole
+  OAuth flow is unit-tested deterministically with a fake clock — no network, no
+  secrets in CI. Keeping the live registry *separate* from the mock registry
+  means the zero-arg `create_provider` contract (and every mock provider) is
+  untouched, satisfying strict backward compatibility.
+- **Consequences:** The framework can now back real authenticated providers; the
+  eBay provider (next sprint) just supplies an `OAuthClientCredentialsAuthProvider`
+  and registers via `register_live_provider`. Nothing is registered yet, so the
+  live factory has no entries. Token refresh is checked per request (not with a
+  background timer) and is not re-attempted mid-retry — acceptable for ~2h tokens.
+  Auth failures are non-retryable by design; a transient token-endpoint blip
+  surfaces immediately rather than being retried.
