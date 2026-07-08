@@ -26,6 +26,7 @@ from pathlib import Path
 from ..comparison import OpportunityDelta, RunComparison, compare_runs
 from ..opportunity import Recommendation
 from ..persistence import ResultStore, StoredOpportunity, StoredRun
+from ..product_scanner import ScannerConfig
 from .config_file import load_pipeline_config
 from .models import PipelineItemResult, PipelineResult
 from .pipeline import ArbitragePipeline, PipelineConfig, recommendation_rank
@@ -399,6 +400,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     scan.add_argument("-l", "--limit", type=int, default=None, help="Max results per provider.")
     scan.add_argument(
+        "-p",
+        "--provider",
+        action="append",
+        default=None,
+        metavar="NAME",
+        help=(
+            "Provider to scan (repeatable); overrides the configured provider "
+            "list. Live providers (e.g. ebay_browse) read credentials from the "
+            "EBAY_CLIENT_ID / EBAY_CLIENT_SECRET environment variables."
+        ),
+    )
+    scan.add_argument(
         "-c",
         "--config",
         default=None,
@@ -478,13 +491,27 @@ def _config_summary(args: argparse.Namespace) -> str:
     parts = [f"config={args.config}" if args.config else "config=defaults"]
     if args.limit is not None:
         parts.append(f"limit={args.limit}")
+    if args.provider:
+        parts.append(f"providers={'+'.join(args.provider)}")
     return ", ".join(parts)
+
+
+def _apply_provider_override(config: PipelineConfig, providers: list[str]) -> PipelineConfig:
+    """Override the scanner's provider list with the CLI ``--provider`` values.
+
+    Other scanner settings (and any ``[providers.<name>]`` live config) are
+    preserved; only the set of providers to query is replaced.
+    """
+    base = config.scanner_config or ScannerConfig()
+    return replace(config, scanner_config=replace(base, providers=list(providers)))
 
 
 def _run_scan(args: argparse.Namespace) -> int:
     config = load_pipeline_config(args.config) if args.config else PipelineConfig()
     if args.limit is not None:
         config = replace(config, scan_limit=args.limit)
+    if args.provider:
+        config = _apply_provider_override(config, args.provider)
 
     result = ArbitragePipeline(config).analyze(args.query)
     items = _sort_items(_filter_items(result.items, args), args.sort)

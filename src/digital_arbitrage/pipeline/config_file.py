@@ -31,11 +31,17 @@ from ..normalization.text import UnicodeForm
 from ..opportunity import OpportunityConfig, ScoringConfig
 from ..product_matching import MatchConfig
 from ..product_scanner import ScannerConfig
+from ..providers.live import (
+    LIVE_PROVIDER_REGISTRY,
+    LiveProviderSetting,
+    ProviderError,
+    build_live_provider_config,
+)
 from .pipeline import PipelineConfig
 
 _MISSING: Final[Any] = object()
 
-_SECTIONS: Final[frozenset[str]] = frozenset(
+_STAGE_SECTIONS: Final[frozenset[str]] = frozenset(
     {
         "pipeline",
         "scanner",
@@ -47,6 +53,11 @@ _SECTIONS: Final[frozenset[str]] = frozenset(
         "scoring",
     }
 )
+
+#: Top-level tables accepted in a pipeline config file. ``providers`` is a table
+#: of per-live-provider tables (``[providers.<name>]``), distinct from the stage
+#: sections above.
+_SECTIONS: Final[frozenset[str]] = _STAGE_SECTIONS | {"providers"}
 
 
 class ConfigError(ValueError):
@@ -282,6 +293,39 @@ def _build_scoring(data: dict[str, Any] | None) -> ScoringConfig | None:
     return _construct(section, ScoringConfig, kwargs)
 
 
+def _build_live_providers(data: dict[str, Any] | None) -> dict[str, LiveProviderSetting]:
+    """Parse the ``[providers.<name>]`` tables into live-provider settings.
+
+    Each table configures one *live* provider: an optional ``enabled`` boolean
+    (default ``True``) toggles it without removing it from ``[scanner].providers``,
+    and the remaining keys are its provider config. Unknown provider names, wrong
+    types, and invalid config are rejected here so mistakes fail loudly at load.
+    Credentials are never read from the file - only from the environment.
+    """
+    if data is None:
+        return {}
+    if not isinstance(data, dict):
+        raise ConfigError("[providers] must be a table of provider tables")
+    settings: dict[str, LiveProviderSetting] = {}
+    for name, table in data.items():
+        prefix = f"[providers.{name}]"
+        if not isinstance(table, dict):
+            raise ConfigError(f"{prefix} must be a table")
+        if name not in LIVE_PROVIDER_REGISTRY:
+            known = ", ".join(sorted(LIVE_PROVIDER_REGISTRY)) or "<none>"
+            raise ConfigError(f"{prefix} unknown live provider; registered: {known}")
+        config = dict(table)
+        enabled = config.pop("enabled", True)
+        if not isinstance(enabled, bool):
+            raise ConfigError(f"{prefix} 'enabled' must be a boolean")
+        try:
+            build_live_provider_config(name, config)
+        except ProviderError as error:
+            raise ConfigError(f"{prefix} {error}") from error
+        settings[name] = LiveProviderSetting(enabled=enabled, config=config)
+    return settings
+
+
 def _build_scan_limit(data: dict[str, Any] | None) -> Any:
     if data is None:
         return _MISSING
@@ -322,4 +366,5 @@ def load_pipeline_config(path: str | Path) -> PipelineConfig:
         opportunity_config=_build_opportunity(raw.get("opportunity")),
         scoring_config=_build_scoring(raw.get("scoring")),
         scan_limit=None if scan_limit is _MISSING else scan_limit,
+        live_provider_settings=_build_live_providers(raw.get("providers")),
     )

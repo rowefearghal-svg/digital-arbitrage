@@ -36,10 +36,12 @@ from .base import LiveProvider
 from .capabilities import ProviderCapabilities
 from .config import LiveProviderConfig
 from .ebay_browse import (
+    DEFAULT_BASE_URL,
     DEFAULT_OAUTH_SCOPE,
     DEFAULT_OAUTH_TOKEN_URL,
     EbayBrowseConfig,
     EbayBrowseProvider,
+    build_ebay_browse_config,
     build_ebay_browse_provider,
     build_ebay_browse_provider_from_env,
 )
@@ -55,9 +57,15 @@ from .errors import (
     ProviderTimeoutError,
 )
 from .factory import (
+    LIVE_PROVIDER_CONFIG_BUILDERS,
+    LIVE_PROVIDER_ENV_BUILDERS,
     LIVE_PROVIDER_REGISTRY,
+    build_live_provider_config,
+    build_live_provider_from_env,
     create_live_provider,
     register_live_provider,
+    register_live_provider_config_builder,
+    register_live_provider_env_builder,
 )
 from .http import (
     HttpClient,
@@ -71,6 +79,7 @@ from .logging_utils import format_fields, get_logger
 from .pagination import Page, paginate
 from .rate_limit import TokenBucketRateLimiter
 from .retry import DEFAULT_RETRY_STATUS, RetryPolicy, run_with_retries
+from .scanning import LiveProviderSetting, build_scanner_from_config
 from .validation import (
     ensure_list,
     ensure_mapping,
@@ -82,9 +91,12 @@ from .validation import (
 )
 
 __all__ = [
+    "DEFAULT_BASE_URL",
     "DEFAULT_OAUTH_SCOPE",
     "DEFAULT_OAUTH_TOKEN_URL",
     "DEFAULT_RETRY_STATUS",
+    "LIVE_PROVIDER_CONFIG_BUILDERS",
+    "LIVE_PROVIDER_ENV_BUILDERS",
     "LIVE_PROVIDER_REGISTRY",
     "AuthProvider",
     "EbayBrowseConfig",
@@ -94,6 +106,7 @@ __all__ = [
     "HttpResponse",
     "LiveProvider",
     "LiveProviderConfig",
+    "LiveProviderSetting",
     "NoAuthProvider",
     "OAuthClientCredentialsAuthProvider",
     "Page",
@@ -112,10 +125,16 @@ __all__ = [
     "TokenBucketRateLimiter",
     "Transport",
     "UrllibTransport",
+    "build_ebay_browse_config",
     "build_ebay_browse_provider",
     "build_ebay_browse_provider_from_env",
+    "build_live_provider_config",
+    "build_live_provider_from_env",
+    "build_scanner_from_config",
     "create_live_provider",
     "register_live_provider",
+    "register_live_provider_config_builder",
+    "register_live_provider_env_builder",
     "ensure_list",
     "ensure_mapping",
     "ensure_type",
