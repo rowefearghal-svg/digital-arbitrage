@@ -632,3 +632,62 @@
   (5,000/day) is not yet enforced by the per-second limiter — deferred as known
   debt (see `docs/EBAY_PROVIDER_PLAN.md`); price/condition **filter** parameters
   and sorting are advertised as capabilities but not yet mapped into the request.
+
+### ADR-019: Local live eBay scanning — wiring `ebay_browse` into the scanner
+
+- **Date:** 2026-07-08
+- **Status:** Accepted
+- **Context:** ADR-018 shipped the `ebay_browse` provider, but nothing wired it
+  into the scanner/pipeline the CLI runs. The scanner built every provider with
+  the mock registry's zero-arg `create_provider`, which cannot construct a
+  config- and credential-taking `LiveProvider`. Sprint 25 lets a user run a real
+  eBay Browse search **locally** with their own credentials, while keeping the
+  default scan mock-only. Constraints unchanged: stdlib only, no secrets in the
+  repo, no live calls in CI, mock providers untouched, backward compatible.
+- **Decision:**
+  - *Name-based construction* — two per-provider registries parallel to
+    `LIVE_PROVIDER_REGISTRY`: `LIVE_PROVIDER_CONFIG_BUILDERS` (mapping → validated
+    `LiveProviderConfig`) and `LIVE_PROVIDER_ENV_BUILDERS` (config + `env` →
+    provider). `build_live_provider_from_env(name, config, *, env, transport,
+    token_transport)` combines them. `ebay_browse` registers
+    `build_ebay_browse_config` (defaults `base_url` to `https://api.ebay.com`,
+    reuses `from_dict` validation) and the existing
+    `build_ebay_browse_provider_from_env`. This keeps adding a new live provider a
+    two-line registration, mirroring the mock/live registry split.
+  - *Scanner assembly* — a new `providers.live.scanning.build_scanner_from_config`
+    builds each configured name from the **live** registry (via its
+    `LiveProviderSetting`) when present, else the **mock** registry — the single
+    place that knows a name might be live. The mock path (`create_provider`) is
+    byte-for-byte unchanged, and `product_scanner.build_scanner` is left intact.
+  - *Enable/disable from TOML* — a new top-level `[providers.<name>]` table in the
+    pipeline config carries per-provider config plus an `enabled` boolean
+    (default `true`). It is parsed into `PipelineConfig.live_provider_settings`
+    (`{name: LiveProviderSetting(enabled, config)}`). A provider runs only when it
+    is both listed in `[scanner].providers` (or `--provider`) **and** enabled;
+    disabled providers are skipped without needing credentials. Unknown provider
+    names, non-boolean `enabled`, and invalid provider config are rejected at
+    load, consistent with ADR-010's fail-loud loader.
+  - *CLI* — `arb scan … --provider NAME` (repeatable) overrides the configured
+    provider list for one scan (`_apply_provider_override` preserves other scanner
+    settings and any `[providers.*]` config). `arb scan "rtx 4090" --provider
+    ebay_browse` therefore runs a live scan.
+  - *Credentials* — read only from `EBAY_CLIENT_ID`/`EBAY_CLIENT_SECRET` at scan
+    time via the existing env builder; missing creds fail fast. Secrets never live
+    in config files.
+  - *Tests* — `tests/test_local_ebay_scan.py` drives the whole path — assembly,
+    registries, TOML enable/disable + validation, `--provider` override, and a
+    full `arb scan --provider ebay_browse` CLI run — through the ADR-018 fake
+    `Transport` and a fake `env`, so no network call and no secret touch CI. The
+    injectable `transport`/`token_transport` params thread through purely for this.
+- **Rationale:** Reusing the registry pattern keeps the mock path untouched and
+  makes "is this name live?" a lookup, not a special case. Putting enable/disable
+  in config (not code) and gating on both listing + `enabled` gives an obvious,
+  reversible opt-in. Threading injectable transports keeps the integration
+  hermetic, honouring "no live API calls in CI".
+- **Consequences:** `PipelineConfig` gains `live_provider_settings` (defaults to
+  empty, so existing behaviour is identical) and the pipeline builds its scanner
+  via `build_scanner_from_config`. The config loader accepts a new `[providers.*]`
+  section. Adding a future live provider needs only its two builder registrations.
+  The shared `transport`/`token_transport` injection assumes a single live
+  provider per scan (true today); per-provider transport wiring is deferred until
+  a second live provider exists.

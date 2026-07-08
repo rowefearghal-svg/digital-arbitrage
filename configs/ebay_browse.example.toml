@@ -1,12 +1,18 @@
 # Example configuration for the read-only eBay Browse provider ("ebay_browse").
 #
-# This is a *provider* config (consumed by EbayBrowseConfig.from_dict), NOT the
-# pipeline config in configs/default.toml - keep the two separate.
+# The [providers.ebay_browse] table can live in your pipeline config file (e.g.
+# configs/default.toml) so `arb scan --config <file>` picks it up. Add
+# "ebay_browse" to [scanner].providers (or pass `--provider ebay_browse`) to run
+# it. The keys below are also accepted directly by EbayBrowseConfig.from_dict.
 #
 # NEVER commit secrets. The OAuth application credentials are read only from the
 # environment (EBAY_CLIENT_ID / EBAY_CLIENT_SECRET); they never live in a file.
 
 [providers.ebay_browse]
+# Master switch for the live provider. Set false to keep this config but skip the
+# provider without editing [scanner].providers. Defaults to true when omitted.
+enabled = true
+
 # Base URL for the Browse API (use the sandbox host while developing:
 # "https://api.sandbox.ebay.com").
 base_url = "https://api.ebay.com"

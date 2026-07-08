@@ -93,7 +93,13 @@ arb scan "rtx 4090"                 # fixed-width table (default)
 arb scan "rtx 4090" --format json   # table | json | csv | markdown
 arb scan "rtx 4090" --limit 5       # cap results per provider
 arb scan "rtx 4090" --config configs/default.toml   # load stage config from TOML
+arb scan "rtx 4090" --provider ebay_browse          # scan one provider (repeatable; live eBay needs creds)
 ```
+
+By default `arb scan` queries the mock providers only. `--provider NAME`
+(repeatable) overrides the configured provider list for a single scan; passing a
+live provider such as `ebay_browse` runs a real API search - see
+[Local live eBay scanning](#local-live-ebay-scanning) below.
 
 **Filter, sort, and export.** Filters combine with AND; `--sort` reorders the
 displayed rows; four output formats are supported:
@@ -349,6 +355,60 @@ registry (`LIVE_PROVIDER_REGISTRY` + `register_live_provider`) and factory
 (`create_live_provider(name, config, *, auth=...)`, or
 `LiveProvider.create(config, *, auth=...)`) handle this. The mock registry is
 unchanged; the live registry holds the `ebay_browse` provider (ADR-018).
+
+#### Local live eBay scanning
+
+`arb scan` can run a real eBay Browse search locally against your own eBay
+developer credentials (ADR-019). It stays **opt-in**: the default scan is
+mock-only, and a live provider runs only when you select it. No secrets are ever
+committed and CI makes no live calls.
+
+**1. Get eBay application credentials.** Create an application in the
+[eBay Developer Program](https://developer.ebay.com/) and copy its OAuth
+*client ID* and *client secret* (App ID / Cert ID). The `ebay_browse` provider
+uses the OAuth **client-credentials** grant, so no user login is required.
+
+**2. Export them as environment variables** (never put secrets in a file):
+
+```bash
+export EBAY_CLIENT_ID="your-app-client-id"
+export EBAY_CLIENT_SECRET="your-app-client-secret"
+```
+
+**3. Run a live scan.** Select the provider on the command line - this overrides
+the configured provider list for that scan:
+
+```bash
+arb scan "rtx 4090" --provider ebay_browse
+arb scan "rtx 4090" --provider ebay_browse --provider ebay   # live + a mock, together
+```
+
+If the credentials are missing the scan fails fast with a clear
+`EBAY_CLIENT_ID and EBAY_CLIENT_SECRET must be set` error.
+
+**Enable/disable from config instead of the CLI.** Add `ebay_browse` to
+`[scanner].providers` and configure it under a `[providers.ebay_browse]` table in
+your pipeline config (see `configs/ebay_browse.example.toml` for every key). The
+`enabled` flag toggles the live provider without editing the provider list:
+
+```toml
+[scanner]
+providers = ["ebay", "ebay_browse"]
+
+[providers.ebay_browse]
+enabled = true                 # set false to keep this config but skip the provider
+marketplace_id = "EBAY_IE"     # EBAY_IE, EBAY_GB, EBAY_US, EBAY_DE, ...
+page_size = 100
+max_results = 200
+```
+
+```bash
+arb scan "rtx 4090" --config configs/my-live.toml
+```
+
+Everything but the credentials lives in config; the credentials come only from
+the environment. Use the eBay **sandbox** hosts (`base_url` /
+`oauth_token_url`) while developing to avoid touching production quota.
 
 ## Repository Layout
 

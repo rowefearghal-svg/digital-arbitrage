@@ -13,11 +13,28 @@
 scan_limit = 10
 
 [scanner]
-# Which mock providers to query. Remove entries to scan fewer marketplaces.
+# Which providers to query. Mock providers are listed by default; add a live
+# provider's name (e.g. "ebay_browse") to include it - see [providers.*] below.
 providers = ["ebay", "facebook_marketplace", "adverts_ie", "donedeal"]
 max_results_per_provider = 10
 default_currency = "EUR"
 log_level = "INFO"
+
+# --------------------------------------------------------------------------- #
+# Live providers (opt-in). A [providers.<name>] table configures a *live* market-
+# place that hits a real API. A provider only runs when it is BOTH listed in
+# [scanner].providers (or selected via `--provider`) AND enabled here. Secrets
+# are NEVER read from this file - only from the environment.
+#
+# eBay Browse: enable it by adding "ebay_browse" to [scanner].providers above (or
+# run `arb scan "rtx 4090" --provider ebay_browse`), export EBAY_CLIENT_ID /
+# EBAY_CLIENT_SECRET, then uncomment the table below. See configs/ebay_browse.
+# example.toml for every available key.
+# [providers.ebay_browse]
+# enabled = true
+# marketplace_id = "EBAY_IE"
+# page_size = 100
+# max_results = 200
 
 [normalization]
 unicode_form = "NFKC"          # one of: NFC, NFD, NFKC, NFKD

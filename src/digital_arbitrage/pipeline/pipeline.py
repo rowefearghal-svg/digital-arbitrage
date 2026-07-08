@@ -12,7 +12,8 @@ built on the existing mock providers - no scraping, AI/ML, or external APIs.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass, field
 
 from ..deduplication import DeduplicationConfig, Deduplicator
 from ..market_pricing import MarketPriceEstimator, MarketPricingConfig
@@ -24,7 +25,8 @@ from ..opportunity import (
     RecommendationScorer,
     ScoringConfig,
 )
-from ..product_scanner import ScannerConfig, build_scanner
+from ..product_scanner import ScannerConfig
+from ..providers.live import LiveProviderSetting, build_scanner_from_config
 from .models import PipelineItemResult, PipelineResult
 
 #: Sort priority for recommendations (higher is better).
@@ -64,6 +66,10 @@ class PipelineConfig:
     scoring_config: ScoringConfig | None = None
     #: Optional per-provider result cap passed to the scanner.
     scan_limit: int | None = None
+    #: Per-live-provider settings (enable flag + config), keyed by provider name.
+    #: Empty by default, so the pipeline is mock-only unless a live provider is
+    #: configured. Credentials are read from the environment, never from here.
+    live_provider_settings: Mapping[str, LiveProviderSetting] = field(default_factory=dict)
 
 
 class ArbitragePipeline:
@@ -71,7 +77,10 @@ class ArbitragePipeline:
 
     def __init__(self, config: PipelineConfig | None = None) -> None:
         self.config = config or PipelineConfig()
-        self._scanner = build_scanner(self.config.scanner_config)
+        self._scanner = build_scanner_from_config(
+            self.config.scanner_config,
+            self.config.live_provider_settings,
+        )
         self._normalizer = Normalizer(config=self.config.normalization_config)
         self._deduplicator = Deduplicator(self.config.deduplication_config)
         self._estimator = MarketPriceEstimator(self.config.pricing_config)

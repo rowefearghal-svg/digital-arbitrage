@@ -29,11 +29,18 @@ from .base import LiveProvider
 from .capabilities import ProviderCapabilities
 from .config import _ALLOWED_SCHEMES, LiveProviderConfig
 from .errors import ProviderConfigError, ProviderResponseError
-from .factory import create_live_provider, register_live_provider
+from .factory import (
+    create_live_provider,
+    register_live_provider,
+    register_live_provider_config_builder,
+    register_live_provider_env_builder,
+)
 from .http import HttpRequest, HttpResponse, Transport, resolve_url
 from .pagination import Page
 from .validation import ensure_list, ensure_mapping, optional, parse_json, require
 
+#: Default Browse API base URL (swap the host for the sandbox variant).
+DEFAULT_BASE_URL = "https://api.ebay.com"
 #: Default OAuth token endpoint (swap the host for the sandbox variant).
 DEFAULT_OAUTH_TOKEN_URL = "https://api.ebay.com/identity/v1/oauth2/token"
 #: Base scope sufficient for ``item_summary/search``.
@@ -339,3 +346,24 @@ def build_ebay_browse_provider_from_env(
         transport=transport,
         token_transport=token_transport,
     )
+
+
+def build_ebay_browse_config(config_data: Mapping[str, object]) -> EbayBrowseConfig:
+    """Build (and validate) an :class:`EbayBrowseConfig` from a plain mapping.
+
+    ``base_url`` defaults to :data:`DEFAULT_BASE_URL` when omitted so a live scan
+    works from a minimal (or empty) ``[providers.ebay_browse]`` config table.
+    """
+    data: dict[str, object] = {"base_url": DEFAULT_BASE_URL}
+    data.update(config_data)
+    config = EbayBrowseConfig.from_dict(data)
+    # ``from_dict`` is inherited and typed to the base class; ``cls`` is this
+    # subclass at runtime, so narrow the type for callers (and mypy).
+    assert isinstance(config, EbayBrowseConfig)
+    return config
+
+
+# Register the eBay Browse builders so the provider can be configured and built
+# by name (``ebay_browse``) from config + environment credentials.
+register_live_provider_config_builder(EbayBrowseProvider.name, build_ebay_browse_config)
+register_live_provider_env_builder(EbayBrowseProvider.name, build_ebay_browse_provider_from_env)
