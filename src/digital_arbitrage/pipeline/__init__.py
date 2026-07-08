@@ -3,7 +3,9 @@
 Wires every analytical stage into one call (Scanner -> Normalization -> Product
 Matching -> Deduplication -> Market Pricing -> Opportunity) and exposes it via
 ``ArbitragePipeline.analyze(query)`` and the ``arb`` CLI. Deterministic and
-provider-agnostic; mock providers only, no scraping/AI/APIs (ADR-009).
+provider-agnostic; mock providers by default (no scraping/AI/APIs, ADR-009), with
+an opt-in live provider such as ``ebay_browse`` for real, read-only marketplace
+scans (ADR-019/ADR-020).
 
 Quick start::
 

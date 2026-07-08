@@ -6,8 +6,11 @@
             -> Market Pricing -> Opportunity
 
 ``analyze(query)`` returns a :class:`PipelineResult` whose items are ranked by
-recommendation, then ROI, then confidence. Deterministic, provider-agnostic, and
-built on the existing mock providers - no scraping, AI/ML, or external APIs.
+recommendation, then ROI, then confidence. Deterministic and provider-agnostic:
+by default it uses the mock providers (no scraping, AI/ML, or external APIs), but
+a live provider (e.g. ``ebay_browse``) can be enabled via configuration, in which
+case the scan makes a real, read-only API call using credentials from the
+environment. See ADR-019/ADR-020.
 """
 
 from __future__ import annotations
@@ -25,7 +28,7 @@ from ..opportunity import (
     RecommendationScorer,
     ScoringConfig,
 )
-from ..product_scanner import ScannerConfig
+from ..product_scanner import Scanner, ScannerConfig
 from ..providers.live import LiveProviderSetting, build_scanner_from_config
 from .models import PipelineItemResult, PipelineResult
 
@@ -75,9 +78,15 @@ class PipelineConfig:
 class ArbitragePipeline:
     """Run the full scan-to-opportunity analysis for a query."""
 
-    def __init__(self, config: PipelineConfig | None = None) -> None:
+    def __init__(
+        self, config: PipelineConfig | None = None, *, scanner: Scanner | None = None
+    ) -> None:
         self.config = config or PipelineConfig()
-        self._scanner = build_scanner_from_config(
+        # A pre-built scanner can be injected (e.g. one wired to a fake
+        # ``Transport``) so the whole pipeline can be exercised end-to-end
+        # without any network call; otherwise it is built from the config,
+        # mixing mock and (optionally) live providers.
+        self._scanner = scanner or build_scanner_from_config(
             self.config.scanner_config,
             self.config.live_provider_settings,
         )
