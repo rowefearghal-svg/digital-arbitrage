@@ -745,3 +745,49 @@
   is unchanged: eBay's daily quota is not enforced by the per-second limiter, and
   price/condition filters and sorting are advertised as capabilities but not yet
   mapped into the request.
+
+### ADR-021: Enriching eBay Browse listings into `Listing.extra`
+
+- **Date:** 2026-07-14
+- **Status:** Accepted
+- **Context:** ADR-018 shipped the `ebay_browse` provider but mapped only a
+  minimal slice of the Browse `itemSummary` payload — `image_url`,
+  `buying_options`, `seller` (username), and `condition_id`. The Browse API
+  returns far more per listing (seller reputation, shipping cost/service,
+  listing timestamps, category, marketing/strike-through pricing, auction
+  dynamics, popularity, extra images, product identifiers). Richer data improves
+  market analysis today and builds better datasets for future ML. We wanted to
+  capture it without destabilising the shared, provider-agnostic `Listing`
+  model or the downstream opportunity calculations.
+- **Decision:**
+  - *Store enrichment in `Listing.extra`, not new model fields.* `Listing.extra`
+    is the existing `dict[str, str]` escape hatch for "provider-specific extras
+    that do not fit the common shape". Every additional useful Browse field is
+    mapped there under a stable, snake_case key. The core `Listing` schema is
+    untouched, so nothing that reads `price`/`condition`/`location`/etc. — most
+    importantly the opportunity/profit scoring (ADR-008/012) — changes at all.
+    Cross-provider code stays honest: only fields common to all providers live on
+    the model; eBay-only richness stays in `extra`.
+  - *Flat, string-typed, lossless-ish encoding.* Scalars are stringified
+    (integral floats drop the redundant `.0`), booleans become `"true"`/`"false"`,
+    string lists are comma-joined, and eBay amount objects are split into
+    `*_price`/`*_currency` (or `*_cost`/`*_currency`) pairs. This keeps `extra` a
+    simple, serialisable `dict[str, str]` (so SQLite persistence and CSV/JSON
+    export from ADR-011/013 keep working unchanged) while remaining trivially
+    parseable by future analytics/ML.
+  - *Add-only, guarded mapping.* Small typed helpers (`_add_str`, `_add_number`,
+    `_add_bool`, `_add_str_list`, `_add_amount`, ...) add a key only when the
+    source field is present and non-empty, reusing the existing `optional`
+    validation so malformed types still fail loud with a context-prefixed
+    `ProviderResponseError`. The four pre-existing keys keep their exact names and
+    values, so the change is fully backwards compatible; `seller` remains the
+    username.
+- **Consequences:** Listings now carry substantially more metadata (seller
+  feedback, shipping, timing, category, discounts, auction bid/price, watch
+  count where eBay provides it, multiple image URLs, identifiers). No new
+  dependencies, standard library only, still read-only. Opportunity calculations
+  and the CLI are unchanged. `watchCount` is not returned by every marketplace/
+  query, so `watch_count` is best-effort. Consumers wanting typed access must
+  parse `extra` strings themselves — an acceptable trade-off for keeping the
+  shared model stable; a future ADR could promote heavily-used keys to typed
+  fields if warranted.

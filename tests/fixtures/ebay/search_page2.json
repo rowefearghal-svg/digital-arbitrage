@@ -21,6 +21,8 @@
       "title": "RTX 4090 auction - no reserve",
       "itemWebUrl": "https://www.ebay.ie/itm/110000000004",
       "buyingOptions": ["AUCTION"],
+      "currentBidPrice": {"value": "999.00", "currency": "EUR"},
+      "bidCount": 14,
       "itemLocation": {"country": "IE"}
     }
   ]
