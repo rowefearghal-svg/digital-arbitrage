@@ -320,10 +320,35 @@ When no `AuthProvider` is given, the client falls back to a static
 `EbayBrowseProvider` (`"ebay_browse"`) is the first real, **read-only** provider
 (ADR-018). It calls the officially supported eBay Browse API
 (`GET /buy/browse/v1/item_summary/search`) with an application OAuth token and
-maps each item summary onto the shared `Listing` model - eBay-only fields
-(`image_url`, `buying_options`, `seller`, `condition_id`) land in `Listing.extra`.
+maps each item summary onto the shared `Listing` model. The core fields
+(`price`, `currency`, `condition`, `location`, ...) populate `Listing` directly;
+every other useful Browse field is preserved in the flat `Listing.extra`
+(`dict[str, str]`) metadata map so it is available for market analysis and future
+ML without touching the core model or the opportunity calculations (ADR-021).
 Credentials come only from the `EBAY_CLIENT_ID` / `EBAY_CLIENT_SECRET`
 environment variables and are never committed or logged.
+
+Fields mapped into `Listing.extra` when present (only non-empty values are added,
+so listings stay lean and the mapping is backwards compatible):
+
+| Group | `extra` keys |
+| --- | --- |
+| Images | `image_url`, `thumbnail_image_urls`, `additional_image_urls` |
+| Buying | `buying_options`, `current_bid_price`, `current_bid_currency`, `bid_count` |
+| Condition | `condition_id`, `condition_text` |
+| Seller | `seller`, `seller_feedback_percentage`, `seller_feedback_score`, `seller_account_type` |
+| Shipping | `shipping_cost`, `shipping_currency`, `shipping_cost_type`, `shipping_type`, `shipping_carrier`, `shipping_min_delivery`, `shipping_max_delivery`, `shipping_guaranteed_delivery` |
+| Location | `item_city`, `item_state`, `item_postal_code`, `item_country` |
+| Category | `category_id`, `category_name`, `leaf_category_ids` |
+| Timing | `item_creation_date`, `item_end_date` |
+| Pricing | `original_price`, `original_price_currency`, `discount_percentage`, `discount_amount`, `discount_amount_currency`, `price_treatment`, `unit_price`, `unit_price_currency`, `unit_pricing_measure` |
+| Popularity | `watch_count` |
+| Identifiers / misc | `epid`, `legacy_item_id`, `item_href`, `item_affiliate_web_url`, `item_group_type`, `subtitle`, `short_description`, `listing_marketplace_id`, `qualified_programs`, `adult_only`, `available_coupons`, `top_rated_buying_experience`, `priority_listing` |
+
+Numbers are stringified (integral floats lose the trailing `.0`), booleans become
+`"true"`/`"false"`, lists are comma-joined, and eBay amount objects are split into
+`*_price`/`*_currency` (or `*_cost`/`*_currency`) pairs. Watch count is only
+present on marketplaces/queries where eBay returns it.
 
 ```python
 import os

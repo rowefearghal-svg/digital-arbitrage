@@ -68,6 +68,13 @@ _CONDITION_BY_ID: dict[str, Condition] = {
 }
 
 
+def _format_number(value: int | float) -> str:
+    """Render a JSON number as a string, dropping a redundant ``.0`` on floats."""
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return str(value)
+
+
 def _map_condition(condition_id: str | None, condition_text: str | None) -> Condition:
     """Map an eBay condition onto our coarse :class:`Condition` enum."""
     if condition_id:
@@ -240,33 +247,261 @@ class EbayBrowseProvider(LiveProvider):
     def _build_extra(
         self, summary: dict[str, object], *, condition_id: str | None
     ) -> dict[str, str]:
+        """Map every useful Browse ``itemSummary`` field into ``Listing.extra``.
+
+        ``Listing.extra`` is a flat ``dict[str, str]`` of provider-specific
+        metadata, so scalars are coerced to strings, nested amounts are split
+        into ``*_price``/``*_currency`` pairs, and lists are comma-joined. Only
+        present, non-empty fields are added, so listings stay lean and the set
+        of keys is fully backwards compatible (existing keys are preserved).
+        See ADR-021 for the enrichment strategy.
+        """
+        ctx = "itemSummaries[]"
         extra: dict[str, str] = {}
-        image = optional(
-            summary, "image", dict, context="itemSummaries[].image", provider=self.name
-        )
-        if image is not None:
-            image_url = optional(
-                image, "imageUrl", str, context="itemSummaries[].image", provider=self.name
-            )
-            if image_url:
-                extra["image_url"] = image_url
-        buying_options = summary.get("buyingOptions")
-        if isinstance(buying_options, list):
-            options = [item for item in buying_options if isinstance(item, str)]
-            if options:
-                extra["buying_options"] = ",".join(options)
-        seller = optional(
-            summary, "seller", dict, context="itemSummaries[].seller", provider=self.name
-        )
-        if seller is not None:
-            username = optional(
-                seller, "username", str, context="itemSummaries[].seller", provider=self.name
-            )
-            if username:
-                extra["seller"] = username
+
+        # Images: primary plus any thumbnail / additional gallery URLs.
+        self._add_images(summary, extra, ctx=ctx)
+
+        # Buying options (FIXED_PRICE / AUCTION / BEST_OFFER ...).
+        self._add_str_list(extra, summary, "buyingOptions", "buying_options", ctx=ctx)
+
+        # Condition: the stable id plus eBay's free-text label.
         if condition_id:
             extra["condition_id"] = condition_id
+        self._add_str(extra, summary, "condition", "condition_text", ctx=ctx)
+
+        # Seller identity and reputation signals.
+        self._add_seller(summary, extra, ctx=ctx)
+
+        # Shipping cost / service details (primary option).
+        self._add_shipping(summary, extra, ctx=ctx)
+
+        # Structured item location (the flat ``Listing.location`` is derived
+        # from these but loses the individual components).
+        self._add_location_detail(summary, extra, ctx=ctx)
+
+        # Category classification.
+        self._add_category(summary, extra, ctx=ctx)
+
+        # Listing lifecycle timestamps (ISO-8601 strings from eBay).
+        self._add_str(extra, summary, "itemCreationDate", "item_creation_date", ctx=ctx)
+        self._add_str(extra, summary, "itemEndDate", "item_end_date", ctx=ctx)
+
+        # Marketing / strike-through discount pricing.
+        self._add_marketing_price(summary, extra, ctx=ctx)
+
+        # Auction dynamics and popularity signals (present per marketplace).
+        self._add_amount(
+            extra, summary, "currentBidPrice", "current_bid_price", "current_bid_currency", ctx=ctx
+        )
+        self._add_number(extra, summary, "bidCount", "bid_count", ctx=ctx)
+        self._add_number(extra, summary, "watchCount", "watch_count", ctx=ctx)
+
+        # Unit pricing (e.g. price per 100g).
+        self._add_amount(extra, summary, "unitPrice", "unit_price", "unit_price_currency", ctx=ctx)
+        self._add_str(extra, summary, "unitPricingMeasure", "unit_pricing_measure", ctx=ctx)
+
+        # Product identifiers and other marketplace metadata.
+        self._add_str(extra, summary, "epid", "epid", ctx=ctx)
+        self._add_str(extra, summary, "legacyItemId", "legacy_item_id", ctx=ctx)
+        self._add_str(extra, summary, "itemHref", "item_href", ctx=ctx)
+        self._add_str(extra, summary, "itemAffiliateWebUrl", "item_affiliate_web_url", ctx=ctx)
+        self._add_str(extra, summary, "itemGroupType", "item_group_type", ctx=ctx)
+        self._add_str(extra, summary, "subtitle", "subtitle", ctx=ctx)
+        self._add_str(extra, summary, "shortDescription", "short_description", ctx=ctx)
+        self._add_str(extra, summary, "listingMarketplaceId", "listing_marketplace_id", ctx=ctx)
+        self._add_str_list(extra, summary, "qualifiedPrograms", "qualified_programs", ctx=ctx)
+        self._add_bool(extra, summary, "adultOnly", "adult_only", ctx=ctx)
+        self._add_bool(extra, summary, "availableCoupons", "available_coupons", ctx=ctx)
+        self._add_bool(
+            extra, summary, "topRatedBuyingExperience", "top_rated_buying_experience", ctx=ctx
+        )
+        self._add_bool(extra, summary, "priorityListing", "priority_listing", ctx=ctx)
+
         return extra
+
+    # -- Listing.extra field helpers ---------------------------------------- #
+
+    def _add_str(
+        self,
+        extra: dict[str, str],
+        mapping: dict[str, object],
+        key: str,
+        out_key: str,
+        *,
+        ctx: str,
+    ) -> None:
+        """Copy a non-empty string field across (validated, type-checked)."""
+        value = optional(mapping, key, str, context=ctx, provider=self.name)
+        if value:
+            extra[out_key] = value
+
+    def _add_number(
+        self,
+        extra: dict[str, str],
+        mapping: dict[str, object],
+        key: str,
+        out_key: str,
+        *,
+        ctx: str,
+    ) -> None:
+        """Copy a numeric field, rendered without a spurious trailing ``.0``."""
+        raw = mapping.get(key)
+        if raw is None:
+            return
+        if isinstance(raw, bool) or not isinstance(raw, int | float):
+            raise ProviderResponseError(
+                f"{ctx}.{key}: expected a number, got {type(raw).__name__}", provider=self.name
+            )
+        extra[out_key] = _format_number(raw)
+
+    def _add_bool(
+        self,
+        extra: dict[str, str],
+        mapping: dict[str, object],
+        key: str,
+        out_key: str,
+        *,
+        ctx: str,
+    ) -> None:
+        """Copy a boolean field as the string ``"true"``/``"false"``."""
+        value = optional(mapping, key, bool, context=ctx, provider=self.name)
+        if value is not None:
+            extra[out_key] = "true" if value else "false"
+
+    def _add_str_list(
+        self,
+        extra: dict[str, str],
+        mapping: dict[str, object],
+        key: str,
+        out_key: str,
+        *,
+        ctx: str,
+    ) -> None:
+        """Copy a list of strings as a comma-joined string (skips non-strings)."""
+        raw = mapping.get(key)
+        if not isinstance(raw, list):
+            return
+        values = [item for item in raw if isinstance(item, str) and item]
+        if values:
+            extra[out_key] = ",".join(values)
+
+    def _add_amount(
+        self,
+        extra: dict[str, str],
+        mapping: dict[str, object],
+        key: str,
+        value_out: str,
+        currency_out: str,
+        *,
+        ctx: str,
+    ) -> None:
+        """Split an eBay amount object into ``value``/``currency`` extra keys."""
+        obj = optional(mapping, key, dict, context=f"{ctx}.{key}", provider=self.name)
+        if obj is None:
+            return
+        actx = f"{ctx}.{key}"
+        self._add_str(extra, obj, "value", value_out, ctx=actx)
+        self._add_str(extra, obj, "currency", currency_out, ctx=actx)
+
+    def _add_images(self, summary: dict[str, object], extra: dict[str, str], *, ctx: str) -> None:
+        image = optional(summary, "image", dict, context=f"{ctx}.image", provider=self.name)
+        if image is not None:
+            self._add_str(extra, image, "imageUrl", "image_url", ctx=f"{ctx}.image")
+        self._add_image_urls(summary, extra, "thumbnailImages", "thumbnail_image_urls", ctx=ctx)
+        self._add_image_urls(summary, extra, "additionalImages", "additional_image_urls", ctx=ctx)
+
+    def _add_image_urls(
+        self,
+        summary: dict[str, object],
+        extra: dict[str, str],
+        key: str,
+        out_key: str,
+        *,
+        ctx: str,
+    ) -> None:
+        raw = summary.get(key)
+        if not isinstance(raw, list):
+            return
+        urls: list[str] = []
+        for item in raw:
+            if isinstance(item, dict):
+                url = item.get("imageUrl")
+                if isinstance(url, str) and url:
+                    urls.append(url)
+        if urls:
+            extra[out_key] = ",".join(urls)
+
+    def _add_seller(self, summary: dict[str, object], extra: dict[str, str], *, ctx: str) -> None:
+        seller = optional(summary, "seller", dict, context=f"{ctx}.seller", provider=self.name)
+        if seller is None:
+            return
+        sctx = f"{ctx}.seller"
+        # ``seller`` (the username) is preserved as-is for backwards compatibility.
+        self._add_str(extra, seller, "username", "seller", ctx=sctx)
+        self._add_str(extra, seller, "feedbackPercentage", "seller_feedback_percentage", ctx=sctx)
+        self._add_number(extra, seller, "feedbackScore", "seller_feedback_score", ctx=sctx)
+        self._add_str(extra, seller, "sellerAccountType", "seller_account_type", ctx=sctx)
+
+    def _add_shipping(self, summary: dict[str, object], extra: dict[str, str], *, ctx: str) -> None:
+        raw = summary.get("shippingOptions")
+        if not isinstance(raw, list) or not raw:
+            return
+        primary = raw[0]
+        if not isinstance(primary, dict):
+            return
+        sctx = f"{ctx}.shippingOptions[]"
+        self._add_amount(
+            extra, primary, "shippingCost", "shipping_cost", "shipping_currency", ctx=sctx
+        )
+        self._add_str(extra, primary, "shippingCostType", "shipping_cost_type", ctx=sctx)
+        self._add_str(extra, primary, "type", "shipping_type", ctx=sctx)
+        self._add_str(extra, primary, "shippingCarrierCode", "shipping_carrier", ctx=sctx)
+        self._add_str(extra, primary, "minEstimatedDeliveryDate", "shipping_min_delivery", ctx=sctx)
+        self._add_str(extra, primary, "maxEstimatedDeliveryDate", "shipping_max_delivery", ctx=sctx)
+        self._add_bool(
+            extra, primary, "guaranteedDelivery", "shipping_guaranteed_delivery", ctx=sctx
+        )
+
+    def _add_location_detail(
+        self, summary: dict[str, object], extra: dict[str, str], *, ctx: str
+    ) -> None:
+        loc = optional(
+            summary, "itemLocation", dict, context=f"{ctx}.itemLocation", provider=self.name
+        )
+        if loc is None:
+            return
+        lctx = f"{ctx}.itemLocation"
+        self._add_str(extra, loc, "city", "item_city", ctx=lctx)
+        self._add_str(extra, loc, "stateOrProvince", "item_state", ctx=lctx)
+        self._add_str(extra, loc, "postalCode", "item_postal_code", ctx=lctx)
+        self._add_str(extra, loc, "country", "item_country", ctx=lctx)
+
+    def _add_category(self, summary: dict[str, object], extra: dict[str, str], *, ctx: str) -> None:
+        raw = summary.get("categories")
+        if isinstance(raw, list) and raw and isinstance(raw[0], dict):
+            cctx = f"{ctx}.categories[]"
+            self._add_str(extra, raw[0], "categoryId", "category_id", ctx=cctx)
+            self._add_str(extra, raw[0], "categoryName", "category_name", ctx=cctx)
+        self._add_str_list(extra, summary, "leafCategoryIds", "leaf_category_ids", ctx=ctx)
+
+    def _add_marketing_price(
+        self, summary: dict[str, object], extra: dict[str, str], *, ctx: str
+    ) -> None:
+        mp = optional(
+            summary, "marketingPrice", dict, context=f"{ctx}.marketingPrice", provider=self.name
+        )
+        if mp is None:
+            return
+        mctx = f"{ctx}.marketingPrice"
+        self._add_amount(
+            extra, mp, "originalPrice", "original_price", "original_price_currency", ctx=mctx
+        )
+        self._add_str(extra, mp, "discountPercentage", "discount_percentage", ctx=mctx)
+        self._add_amount(
+            extra, mp, "discountAmount", "discount_amount", "discount_amount_currency", ctx=mctx
+        )
+        self._add_str(extra, mp, "priceTreatment", "price_treatment", ctx=mctx)
 
     def _has_more(self, payload: dict[str, object]) -> bool:
         """Whether another page exists (server ``next`` link, else offset math)."""

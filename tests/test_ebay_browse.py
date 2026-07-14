@@ -167,9 +167,57 @@ def test_maps_all_listing_fields_for_first_item() -> None:
     assert first.posted_at is None
     assert first.extra == {
         "image_url": "https://i.ebayimg.com/images/g/example0001/s-l225.jpg",
+        "thumbnail_image_urls": "https://i.ebayimg.com/images/g/example0001/s-l64.jpg",
+        "additional_image_urls": (
+            "https://i.ebayimg.com/images/g/example0001/s-l500-a.jpg,"
+            "https://i.ebayimg.com/images/g/example0001/s-l500-b.jpg"
+        ),
         "buying_options": "FIXED_PRICE",
-        "seller": "example_seller_ie",
         "condition_id": "1000",
+        "condition_text": "New",
+        "seller": "example_seller_ie",
+        "seller_feedback_percentage": "99.5",
+        "seller_feedback_score": "4821",
+        "seller_account_type": "BUSINESS",
+        "shipping_cost": "12.50",
+        "shipping_currency": "EUR",
+        "shipping_cost_type": "FIXED",
+        "shipping_type": "Economy Shipping",
+        "shipping_carrier": "AnPost",
+        "shipping_min_delivery": "2026-07-16T00:00:00.000Z",
+        "shipping_max_delivery": "2026-07-18T00:00:00.000Z",
+        "shipping_guaranteed_delivery": "false",
+        "item_city": "Dublin",
+        "item_state": "Leinster",
+        "item_postal_code": "D01",
+        "item_country": "IE",
+        "category_id": "27386",
+        "category_name": "Graphics/Video Cards",
+        "leaf_category_ids": "27386",
+        "item_creation_date": "2026-07-01T09:00:00.000Z",
+        "item_end_date": "2026-08-01T09:00:00.000Z",
+        "original_price": "1999.99",
+        "original_price_currency": "EUR",
+        "discount_percentage": "10",
+        "discount_amount": "200.00",
+        "discount_amount_currency": "EUR",
+        "price_treatment": "STRIKETHROUGH",
+        "watch_count": "37",
+        "unit_price": "1799.99",
+        "unit_price_currency": "EUR",
+        "unit_pricing_measure": "1 unit",
+        "epid": "24057409123",
+        "legacy_item_id": "110000000001",
+        "item_href": "https://api.ebay.com/buy/browse/v1/item/v1%7C110000000001%7C0",
+        "item_affiliate_web_url": "https://www.ebay.ie/itm/110000000001?mkcid=1",
+        "subtitle": "Factory sealed, ships from Ireland",
+        "short_description": "Brand new sealed RTX 4090 Founders Edition.",
+        "listing_marketplace_id": "EBAY_IE",
+        "qualified_programs": "EBAY_PLUS,AUTHENTICITY_GUARANTEE",
+        "adult_only": "false",
+        "available_coupons": "true",
+        "top_rated_buying_experience": "true",
+        "priority_listing": "false",
     }
 
 
@@ -199,7 +247,13 @@ def test_auction_item_without_price_defaults_currency_and_none_price() -> None:
     assert auction.currency == "EUR"  # config default
     assert auction.condition is Condition.UNKNOWN  # no conditionId or text
     assert auction.location == "IE"
-    assert auction.extra == {"buying_options": "AUCTION"}
+    assert auction.extra == {
+        "buying_options": "AUCTION",
+        "current_bid_price": "999.00",
+        "current_bid_currency": "EUR",
+        "bid_count": "14",
+        "item_country": "IE",
+    }
     assert "condition_id" not in auction.extra
 
 
@@ -267,6 +321,169 @@ def test_condition_text_fallback_when_id_absent(text: str, expected: Condition) 
     transport = _SearchTransport({"0": _response(200, json.dumps(body).encode())})
     listing = _provider(transport).search("q", limit=1)[0]
     assert listing.condition is expected
+
+
+# --------------------------------------------------------------------------- #
+# Enrichment: Listing.extra field mapping (Sprint 27 / ADR-021)
+# --------------------------------------------------------------------------- #
+
+
+def _extra_for(item: dict[str, object]) -> dict[str, str]:
+    """Map a single raw item summary and return its ``Listing.extra``."""
+    body = {"total": 1, "limit": 2, "offset": 0, "itemSummaries": [item]}
+    transport = _SearchTransport({"0": _response(200, json.dumps(body).encode())})
+    return _provider(transport).search("q", limit=1)[0].extra
+
+
+_MINIMAL_ITEM: dict[str, object] = {
+    "itemId": "v1|1|0",
+    "title": "bare item",
+    "itemWebUrl": "https://www.ebay.ie/itm/1",
+}
+
+
+def test_minimal_item_produces_empty_extra() -> None:
+    assert _extra_for(dict(_MINIMAL_ITEM)) == {}
+
+
+def test_backwards_compatible_extra_keys_preserved() -> None:
+    provider, _ = _page1_provider()
+    extra = provider.search("rtx 4090", limit=1)[0].extra
+    # Keys that existed before Sprint 27 must still be present and unchanged.
+    assert extra["image_url"] == "https://i.ebayimg.com/images/g/example0001/s-l225.jpg"
+    assert extra["buying_options"] == "FIXED_PRICE"
+    assert extra["seller"] == "example_seller_ie"
+    assert extra["condition_id"] == "1000"
+
+
+def test_seller_reputation_fields_mapped() -> None:
+    extra = _extra_for(
+        {
+            **_MINIMAL_ITEM,
+            "seller": {
+                "username": "u",
+                "feedbackPercentage": "98.7",
+                "feedbackScore": 1234,
+                "sellerAccountType": "INDIVIDUAL",
+            },
+        }
+    )
+    assert extra["seller"] == "u"
+    assert extra["seller_feedback_percentage"] == "98.7"
+    assert extra["seller_feedback_score"] == "1234"
+    assert extra["seller_account_type"] == "INDIVIDUAL"
+
+
+def test_shipping_uses_primary_option_only() -> None:
+    extra = _extra_for(
+        {
+            **_MINIMAL_ITEM,
+            "shippingOptions": [
+                {"shippingCostType": "FIXED", "shippingCost": {"value": "5.00", "currency": "GBP"}},
+                {"shippingCostType": "CALCULATED"},
+            ],
+        }
+    )
+    assert extra["shipping_cost"] == "5.00"
+    assert extra["shipping_currency"] == "GBP"
+    assert extra["shipping_cost_type"] == "FIXED"
+
+
+def test_free_shipping_zero_cost_is_mapped() -> None:
+    extra = _extra_for(
+        {
+            **_MINIMAL_ITEM,
+            "shippingOptions": [
+                {"shippingCostType": "FIXED", "shippingCost": {"value": "0.00", "currency": "EUR"}}
+            ],
+        }
+    )
+    assert extra["shipping_cost"] == "0.00"
+
+
+def test_category_takes_first_and_joins_leaf_ids() -> None:
+    extra = _extra_for(
+        {
+            **_MINIMAL_ITEM,
+            "categories": [
+                {"categoryId": "111", "categoryName": "Primary"},
+                {"categoryId": "222", "categoryName": "Secondary"},
+            ],
+            "leafCategoryIds": ["111", "333"],
+        }
+    )
+    assert extra["category_id"] == "111"
+    assert extra["category_name"] == "Primary"
+    assert extra["leaf_category_ids"] == "111,333"
+
+
+def test_boolean_fields_render_as_true_false_strings() -> None:
+    extra = _extra_for({**_MINIMAL_ITEM, "adultOnly": True, "topRatedBuyingExperience": False})
+    assert extra["adult_only"] == "true"
+    assert extra["top_rated_buying_experience"] == "false"
+
+
+def test_integer_valued_float_number_renders_without_trailing_zero() -> None:
+    extra = _extra_for({**_MINIMAL_ITEM, "watchCount": 42.0})
+    assert extra["watch_count"] == "42"
+
+
+def test_non_numeric_watch_count_raises_response_error() -> None:
+    with pytest.raises(ProviderResponseError, match="expected a number"):
+        _extra_for({**_MINIMAL_ITEM, "watchCount": "lots"})
+
+
+def test_image_lists_joined_and_skip_malformed_entries() -> None:
+    extra = _extra_for(
+        {
+            **_MINIMAL_ITEM,
+            "thumbnailImages": [{"imageUrl": "https://x/t1.jpg"}, {"noUrl": 1}, "bad"],
+            "additionalImages": [
+                {"imageUrl": "https://x/a1.jpg"},
+                {"imageUrl": "https://x/a2.jpg"},
+            ],
+        }
+    )
+    assert extra["thumbnail_image_urls"] == "https://x/t1.jpg"
+    assert extra["additional_image_urls"] == "https://x/a1.jpg,https://x/a2.jpg"
+
+
+def test_marketing_discount_and_current_bid_split_into_value_currency() -> None:
+    extra = _extra_for(
+        {
+            **_MINIMAL_ITEM,
+            "marketingPrice": {
+                "originalPrice": {"value": "100.00", "currency": "USD"},
+                "discountPercentage": "20",
+                "discountAmount": {"value": "20.00", "currency": "USD"},
+                "priceTreatment": "MARKDOWN",
+            },
+            "currentBidPrice": {"value": "50.00", "currency": "USD"},
+        }
+    )
+    assert extra["original_price"] == "100.00"
+    assert extra["original_price_currency"] == "USD"
+    assert extra["discount_percentage"] == "20"
+    assert extra["discount_amount"] == "20.00"
+    assert extra["price_treatment"] == "MARKDOWN"
+    assert extra["current_bid_price"] == "50.00"
+    assert extra["current_bid_currency"] == "USD"
+
+
+def test_listing_times_and_identifiers_mapped() -> None:
+    extra = _extra_for(
+        {
+            **_MINIMAL_ITEM,
+            "itemCreationDate": "2026-07-01T09:00:00.000Z",
+            "itemEndDate": "2026-08-01T09:00:00.000Z",
+            "epid": "999",
+            "legacyItemId": "abc",
+        }
+    )
+    assert extra["item_creation_date"] == "2026-07-01T09:00:00.000Z"
+    assert extra["item_end_date"] == "2026-08-01T09:00:00.000Z"
+    assert extra["epid"] == "999"
+    assert extra["legacy_item_id"] == "abc"
 
 
 # --------------------------------------------------------------------------- #

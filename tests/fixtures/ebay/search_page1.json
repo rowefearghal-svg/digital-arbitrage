@@ -7,16 +7,64 @@
   "itemSummaries": [
     {
       "itemId": "v1|110000000001|0",
+      "legacyItemId": "110000000001",
       "title": "NVIDIA GeForce RTX 4090 Founders Edition 24GB",
+      "subtitle": "Factory sealed, ships from Ireland",
+      "shortDescription": "Brand new sealed RTX 4090 Founders Edition.",
       "itemWebUrl": "https://www.ebay.ie/itm/110000000001",
+      "itemAffiliateWebUrl": "https://www.ebay.ie/itm/110000000001?mkcid=1",
       "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1%7C110000000001%7C0",
+      "epid": "24057409123",
+      "listingMarketplaceId": "EBAY_IE",
       "price": {"value": "1799.99", "currency": "EUR"},
+      "marketingPrice": {
+        "originalPrice": {"value": "1999.99", "currency": "EUR"},
+        "discountPercentage": "10",
+        "discountAmount": {"value": "200.00", "currency": "EUR"},
+        "priceTreatment": "STRIKETHROUGH"
+      },
       "condition": "New",
       "conditionId": "1000",
       "itemLocation": {"city": "Dublin", "stateOrProvince": "Leinster", "postalCode": "D01", "country": "IE"},
       "image": {"imageUrl": "https://i.ebayimg.com/images/g/example0001/s-l225.jpg"},
+      "thumbnailImages": [{"imageUrl": "https://i.ebayimg.com/images/g/example0001/s-l64.jpg"}],
+      "additionalImages": [
+        {"imageUrl": "https://i.ebayimg.com/images/g/example0001/s-l500-a.jpg"},
+        {"imageUrl": "https://i.ebayimg.com/images/g/example0001/s-l500-b.jpg"}
+      ],
       "buyingOptions": ["FIXED_PRICE"],
-      "seller": {"username": "example_seller_ie"}
+      "categories": [
+        {"categoryId": "27386", "categoryName": "Graphics/Video Cards"},
+        {"categoryId": "175673", "categoryName": "Computer Components & Parts"}
+      ],
+      "leafCategoryIds": ["27386"],
+      "seller": {
+        "username": "example_seller_ie",
+        "feedbackPercentage": "99.5",
+        "feedbackScore": 4821,
+        "sellerAccountType": "BUSINESS"
+      },
+      "shippingOptions": [
+        {
+          "shippingCostType": "FIXED",
+          "shippingCost": {"value": "12.50", "currency": "EUR"},
+          "type": "Economy Shipping",
+          "shippingCarrierCode": "AnPost",
+          "minEstimatedDeliveryDate": "2026-07-16T00:00:00.000Z",
+          "maxEstimatedDeliveryDate": "2026-07-18T00:00:00.000Z",
+          "guaranteedDelivery": false
+        }
+      ],
+      "itemCreationDate": "2026-07-01T09:00:00.000Z",
+      "itemEndDate": "2026-08-01T09:00:00.000Z",
+      "watchCount": 37,
+      "adultOnly": false,
+      "availableCoupons": true,
+      "topRatedBuyingExperience": true,
+      "priorityListing": false,
+      "qualifiedPrograms": ["EBAY_PLUS", "AUTHENTICITY_GUARANTEE"],
+      "unitPrice": {"value": "1799.99", "currency": "EUR"},
+      "unitPricingMeasure": "1 unit"
     },
     {
       "itemId": "v1|110000000002|0",
