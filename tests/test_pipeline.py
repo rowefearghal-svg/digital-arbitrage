@@ -105,6 +105,16 @@ def test_pipeline_populates_recommendation_score() -> None:
         assert item.to_dict()["recommendation_score"] == round(item.score, 2)
 
 
+def test_pipeline_classifies_every_listing() -> None:
+    result = ArbitragePipeline().analyze("rtx 4090")
+    canonicals = [item.group.canonical for item in result.items]
+    assert canonicals, "expected at least one grouped listing"
+    for listing in canonicals:
+        assert listing.classification is not None
+        assert 0 <= listing.classification.match_confidence <= 100
+        assert listing.classification.reason
+
+
 def test_scan_limit_reduces_listings() -> None:
     full = ArbitragePipeline().analyze("rtx 4090")
     limited = ArbitragePipeline(PipelineConfig(scan_limit=1)).analyze("rtx 4090")

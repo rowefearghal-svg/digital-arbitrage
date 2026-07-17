@@ -791,3 +791,52 @@
   parse `extra` strings themselves — an acceptable trade-off for keeping the
   shared model stable; a future ADR could promote heavily-used keys to typed
   fields if warranted.
+
+### ADR-022: Generic, title-only listing classification
+
+- **Date:** 2026-07-17
+- **Status:** Accepted
+- **Context:** Live scans (ADR-020) return genuine listings but also cables,
+  adapters, spare fans, empty boxes, and unrelated keyword matches. Feeding
+  these into pricing/opportunity pollutes every later stage. We need to tell the
+  real product apart from accessories/parts/junk *before* pricing — without
+  becoming eBay-specific, since future providers (Amazon, Facebook Marketplace,
+  DoneDeal, Adverts, ...) must reuse the same logic. The engine must stay
+  deterministic: no images, no LLMs, no external services (ADR-006/007).
+- **Decision:**
+  - *New `classification` module, driven by a marketplace-independent
+    `SearchProfile`.* The profile is four plain keyword sets — `required_terms`,
+    `excluded_terms`, `accessory_terms`, `part_terms` — with generic defaults in
+    `keywords.py`. `required_terms` are derived from the search query's tokens;
+    the rest seed from defaults and are fully overridable via
+    `ClassificationConfig`. Nothing in the module imports a provider.
+  - *Title-only, deterministic matching.* Two matchers (`matching.py`), both
+    built on the existing `normalization.text.tokenize` (so case, spacing,
+    punctuation, hyphens, and repeated whitespace never change the outcome and
+    no new dependency is added): **word/phrase matching** on whole-token
+    boundaries (so `fan` matches `stock fan` but not `fantastic`), used for
+    accessory/part/excluded keywords; and **compact matching** (alphanumerics
+    only, boundaries ignored) used solely for required model tokens, so glued
+    forms like `rtx4090` still match a requirement for `rtx 4090`.
+  - *Fixed decision order (first match wins):* excluded keyword → `REJECTED`;
+    no required token present → `REJECTED`; some-but-not-all required present →
+    `UNKNOWN`; accessory keyword → `ACCESSORY`; part keyword → `PART`; else
+    `COMPLETE_PRODUCT`. Accessory is checked before part (documented tie-break).
+    Each verdict carries a deterministic 0-100 `match_confidence` and a
+    human-readable `reason` (e.g. `"Accessory keyword: cable"`,
+    `"Strong model match"`, `"Missing required term: rtx 4090"`).
+  - *Additive integration.* A `classification: ListingClassification | None`
+    field is added to `NormalizedListing` (defaults to `None`, so existing
+    callers are unaffected). The pipeline runs the classifier between
+    normalization and deduplication, annotating every listing **in place** and
+    removing none. Excluded keywords are conservative and phrase-based (e.g.
+    `"empty box"`, not `"box"`) so genuine listings that merely mention their
+    box/manual are never disqualified.
+- **Consequences:** Standard library only; deterministic and provider-agnostic.
+  Existing provider interfaces, pricing, scoring, CLI output, and persistence
+  are untouched — classifications are computed and attached but do **not** yet
+  affect deduplication, pricing, or ranking; how they feed scoring is left to a
+  future sprint. Because required terms come from raw query tokens, very short
+  or ambiguous tokens can theoretically compact-match unintended substrings
+  (e.g. `i9`); acceptable for now, revisitable with per-token minimum lengths or
+  provider-supplied profiles later.

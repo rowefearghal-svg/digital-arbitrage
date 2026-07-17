@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from ..classification.models import ListingClassification
 from ..product_scanner.models import Condition, Listing
 
 
@@ -23,6 +24,10 @@ class NormalizedListing:
     currency: str | None = None
     condition: Condition = Condition.UNKNOWN
     location: str | None = None
+    #: Title-based relevance verdict, populated by the classification stage
+    #: (see ADR-022). ``None`` until a classifier runs, so this is fully
+    #: backwards compatible for listings that skip classification.
+    classification: ListingClassification | None = None
 
     @classmethod
     def from_listing(cls, listing: Listing) -> NormalizedListing:
