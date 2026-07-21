@@ -80,6 +80,7 @@ from .pagination import Page, paginate
 from .rate_limit import TokenBucketRateLimiter
 from .retry import DEFAULT_RETRY_STATUS, RetryPolicy, run_with_retries
 from .scanning import LiveProviderSetting, build_scanner_from_config
+from .stockx import StockXCredentials
 from .validation import (
     ensure_list,
     ensure_mapping,
@@ -122,6 +123,7 @@ __all__ = [
     "ProviderTimeoutError",
     "RetryPolicy",
     "StaticBearerTokenAuthProvider",
+    "StockXCredentials",
     "TokenBucketRateLimiter",
     "Transport",
     "UrllibTransport",
