@@ -18,6 +18,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 
+from ..classification import ClassificationConfig, ListingClassifier
 from ..deduplication import DeduplicationConfig, Deduplicator
 from ..market_pricing import MarketPriceEstimator, MarketPricingConfig
 from ..normalization import NormalizationConfig, Normalizer
@@ -63,6 +64,7 @@ class PipelineConfig:
 
     scanner_config: ScannerConfig | None = None
     normalization_config: NormalizationConfig | None = None
+    classification_config: ClassificationConfig | None = None
     deduplication_config: DeduplicationConfig | None = None
     pricing_config: MarketPricingConfig | None = None
     opportunity_config: OpportunityConfig | None = None
@@ -91,6 +93,7 @@ class ArbitragePipeline:
             self.config.live_provider_settings,
         )
         self._normalizer = Normalizer(config=self.config.normalization_config)
+        self._classifier = ListingClassifier(self.config.classification_config)
         self._deduplicator = Deduplicator(self.config.deduplication_config)
         self._estimator = MarketPriceEstimator(self.config.pricing_config)
         self._analyzer = OpportunityAnalyzer(self.config.opportunity_config)
@@ -100,6 +103,11 @@ class ArbitragePipeline:
         """Scan, normalize, group, price, and score opportunities for ``query``."""
         listings = self._scanner.scan(query, limit=self.config.scan_limit)
         normalized = self._normalizer.normalize_many(listings)
+        # Classify every listing by title (see ADR-022). This is additive: it
+        # annotates each listing's ``classification`` and never drops any, so
+        # deduplication and later stages are unchanged. How classifications
+        # affect scoring is deferred to a future sprint.
+        self._classifier.classify_many(normalized, self._classifier.profile_for(query))
         deduped = self._deduplicator.deduplicate(normalized)
 
         items = []

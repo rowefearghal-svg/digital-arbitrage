@@ -25,6 +25,14 @@ _A concise product description will be added as scope firms up (see
   internal `NormalizedListing` via a configurable, provider-agnostic pipeline
   (unicode + text/whitespace/title cleanup, currency/condition/location
   normalization). No pricing, FX, or AI.
+- **`classification`** - deterministic, **title-only** classifier that labels
+  each listing `COMPLETE_PRODUCT / ACCESSORY / PART / UNKNOWN / REJECTED` with a
+  0-100 `match_confidence` and a human-readable reason, so cables, adapters,
+  spare fans, and unrelated keyword matches are told apart from the real
+  product. Driven by a marketplace-independent `SearchProfile`
+  (required / excluded / accessory / part terms); matching is case/spacing/
+  hyphen-insensitive. Additive: it annotates `NormalizedListing.classification`
+  and removes nothing. No images, LLMs, or external services (ADR-022).
 - **`product_matching`** - deterministic engine estimating whether two
   `NormalizedListing`s are the same product, via token similarity + brand/model
   heuristics with configurable thresholds. Returns an explained `MatchResult`
@@ -73,8 +81,9 @@ _A concise product description will be added as scope firms up (see
   providers. Standard library only; existing mock providers are untouched
   (ADR-015, ADR-017).
 
-Pipeline order: **Scanner -> Normalization -> Product Matching -> Deduplication
--> Market Pricing -> Opportunity.**
+Pipeline order: **Scanner -> Normalization -> Classification -> Product Matching
+-> Deduplication -> Market Pricing -> Opportunity.** Classification is currently
+annotate-only; it does not yet influence deduplication, pricing, or scoring.
 
 ```python
 from digital_arbitrage.pipeline import ArbitragePipeline
