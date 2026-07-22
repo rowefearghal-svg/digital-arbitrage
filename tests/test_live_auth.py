@@ -12,6 +12,7 @@ import base64
 import json
 import logging
 import threading
+from pathlib import Path
 
 import pytest
 
@@ -35,6 +36,7 @@ from digital_arbitrage.providers.live import (
     ProviderConfigError,
     ProviderConnectionError,
     StaticBearerTokenAuthProvider,
+    TokenCache,
     Transport,
     create_live_provider,
     register_live_provider,
@@ -532,3 +534,61 @@ def test_create_provider_mock_still_zero_arg() -> None:
     provider = create_provider("ebay")
     listings = provider.search("rtx 4090", limit=3)
     assert len(listings) <= 3
+
+
+# --------------------------------------------------------------------------- #
+# Authorization-code token cache regressions (Sprint 29)
+# --------------------------------------------------------------------------- #
+
+
+def test_token_cache_persists_refresh_token_when_new_response_omits_it(
+    tmp_path: Path,
+) -> None:
+    cache = TokenCache(path=tmp_path / "tokens.json")
+    cache.save(
+        {
+            "access_token": "old",
+            "refresh_token": "keep-me",
+            "expires_in": 43200,
+        }
+    )
+    cache.save({"access_token": "new", "expires_in": 3600})
+    data = cache.load()
+    assert data["refresh_token"] == "keep-me"
+    assert data["access_token"] == "new"
+
+
+def test_oauth_auth_code_refresh_leeway_is_used(tmp_path: Path) -> None:
+    """Regression: the refresh_leeway constructor argument must be honored."""
+    from digital_arbitrage.providers.live.auth_code import OAuthAuthorizationCodeAuthProvider
+
+    class _RefreshTransport(Transport):
+        def __init__(self) -> None:
+            self.requests: list[HttpRequest] = []
+
+        def send(self, request: HttpRequest) -> HttpResponse:
+            self.requests.append(request)
+            body = json.dumps(
+                {"access_token": "tok", "expires_in": 120, "token_type": "Bearer"}
+            ).encode()
+            return HttpResponse(200, {}, body, request.full_url())
+
+    clock = _Clock(1000.0)
+    cache = TokenCache(path=tmp_path / "tokens.json")
+    cache.save({"refresh_token": "rt"})
+    auth = OAuthAuthorizationCodeAuthProvider(
+        client_id="c",
+        client_secret="s",
+        token_url="https://auth.test.local/token",
+        refresh_token="rt",
+        provider="test",
+        transport=_RefreshTransport(),
+        token_cache=cache,
+        refresh_leeway=30.0,
+        monotonic=clock,
+    )
+    assert auth.authorization() == "Bearer tok"
+    # With a 120s expiry and a 30s leeway, the token is still valid 89s later.
+    clock.now = 1000.0 + 89
+    assert auth.authorization() == "Bearer tok"
+    assert auth._expires_at == 1000.0 + 90  # 120 - 30

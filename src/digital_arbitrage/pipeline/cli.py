@@ -1,14 +1,16 @@
 """Command-line interface for the arbitrage pipeline.
 
-Exposes four commands, all built from :class:`ArbitragePipeline` results. Scans
-use the mock providers by default (no scraping or external calls); selecting a
-live provider such as ``ebay_browse`` (via ``--provider`` or config) runs a real,
-read-only marketplace search with credentials read only from the environment
-(ADR-019/ADR-020):
+Exposes five commands, all built from :class:`ArbitragePipeline` results except
+for ``auth``. Scans use the mock providers by default (no scraping or external
+calls); selecting a live provider such as ``ebay_browse`` or ``stockx`` (via
+``--provider`` or config) runs a real, read-only marketplace search with
+credentials read only from the environment (ADR-019/ADR-020):
 
 * ``arb scan "<query>"`` - run the pipeline with filtering, sorting, and multiple
   output formats (``table``, ``json``, ``csv``, ``markdown``); ``--save`` also
   persists the run to a SQLite history database.
+* ``arb auth stockx`` - run the one-time browser OAuth flow for StockX and cache
+  the refresh token.
 * ``arb history`` - list previously saved scan runs.
 * ``arb show <run_id>`` - view the opportunities stored for a previous run.
 * ``arb compare <old_run_id> <new_run_id>`` - diff two saved runs.
@@ -20,6 +22,7 @@ import argparse
 import csv
 import io
 import json
+import os
 import sys
 import traceback
 from collections.abc import Callable, Sequence
@@ -384,8 +387,8 @@ def build_parser() -> argparse.ArgumentParser:
         prog="arb",
         description=(
             "Digital arbitrage analysis pipeline. Uses mock providers by default; "
-            "select a live provider (e.g. --provider ebay_browse) for a real, "
-            "read-only marketplace scan."
+            "select a live provider (e.g. --provider ebay_browse or --provider stockx) "
+            "for a real, read-only marketplace scan."
         ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -415,8 +418,10 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="NAME",
         help=(
             "Provider to scan (repeatable); overrides the configured provider "
-            "list. Live providers (e.g. ebay_browse) read credentials from the "
-            "EBAY_CLIENT_ID / EBAY_CLIENT_SECRET environment variables."
+            "list. Live providers read credentials from the environment: "
+            "ebay_browse uses EBAY_CLIENT_ID / EBAY_CLIENT_SECRET; "
+            "stockx uses STOCKX_API_KEY / STOCKX_CLIENT_ID / STOCKX_CLIENT_SECRET "
+            "plus a cached refresh token."
         ),
     )
     scan.add_argument(
@@ -451,6 +456,19 @@ def build_parser() -> argparse.ArgumentParser:
         help=f"History database path (default: {DEFAULT_DB_PATH}).",
     )
     scan.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
+
+    auth = subparsers.add_parser("auth", help="Run browser authentication for a live provider.")
+    auth.add_argument(
+        "provider",
+        choices=("stockx",),
+        help="Provider to authenticate (only stockx is supported currently).",
+    )
+    auth.add_argument(
+        "--headless",
+        action="store_true",
+        help="Run the browser in headless mode (may fail if provider requires CAPTCHA).",
+    )
+    auth.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
 
     history = subparsers.add_parser("history", help="List previously saved scan runs.")
     history.add_argument(
@@ -533,6 +551,47 @@ def _run_scan(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_auth(args: argparse.Namespace) -> int:
+    """Run the browser-based OAuth flow for a live provider and cache the token."""
+    if args.provider != "stockx":
+        print(f"error: unsupported provider for auth: {args.provider}", file=sys.stderr)
+        return 1
+
+    api_key = os.environ.get("STOCKX_API_KEY", "")
+    client_id = os.environ.get("STOCKX_CLIENT_ID", "")
+    client_secret = os.environ.get("STOCKX_CLIENT_SECRET", "")
+    if not api_key or not client_id or not client_secret:
+        print(
+            "error: STOCKX_API_KEY, STOCKX_CLIENT_ID, and STOCKX_CLIENT_SECRET "
+            "must be set in the environment",
+            file=sys.stderr,
+        )
+        return 1
+
+    from digital_arbitrage.providers.live.auth_browser import BrowserTokenExchange
+    from digital_arbitrage.providers.live.auth_code import TokenCache
+
+    cache = TokenCache()
+    exchange = BrowserTokenExchange(
+        client_id=client_id,
+        client_secret=client_secret,
+        authorization_url="https://accounts.stockx.com/authorize",
+        token_url="https://accounts.stockx.com/oauth/token",
+        redirect_uri="https://localhost:3000/callback",
+        scope="openid offline_access",
+        audience="gateway.stockx.com",
+        token_cache=cache,
+        headless=args.headless,
+        provider="stockx",
+    )
+    response = exchange.run_initial_flow(timeout=300.0)
+    if not response.refresh_token:
+        print("error: authorization succeeded but no refresh token was returned", file=sys.stderr)
+        return 1
+    print(f"StockX authentication successful. Refresh token cached at {cache.path}")
+    return 0
+
+
 def _run_history(args: argparse.Namespace) -> int:
     db_path = args.db if args.db is not None else DEFAULT_DB_PATH
     with ResultStore(db_path) as store:
@@ -572,6 +631,7 @@ def _run_compare(args: argparse.Namespace) -> int:
 
 _COMMANDS: dict[str, Callable[[argparse.Namespace], int]] = {
     "scan": _run_scan,
+    "auth": _run_auth,
     "history": _run_history,
     "show": _run_show,
     "compare": _run_compare,
