@@ -534,6 +534,33 @@ Runtime configuration lives in `configs/`. Never commit secrets - copy
 `config.example.toml` to `config.toml` (gitignored) and keep secrets in a local
 `.env` (see `.env` handling in `.gitignore`).
 
+### Provider credentials (`.env`)
+
+External-provider credentials are read **only from the environment** - never
+from a config file, the repository, or CI. To set them up locally, copy the
+tracked template to a local, gitignored `.env` and fill in real values:
+
+```bash
+cp .env.example .env
+# edit .env, then load it into your shell before running a live scan:
+set -a; source .env; set +a
+```
+
+Supported credential variables:
+
+| Provider     | Environment variables                                             |
+| ------------ | ----------------------------------------------------------------- |
+| eBay Browse  | `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET`                            |
+| StockX       | `STOCKX_API_KEY`, `STOCKX_CLIENT_ID`, `STOCKX_CLIENT_SECRET`      |
+
+The StockX credentials are loaded via `StockXCredentials.from_env()`
+(`digital_arbitrage.providers.live`), mirroring the eBay pattern: all three
+values are required and a missing one fails fast with a clear
+`... must be set` error. Secrets are never logged (`repr` is redacted).
+
+`.env` and `*.key` / `*.pem` are already gitignored; **never commit real
+credentials**.
+
 ## Data & Models
 
 Datasets, models, and checkpoints are **not** stored in Git. Keep them in a
