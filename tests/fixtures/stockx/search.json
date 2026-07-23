@@ -1,0 +1,40 @@
+{
+  "count": 2,
+  "pageNumber": 1,
+  "pageSize": 2,
+  "hasNextPage": false,
+  "products": [
+    {
+      "productId": "5e6a1e57-1c7d-435a-82bd-5666a13560fe",
+      "urlKey": "nike-dunk-low-retro-white-black-2021",
+      "styleId": "DD1391-100",
+      "productType": "sneakers",
+      "title": "Nike Dunk Low Retro White Black Panda",
+      "brand": "Nike",
+      "productAttributes": {
+        "color": null,
+        "colorway": "White/Black",
+        "gender": "men",
+        "releaseDate": "2021-03-10",
+        "retailPrice": 115,
+        "season": null
+      }
+    },
+    {
+      "productId": "e175c189-cf87-4007-bc94-e5b919c4c75c",
+      "urlKey": "nike-dunk-low-white-black-2021-w",
+      "styleId": "DD1503-101",
+      "productType": "sneakers",
+      "title": "Nike Dunk Low Retro White Black Panda (Women's)",
+      "brand": "Nike",
+      "productAttributes": {
+        "color": null,
+        "colorway": "White/Black",
+        "gender": "women",
+        "releaseDate": "2021-03-10",
+        "retailPrice": 115,
+        "season": null
+      }
+    }
+  ]
+}

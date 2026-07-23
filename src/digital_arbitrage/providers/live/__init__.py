@@ -32,6 +32,8 @@ from .auth import (
     OAuthClientCredentialsAuthProvider,
     StaticBearerTokenAuthProvider,
 )
+from .auth_browser import BrowserTokenExchange
+from .auth_code import OAuthAuthorizationCodeAuthProvider, TokenCache
 from .base import LiveProvider
 from .capabilities import ProviderCapabilities
 from .config import LiveProviderConfig
@@ -81,6 +83,13 @@ from .rate_limit import TokenBucketRateLimiter
 from .retry import DEFAULT_RETRY_STATUS, RetryPolicy, run_with_retries
 from .scanning import LiveProviderSetting, build_scanner_from_config
 from .stockx import StockXCredentials
+from .stockx_provider import (
+    StockXConfig,
+    StockXProvider,
+    build_stockx_config,
+    build_stockx_provider,
+    build_stockx_provider_from_env,
+)
 from .validation import (
     ensure_list,
     ensure_mapping,
@@ -109,8 +118,10 @@ __all__ = [
     "LiveProviderConfig",
     "LiveProviderSetting",
     "NoAuthProvider",
+    "OAuthAuthorizationCodeAuthProvider",
     "OAuthClientCredentialsAuthProvider",
     "Page",
+    "BrowserTokenExchange",
     "ProviderAuthError",
     "ProviderCapabilities",
     "ProviderConfigError",
@@ -123,13 +134,19 @@ __all__ = [
     "ProviderTimeoutError",
     "RetryPolicy",
     "StaticBearerTokenAuthProvider",
+    "StockXConfig",
     "StockXCredentials",
+    "StockXProvider",
     "TokenBucketRateLimiter",
+    "TokenCache",
     "Transport",
     "UrllibTransport",
     "build_ebay_browse_config",
     "build_ebay_browse_provider",
     "build_ebay_browse_provider_from_env",
+    "build_stockx_config",
+    "build_stockx_provider",
+    "build_stockx_provider_from_env",
     "build_live_provider_config",
     "build_live_provider_from_env",
     "build_scanner_from_config",
