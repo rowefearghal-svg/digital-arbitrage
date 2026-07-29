@@ -15,9 +15,10 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Private :: Do Not Upload",
 ]
-# Runtime dependencies are added here as the project grows. Empty on purpose:
-# this bootstrap has no application logic yet.
-dependencies = []
+# Runtime dependencies are added here as the project grows.
+# rapidfuzz: deterministic fuzzy string matching used by the PUE candidate
+# retrieval stage (see docs/architecture/PUE_v0.1_VERTICAL_SLICE_SPECIFICATION.md).
+dependencies = ["rapidfuzz>=3.6"]
 
 [project.scripts]
 arb = "digital_arbitrage.pipeline.cli:main"

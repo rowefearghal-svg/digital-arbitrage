@@ -1,0 +1,293 @@
+{
+  "fixture_version": "sprint1-acceptance-0.1.0",
+  "schema_version": "0.1",
+  "source": "docs/architecture/PUE_v0.1_VERTICAL_SLICE_SPECIFICATION.md section 21",
+  "cases": [
+    {
+      "case_id": "case_01_outside_domain",
+      "title": "Samsung?",
+      "difficulty": "easy",
+      "annotation_source": "spec_section_21_row_1",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["outside_supported_domain"],
+      "forbidden_decision_types": ["identified", "partially_identified", "classified"],
+      "forbidden_product_forms": ["complete_product"],
+      "min_evidence_count": 0
+    },
+    {
+      "case_id": "case_02_rtx4090_fe",
+      "title": "NVIDIA GeForce RTX 4090 Founders Edition 24GB",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_2",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["identified", "partially_identified"],
+      "forbidden_decision_types": ["outside_supported_domain", "abstained", "processing_failed"],
+      "required_evidence_types": ["product_family_token", "capacity_value"],
+      "forbidden_product_forms": ["component", "accessory", "packaging_only"],
+      "min_evidence_count": 3
+    },
+    {
+      "case_id": "case_03_asus_tuf_exact_mpn",
+      "title": "ASUS TUF RTX 4090 OC TUF-RTX4090-O24G",
+      "difficulty": "easy",
+      "annotation_source": "spec_section_21_row_3",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["identified"],
+      "forbidden_decision_types": ["ambiguous", "abstained", "outside_supported_domain"],
+      "expected_identification_levels": ["exact_catalogue_product"],
+      "expected_catalogue_product_id": "gpu-asus-tuf-rtx4090-o24g",
+      "required_evidence_types": ["mpn_token", "brand_token", "product_family_token"],
+      "min_evidence_count": 3
+    },
+    {
+      "case_id": "case_04_rtx4090_waterblock",
+      "title": "RTX 4090 Waterblock Full Cover GPU Cooling Block",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_4",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["classified"],
+      "forbidden_decision_types": ["identified", "partially_identified"],
+      "forbidden_product_forms": ["complete_product"],
+      "expected_product_form": "component",
+      "expected_comparability": ["not_comparable_product_form"],
+      "require_hard_rejected_candidate": true,
+      "required_evidence_types": ["product_form_term", "product_family_token"],
+      "min_evidence_count": 3
+    },
+    {
+      "case_id": "case_05_empty_box_only",
+      "title": "Empty RTX 4090 Founders Edition Box Only",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_5",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["classified"],
+      "forbidden_decision_types": ["identified", "partially_identified"],
+      "expected_product_form": "packaging_only",
+      "forbidden_product_forms": ["complete_product"],
+      "expected_comparability": ["not_comparable_product_form"],
+      "required_evidence_types": ["packaging_term"],
+      "min_evidence_count": 2
+    },
+    {
+      "case_id": "case_06_replacement_fan",
+      "title": "RTX 4090 replacement fan set",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_6",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["classified"],
+      "forbidden_decision_types": ["identified", "partially_identified"],
+      "expected_product_form": "replacement_part",
+      "forbidden_product_forms": ["complete_product"],
+      "required_evidence_types": ["product_form_term"],
+      "min_evidence_count": 2
+    },
+    {
+      "case_id": "case_07_power_adapter",
+      "title": "12VHPWR power adapter for RTX 4090",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_7",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["classified", "ambiguous"],
+      "forbidden_decision_types": ["identified", "partially_identified"],
+      "forbidden_product_forms": ["complete_product"],
+      "min_evidence_count": 2
+    },
+    {
+      "case_id": "case_08_gpu_not_included",
+      "title": "RTX 4090 GPU not included - water block only",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_8",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["classified"],
+      "forbidden_decision_types": ["identified", "partially_identified"],
+      "forbidden_product_forms": ["complete_product"],
+      "required_evidence_types": ["exclusion_term", "product_form_term"],
+      "require_hard_rejected_candidate": true,
+      "min_evidence_count": 3
+    },
+    {
+      "case_id": "case_09_gpu_with_waterblock_bundle",
+      "title": "ASUS RTX 4090 with EK water block",
+      "difficulty": "hard",
+      "annotation_source": "spec_section_21_row_9",
+      "annotation_confidence": "medium",
+      "allowed_decision_types": ["ambiguous", "classified"],
+      "forbidden_decision_types": ["identified"],
+      "min_evidence_count": 3
+    },
+    {
+      "case_id": "case_10_generic_rtx4090",
+      "title": "NVIDIA RTX 4090",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_10",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["partially_identified", "identified"],
+      "forbidden_decision_types": ["outside_supported_domain", "abstained"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_11_rtx3060_board_partner_ambiguity",
+      "title": "RTX 3060 12GB",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_11",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["partially_identified", "classified"],
+      "forbidden_decision_types": ["outside_supported_domain", "abstained"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_12_rtx3060_capacity_ambiguity",
+      "title": "RTX 3060",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_12",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["partially_identified", "classified", "ambiguous"],
+      "forbidden_decision_types": ["identified"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_13_rtx4080_super",
+      "title": "RTX 4080 Super Gaming OC",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_13",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["identified", "partially_identified"],
+      "forbidden_decision_types": ["outside_supported_domain", "abstained"],
+      "min_evidence_count": 2
+    },
+    {
+      "case_id": "case_14_title_structured_contradiction",
+      "title": "RTX 4080 Gaming OC",
+      "structured_attributes": { "model": "RTX 4070" },
+      "difficulty": "hard",
+      "annotation_source": "spec_section_21_row_14",
+      "annotation_confidence": "medium",
+      "allowed_decision_types": ["ambiguous", "abstained"],
+      "forbidden_decision_types": ["identified"],
+      "require_contradicted_claim": true,
+      "min_evidence_count": 2
+    },
+    {
+      "case_id": "case_15_mobile_vs_desktop",
+      "title": "Laptop RTX 4090 GPU",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_15",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["identified", "partially_identified", "classified"],
+      "forbidden_decision_types": ["outside_supported_domain"],
+      "forbidden_selected_catalogue_product_ids": [
+        "gpu-nvidia-rtx4090-fe", "gpu-asus-tuf-rtx4090-o24g", "gpu-asus-rog-strix-rtx4090-o24g",
+        "gpu-msi-rtx4090-gamingx-trio", "gpu-gigabyte-aorus-rtx4090-master", "gpu-zotac-rtx4090-trinity-oc"
+      ],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_16_generic_graphics_card",
+      "title": "Graphics card excellent condition",
+      "difficulty": "hard",
+      "annotation_source": "spec_section_21_row_16",
+      "annotation_confidence": "medium",
+      "allowed_decision_types": ["classified", "abstained"],
+      "forbidden_decision_types": ["identified", "partially_identified"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_17_apple_laptop",
+      "title": "Apple laptop good condition",
+      "difficulty": "easy",
+      "annotation_source": "spec_section_21_row_17",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["outside_supported_domain", "abstained"],
+      "forbidden_decision_types": ["identified", "partially_identified", "classified"],
+      "min_evidence_count": 0
+    },
+    {
+      "case_id": "case_18_for_parts",
+      "title": "For parts RTX 4090 not working",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_18",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["partially_identified", "identified", "classified"],
+      "forbidden_decision_types": ["outside_supported_domain"],
+      "expected_comparability": ["not_comparable_condition"],
+      "min_evidence_count": 2
+    },
+    {
+      "case_id": "case_19_box_included_not_box_only",
+      "title": "RTX 4090 retail box included",
+      "difficulty": "hard",
+      "annotation_source": "spec_section_21_row_19",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["identified", "partially_identified", "classified"],
+      "forbidden_decision_types": ["outside_supported_domain"],
+      "forbidden_product_forms": ["packaging_only"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_20_unknown_out_of_catalogue",
+      "title": "RTX 5099 Ultra graphics card",
+      "difficulty": "hard",
+      "annotation_source": "spec_section_21_row_20",
+      "annotation_confidence": "medium",
+      "allowed_decision_types": ["classified", "partially_identified", "abstained"],
+      "forbidden_decision_types": ["identified"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_21_exact_mpn_box_only_contradiction",
+      "title": "ASUS TUF RTX 4090 OC TUF-RTX4090-O24G Box Only",
+      "difficulty": "hard",
+      "annotation_source": "spec_section_21_row_21",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["classified", "ambiguous"],
+      "forbidden_decision_types": ["identified", "partially_identified"],
+      "forbidden_product_forms": ["complete_product"],
+      "require_hard_rejected_candidate": true,
+      "forbidden_selected_catalogue_product_ids": ["gpu-asus-tuf-rtx4090-o24g"],
+      "min_evidence_count": 3
+    },
+    {
+      "case_id": "case_22_compatibility_only_no_sold_item",
+      "title": "Compatible with RTX 4090",
+      "difficulty": "hard",
+      "annotation_source": "spec_section_21_row_22",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["ambiguous", "abstained"],
+      "forbidden_decision_types": ["identified", "partially_identified", "classified"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_23_gpu_psu_bundle",
+      "title": "RTX 4090 + PSU bundle",
+      "difficulty": "medium",
+      "annotation_source": "spec_section_21_row_23",
+      "annotation_confidence": "medium",
+      "allowed_decision_types": ["partially_identified", "classified", "identified"],
+      "forbidden_decision_types": ["outside_supported_domain"],
+      "expected_comparability": ["not_comparable_bundle"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_24_empty_title",
+      "title": "   ",
+      "difficulty": "easy",
+      "annotation_source": "spec_section_21_row_24",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["abstained"],
+      "forbidden_decision_types": ["processing_failed", "identified", "classified"],
+      "expected_abstention_reason": "insufficient_evidence",
+      "min_evidence_count": 0
+    },
+    {
+      "case_id": "case_25_malformed_object",
+      "title": null,
+      "malformed": true,
+      "difficulty": "easy",
+      "annotation_source": "spec_section_21_row_25",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["processing_failed"],
+      "forbidden_decision_types": ["abstained", "identified", "classified"],
+      "min_evidence_count": 0
+    }
+  ]
+}
