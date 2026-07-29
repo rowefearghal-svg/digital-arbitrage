@@ -60,19 +60,19 @@ def test_acceptance_case(case: dict, repo, context) -> None:
     decision = record.decision
 
     allowed = set(case["allowed_decision_types"])
-    assert (
-        decision.decision_type.value in allowed
-    ), f"{case['case_id']}: decision {decision.decision_type.value} not in {allowed}"
+    assert decision.decision_type.value in allowed, (
+        f"{case['case_id']}: decision {decision.decision_type.value} not in {allowed}"
+    )
 
     forbidden = set(case.get("forbidden_decision_types", ()))
-    assert (
-        decision.decision_type.value not in forbidden
-    ), f"{case['case_id']}: forbidden decision {decision.decision_type.value}"
+    assert decision.decision_type.value not in forbidden, (
+        f"{case['case_id']}: forbidden decision {decision.decision_type.value}"
+    )
 
     if "forbidden_product_forms" in case:
-        assert decision.product_form.value not in set(
-            case["forbidden_product_forms"]
-        ), f"{case['case_id']}: forbidden product_form {decision.product_form.value}"
+        assert decision.product_form.value not in set(case["forbidden_product_forms"]), (
+            f"{case['case_id']}: forbidden product_form {decision.product_form.value}"
+        )
 
     if "expected_product_form" in case:
         assert decision.product_form.value == case["expected_product_form"]
@@ -111,9 +111,9 @@ def test_acceptance_case(case: dict, repo, context) -> None:
             assert required in present, f"{case['case_id']}: missing evidence type {required}"
 
     if case.get("require_hard_rejected_candidate"):
-        assert any(
-            ev.hard_rejected for ev in record.candidate_evaluations
-        ), f"{case['case_id']}: expected at least one hard-rejected Candidate"
+        assert any(ev.hard_rejected for ev in record.candidate_evaluations), (
+            f"{case['case_id']}: expected at least one hard-rejected Candidate"
+        )
         assert any(
             f.severity == ContradictionSeverity.HARD
             for ev in record.candidate_evaluations

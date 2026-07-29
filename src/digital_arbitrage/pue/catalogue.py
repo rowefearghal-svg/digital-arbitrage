@@ -72,7 +72,8 @@ def _product_from_json(entry: Mapping[str, object], knowledge_version: str) -> C
         aliases=tuple(str(a) for a in entry.get("aliases", ())),  # type: ignore[attr-defined]
         attributes=dict(attributes_raw),
         compatibility_targets=tuple(
-            str(c) for c in entry.get("compatibility_targets", ())  # type: ignore[attr-defined]
+            str(c)
+            for c in entry.get("compatibility_targets", ())  # type: ignore[attr-defined]
         ),
         knowledge_version=str(entry.get("knowledge_version", knowledge_version)),
     )
