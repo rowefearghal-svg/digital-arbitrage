@@ -32,6 +32,7 @@ from ..opportunity import (
 from ..product_scanner import Scanner, ScannerConfig
 from ..providers.live import LiveProviderSetting, build_scanner_from_config
 from .models import PipelineItemResult, PipelineResult
+from .pue_shadow import ShadowConfig, run_pue_shadow
 
 #: Sort priority for recommendations (higher is better).
 _RECOMMENDATION_RANK: dict[Recommendation, int] = {
@@ -75,6 +76,11 @@ class PipelineConfig:
     #: Empty by default, so the pipeline is mock-only unless a live provider is
     #: configured. Credentials are read from the environment, never from here.
     live_provider_settings: Mapping[str, LiveProviderSetting] = field(default_factory=dict)
+    #: Optional Product Understanding Engine shadow-mode configuration (see
+    #: docs/architecture/PUE_v0.1_VERTICAL_SLICE_SPECIFICATION.md section 5.3).
+    #: Disabled by default: ``None`` and ``ShadowConfig(enabled=False)`` are
+    #: both complete no-ops that never alter this pipeline's output.
+    pue_shadow_config: ShadowConfig | None = None
 
 
 class ArbitragePipeline:
@@ -98,6 +104,10 @@ class ArbitragePipeline:
         self._estimator = MarketPriceEstimator(self.config.pricing_config)
         self._analyzer = OpportunityAnalyzer(self.config.opportunity_config)
         self._scorer = RecommendationScorer(self.config.scoring_config)
+        #: PUE shadow-mode output from the most recent ``analyze()`` call, if
+        #: shadow mode is enabled (see ``PipelineConfig.pue_shadow_config``).
+        #: Never influences ``PipelineResult``.
+        self.last_pue_shadow_records: tuple = ()
 
     def analyze(self, query: str) -> PipelineResult:
         """Scan, normalize, group, price, and score opportunities for ``query``."""
@@ -108,6 +118,18 @@ class ArbitragePipeline:
         # deduplication and later stages are unchanged. How classifications
         # affect scoring is deferred to a future sprint.
         self._classifier.classify_many(normalized, self._classifier.profile_for(query))
+
+        # Product Understanding Engine shadow execution (see
+        # docs/architecture/PUE_v0.1_VERTICAL_SLICE_SPECIFICATION.md section
+        # 5.3). Disabled by default; when enabled, runs after normalization
+        # and persists its own output without altering anything below this
+        # line. A PUE exception never reaches this pipeline (see
+        # ``run_pue_shadow``), so `self.last_pue_shadow_records` may be empty
+        # even when shadow mode is enabled.
+        self.last_pue_shadow_records = run_pue_shadow(
+            normalized, config=self.config.pue_shadow_config or ShadowConfig(enabled=False)
+        )
+
         deduped = self._deduplicator.deduplicate(normalized)
 
         items = []

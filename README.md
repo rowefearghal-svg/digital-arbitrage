@@ -81,9 +81,28 @@ _A concise product description will be added as scope firms up (see
   providers. Standard library only; existing mock providers are untouched
   (ADR-015, ADR-017).
 
-Pipeline order: **Scanner -> Normalization -> Classification -> Product Matching
--> Deduplication -> Market Pricing -> Opportunity.** Classification is currently
-annotate-only; it does not yet influence deduplication, pricing, or scoring.
+- **`pue`** - the **Product Understanding Engine (PUE) v0.1 Sprint 1**
+  vertical slice: a deterministic, local, title-first reasoning chain
+  (`Observation -> Evidence -> Claim -> ProductHypothesis -> Candidate
+  Retrieval -> Candidate Evaluation -> Decision -> Explanation ->
+  ReasoningRecord`) for the GPU domain. Distinguishes a complete graphics
+  card from water blocks, replacement parts, packaging, compatible
+  accessories, and bundles; supports exact/partial/classified/ambiguous/
+  abstaining/outside-domain/processing-failed outcomes; never forces an
+  unknown listing into the nearest catalogue product. Backed by a
+  hand-seeded, versioned JSON catalogue (`data/pue/catalogues/`) and term
+  knowledge artifact (`data/pue/knowledge/`); persisted via its own SQLite
+  `pue_cases` table (`pue/persistence.py`). Runs in **shadow mode only**
+  (see `pipeline/pue_shadow.py`): disabled by default, and even when
+  enabled it never changes `PipelineResult`, deduplication, pricing, or
+  scoring. See `docs/architecture/PUE_v0.1_VERTICAL_SLICE_SPECIFICATION.md`
+  and ADR-023 through ADR-030.
+
+Pipeline order: **Scanner -> Normalization -> Classification -> [PUE shadow,
+optional] -> Product Matching -> Deduplication -> Market Pricing ->
+Opportunity.** Classification is currently annotate-only; it does not yet
+influence deduplication, pricing, or scoring. The PUE shadow stage is
+disabled by default and, even when enabled, is purely observational.
 
 ```python
 from digital_arbitrage.pipeline import ArbitragePipeline
@@ -227,8 +246,17 @@ is added by subclassing `LiveProvider` and implementing two small hooks:
 
 ```python
 from digital_arbitrage.providers.live import (
-    HttpClient, HttpRequest, HttpResponse, LiveProvider, LiveProviderConfig,
-    Page, ProviderCapabilities, ensure_mapping, parse_json, require, resolve_url,
+    HttpClient,
+    HttpRequest,
+    HttpResponse,
+    LiveProvider,
+    LiveProviderConfig,
+    Page,
+    ProviderCapabilities,
+    ensure_mapping,
+    parse_json,
+    require,
+    resolve_url,
 )
 from digital_arbitrage.product_scanner.models import Listing
 
@@ -308,11 +336,13 @@ header per request. Three strategies ship (ADR-017):
 
 ```python
 from digital_arbitrage.providers.live import (
-    LiveProviderConfig, OAuthClientCredentialsAuthProvider, create_live_provider,
+    LiveProviderConfig,
+    OAuthClientCredentialsAuthProvider,
+    create_live_provider,
 )
 
 auth = OAuthClientCredentialsAuthProvider(
-    client_id=os.environ["EBAY_CLIENT_ID"],       # from a secret, never the repo
+    client_id=os.environ["EBAY_CLIENT_ID"],  # from a secret, never the repo
     client_secret=os.environ["EBAY_CLIENT_SECRET"],
     token_url="https://api.ebay.com/identity/v1/oauth2/token",
     scope="https://api.ebay.com/oauth/api_scope",
@@ -362,7 +392,8 @@ present on marketplaces/queries where eBay returns it.
 ```python
 import os
 from digital_arbitrage.providers.live import (
-    EbayBrowseConfig, build_ebay_browse_provider_from_env,
+    EbayBrowseConfig,
+    build_ebay_browse_provider_from_env,
 )
 
 config = EbayBrowseConfig(base_url="https://api.ebay.com", marketplace_id="EBAY_IE")
@@ -376,6 +407,7 @@ live registry, so it can also be built by name:
 
 ```python
 from digital_arbitrage.providers.live import create_live_provider
+
 provider = create_live_provider("ebay_browse", config, auth=auth)
 ```
 

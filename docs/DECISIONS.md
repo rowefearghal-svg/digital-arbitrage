@@ -840,3 +840,188 @@
   or ambiguous tokens can theoretically compact-match unintended substrings
   (e.g. `i9`); acceptable for now, revisitable with per-token minimum lengths or
   provider-supplied profiles later.
+
+### ADR-023: PUE placement and relationship to the existing classifier
+
+- **Date:** 2026-07-29
+- **Status:** Accepted
+- **Context:** The Product Understanding Engine (PUE) v0.1 vertical slice
+  needs a home in the repository and a defined relationship to the existing
+  deterministic title classifier (`classification`, ADR-022), which already
+  runs between normalization and deduplication.
+- **Decision:** Add a new top-level package `src/digital_arbitrage/pue/`,
+  independent of `classification`. The PUE does not replace the classifier
+  in v0.1: it runs afterward, in shadow mode, gated by
+  `PipelineConfig.pue_shadow_config` (see `pipeline/pue_shadow.py`), and
+  never changes `PipelineResult`. The classifier is not adapted into PUE
+  Evidence in Sprint 1 (deferred; the spec's adapter section 5.4 is a
+  Sprint-2-or-later concern) - Sprint 1 focuses on making the PUE's own
+  reasoning chain work end to end.
+- **Alternatives considered:** (a) extend `classification` in place - rejected,
+  the PUE's object model (Evidence/Claim/Hypothesis/Decision) is materially
+  richer than a single `ListingClassification` verdict and deserves its own
+  package; (b) make the PUE authoritative immediately - rejected, spec
+  section 5.3 requires a shadow period before any downstream behavior change.
+- **Consequences:** Zero risk to existing classification/matching/dedup/
+  scoring behavior; PUE output is inspectable independently via its own
+  SQLite store (`pue_cases`). Revisit once a release benchmark (Sprint 3)
+  justifies feeding PUE product-form/comparability into matching.
+
+### ADR-024: Frozen standard-library dataclasses for the PUE object model
+
+- **Date:** 2026-07-29
+- **Status:** Accepted
+- **Context:** The PUE needs an immutable, serializable object model for
+  Observation/Evidence/Claim/Hypothesis/Candidate/Decision/etc. without
+  committing to a schema library before real validation/serialization
+  bottlenecks are measured.
+- **Decision:** Use `@dataclass(frozen=True, slots=True)` for every
+  reasoning object (`pue/models.py`). Mapping-typed fields are recursively
+  frozen into `MappingProxyType` trees in `__post_init__` via
+  `pue/validation.py::freeze_mapping`/`freeze_value`, so nested dicts/lists
+  cannot be mutated after construction. Explicit validation/construction
+  functions (not a decorator-driven schema) enforce invariants.
+- **Alternatives considered:** Pydantic or msgspec - rejected for v0.1: no
+  new dependency, no runtime schema overhead, and the object *contract*
+  (documented in the vertical-slice spec) matters more than the library. A
+  benchmarked migration remains possible later without changing meaning.
+- **Consequences:** Slightly more boilerplate (manual `__post_init__`
+  freezing, manual JSON `to_dict`/`from_dict` in `pue/persistence.py`) in
+  exchange for zero dependencies and full control over immutability and
+  serialization. Revisit if hand-written serialization becomes a measured
+  maintenance or performance bottleneck.
+
+### ADR-025: Seed catalogue provenance and licensing
+
+- **Date:** 2026-07-29
+- **Status:** Accepted
+- **Context:** Sprint 1 needs a GPU candidate catalogue to retrieve against,
+  without waiting on a production catalogue license or scraping a real
+  dataset (both out of scope per the brief's "no blocker" instruction).
+- **Decision:** Hand-author `data/pue/catalogues/gpu_seed_v0.1.json` (36
+  records) using publicly documented product names and, where reasonably
+  confident, publicly documented manufacturer part numbers (e.g. the ASUS
+  TUF RTX 4090 OC MPN used directly in the spec's own acceptance case).
+  Records whose exact manufacturer SKU could not be independently verified
+  in this sprint carry a `provenance.source_description` note saying so;
+  purely illustrative concepts (a mobile-GPU competitor concept, a bundle,
+  several accessories) are marked `"synthetic": true`. `data/` is
+  git-ignored by default for generated datasets/models (see `.gitignore`);
+  a scoped exception (`!data/pue/`) was added because this catalogue is
+  hand-authored source, not generated output.
+- **Consequences:** The catalogue is an evaluation instrument, not a
+  production data source (spec 12.1) - real MPNs should be re-verified
+  before any commercial use, and no external dataset was imported (spec
+  24.5/24.6, risk 8 control). A future production catalogue can replace it
+  behind the same `CandidateRepository` interface.
+
+### ADR-026: SQLite with a JSON Reasoning Record payload
+
+- **Date:** 2026-07-29
+- **Status:** Accepted
+- **Context:** Complete Reasoning Records must persist, replay, and support
+  equivalent-record lookup, using the project's existing SQLite convention
+  (`digital_arbitrage.persistence.storage.ResultStore`) rather than a new
+  storage technology.
+- **Decision:** Add `pue/persistence.py::PueCaseStore`, a plain `sqlite3`
+  store with the `pue_cases` table specified in the vertical-slice spec
+  (summary columns + `reasoning_record_json`), indexed on
+  `(provider, provider_listing_id)`, `source_fingerprint`, and
+  `(capability_version, policy_version, knowledge_version)`.
+  `save_case` raises rather than overwriting an existing `case_id`
+  (historical records are immutable; a rerun creates a new case).
+- **Consequences:** Fast to build, easy to inspect, and consistent with the
+  existing `ResultStore` pattern; no ORM, no new dependency. A normalized
+  relational schema (separate tables per reasoning object) is explicitly
+  deferred until a real query/performance need is measured (spec 19.2).
+
+### ADR-027: Decision and comparability taxonomy
+
+- **Date:** 2026-07-29
+- **Status:** Accepted
+- **Context:** The engine must express seven distinct outcomes (exact,
+  partial, classified, ambiguous, abstained, outside-domain,
+  processing-failed) plus a separate structural-comparability signal,
+  without conflating "we don't know" with "something broke," and without an
+  `ESCALATED` pseudo-outcome leaking into the Decision type.
+- **Decision:** Implement `DecisionType`, `IdentificationLevel`,
+  `ComparabilityStatus`, and `AbstentionReason` exactly as enumerated in the
+  vertical-slice spec (`pue/enums.py`). `PROCESSING_FAILED` is only raised
+  for genuine operational failure (malformed input, uncaught exception),
+  tagged with an explicit `ProcessingFailureCategory` in
+  `operational_metrics`, never with an `AbstentionReason`. `ESCALATED` does
+  not exist as an enum member (verified by
+  `tests/pue/test_decisions.py::test_no_escalated_decision_type_exists`).
+- **Consequences:** Callers can distinguish "abstained because evidence was
+  weak" from "failed because the input was malformed" unambiguously; the
+  comparability signal (`NOT_COMPARABLE_PRODUCT_FORM`,
+  `NOT_COMPARABLE_BUNDLE`, `NOT_COMPARABLE_CONDITION`, etc.) is reported
+  independently of the Decision type so downstream comparability logic
+  never has to re-derive it from product form.
+
+### ADR-028: Named uncertainty dimensions, not a single probability
+
+- **Date:** 2026-07-29
+- **Status:** Accepted
+- **Context:** A single calibrated confidence score would misrepresent how
+  little labelled data exists at Sprint 1, and would invite downstream code
+  to treat it as a probability it is not.
+- **Decision:** `DecisionUncertainty` (spec 8.8) reports six independently
+  banded dimensions (`observation_quality`, `claim_support`,
+  `candidate_fit`, `evidence_coverage`, `contradiction_level`,
+  `distinguishability`) plus a `calibration_status`, all derived by
+  transparent rule-based thresholds in `pue/decisions.py`. They are never
+  combined into one number.
+- **Alternatives considered:** A single 0-100 "PUE confidence" score
+  mirroring the existing classifier's `match_confidence` - rejected because
+  it would be presented as calibrated when it is not (spec explicitly
+  forbids this), and because it would erase which specific dimension is
+  weak (evidence coverage vs. candidate distinguishability are different
+  problems requiring different fixes).
+- **Consequences:** Slightly more verbose Decision objects; correspondingly
+  more actionable for debugging and for a future calibration effort once
+  enough labelled outcomes exist (spec section 28 activation gate).
+
+### ADR-029: Shadow-mode release strategy
+
+- **Date:** 2026-07-29
+- **Status:** Accepted
+- **Context:** The PUE must not be trusted with purchase-affecting decisions
+  before it has been benchmarked, but the project still needs to exercise it
+  against real pipeline traffic to gather that benchmark.
+- **Decision:** `pipeline/pue_shadow.py::run_pue_shadow` runs after
+  normalization+classification, controlled by
+  `PipelineConfig.pue_shadow_config` (`ShadowConfig`, disabled by default).
+  It persists its own `ReasoningRecord`s to a separate SQLite database
+  (`~/.digital_arbitrage/pue_shadow.db` by default) and returns them via
+  `ArbitragePipeline.last_pue_shadow_records` for inspection - `analyze()`'s
+  return value (`PipelineResult`) is untouched. Any exception raised inside
+  shadow execution is caught and logged; it never propagates into the
+  pipeline (`tests/pue/test_integration.py::test_shadow_exception_does_not_propagate`).
+- **Consequences:** Zero behavior change for existing consumers of
+  `ArbitragePipeline.analyze()` even with shadow mode enabled
+  (`test_shadow_isolation_does_not_change_classifier_output`); a future
+  sprint can compare classifier vs. PUE output before promoting the PUE to
+  an authoritative role.
+
+### ADR-030: PUE position before semantic deduplication and commercial scoring
+
+- **Date:** 2026-07-29
+- **Status:** Accepted
+- **Context:** The target logical pipeline (spec 5.2) places the PUE between
+  normalization and cross-listing product matching/deduplication, so that
+  product-form and identity understanding can eventually protect
+  deduplication from grouping a water block with a complete graphics card.
+- **Decision:** In Sprint 1, the PUE runs in shadow mode only, after
+  classification and *before* deduplication in `ArbitragePipeline.analyze()`,
+  but its output does not yet feed `Deduplicator` or `OpportunityAnalyzer`/
+  `RecommendationScorer`. Product understanding (`pue/`) and commercial
+  scoring (`opportunity/`, `market_pricing/`) remain fully separate modules
+  with no import relationship in either direction; no price/profit/ROI field
+  is ever read by `pue/claims.py`, `pue/evaluation.py`, or `pue/decisions.py`
+  (verified by `tests/pue/test_invariants.py::test_invariant_no_commercial_fields`).
+- **Consequences:** Deduplication and scoring behavior is provably unchanged
+  in this PR. Wiring PUE product-form/comparability into `Deduplicator` is
+  the natural Sprint 2/3 follow-up once the shadow benchmark shows the PUE
+  is safe to trust (spec section 26, Sprint 3 "recommendation on whether PUE
+  product-form output may affect downstream comparability").

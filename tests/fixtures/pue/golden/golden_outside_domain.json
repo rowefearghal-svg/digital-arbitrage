@@ -1,0 +1,113 @@
+{
+  "candidate_evaluations": [],
+  "candidates": [],
+  "case_id": "id-000001",
+  "claims": [
+    {
+      "capability_version": "pue-0.1.0",
+      "claim_id": "id-000004",
+      "contradicting_evidence_ids": [],
+      "created_by": "claim_construction_v0.1",
+      "observation_id": "id-000002",
+      "predicate": "brand",
+      "qualifying_evidence_ids": [],
+      "status": "supported",
+      "support_level": "strong",
+      "supporting_evidence_ids": [
+        "id-000003"
+      ],
+      "value": "samsung"
+    }
+  ],
+  "created_at": "2026-07-29T12:00:00+00:00",
+  "decision": {
+    "abstention_reason": null,
+    "alternative_candidate_ids": [],
+    "capability_version": "pue-0.1.0",
+    "case_id": "id-000001",
+    "comparability_status": "not_assessed",
+    "contradiction_codes": [],
+    "decision_id": "id-000005",
+    "decision_type": "outside_supported_domain",
+    "identification_level": "unknown",
+    "identified_brand": null,
+    "identified_family": null,
+    "identified_model": null,
+    "identified_variant": null,
+    "knowledge_version": "gpu-seed-0.1.0",
+    "observation_id": "id-000002",
+    "policy_version": "gpu-policy-0.1.0",
+    "product_form": "unknown",
+    "product_type": null,
+    "review_recommended": false,
+    "selected_candidate_instance_id": null,
+    "selected_hypothesis_id": null,
+    "uncertainty": {
+      "calibration_status": "uncalibrated",
+      "candidate_fit": "unknown",
+      "claim_support": "low",
+      "contradiction_level": "low",
+      "distinguishability": "unknown",
+      "evidence_coverage": "low",
+      "observation_quality": "low"
+    },
+    "unresolved_fields": []
+  },
+  "evidence": [
+    {
+      "capability_version": "pue-0.1.0",
+      "evidence_id": "id-000003",
+      "evidence_type": "brand_token",
+      "extraction_confidence": 1.0,
+      "extraction_method": "gpu_terms_deterministic_v0.1",
+      "normalized_value": "samsung",
+      "observation_id": "id-000002",
+      "polarity_hint": "supporting",
+      "raw_value": "Samsung",
+      "source_end": 7,
+      "source_field": "normalized_title",
+      "source_start": 0
+    }
+  ],
+  "explanation": {
+    "contradictory_points": [],
+    "decision_id": "id-000005",
+    "evidence_ids": [],
+    "explanation_id": "id-000006",
+    "profile": "operator",
+    "rejected_alternatives": [],
+    "summary": "This listing does not appear to be within the supported graphics-hardware domain.",
+    "supporting_points": [],
+    "unresolved_points": []
+  },
+  "hypotheses": [],
+  "observation": {
+    "acquired_at": "2026-07-29T12:00:00+00:00",
+    "case_id": "id-000001",
+    "image_refs": [],
+    "normalized_title": "Samsung?",
+    "observation_id": "id-000002",
+    "provider": "golden-provider",
+    "provider_listing_id": "golden-1",
+    "raw_attributes": {},
+    "raw_category": null,
+    "raw_condition": "unknown",
+    "raw_description": null,
+    "raw_title": "Samsung?",
+    "schema_version": "0.1",
+    "source_fingerprint": "a9762d34e264278f7d2f983b16aaf99f19a88fc4374c80dc980de3dcc6298322"
+  },
+  "operational_metrics": {
+    "candidate_count": 0,
+    "claim_count": 1,
+    "claims_hypotheses_ms": 0.0174,
+    "decision_explanation_ms": 0.0266,
+    "evaluation_ms": 0.0024,
+    "evidence_count": 1,
+    "extraction_ms": 0.0821,
+    "hypothesis_count": 0,
+    "retrieval_ms": 0.0004,
+    "total_ms": 0.1289
+  },
+  "schema_version": "0.1"
+}

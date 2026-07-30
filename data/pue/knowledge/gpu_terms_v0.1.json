@@ -1,0 +1,117 @@
+{
+  "term_version": "gpu-terms-0.1.0",
+  "schema_version": "0.1",
+  "curator": "digital-arbitrage PUE Sprint 1",
+  "date_admitted": "2026-07-29",
+  "license_note": "Hand-authored deterministic term lists. No external dataset imported.",
+  "brand_aliases": {
+    "nvidia": ["nvidia", "geforce", "nvidia geforce"],
+    "amd": ["amd", "radeon", "amd radeon"],
+    "intel": ["intel", "intel arc"],
+    "asus": ["asus", "tuf", "rog strix", "rog", "strix", "dual", "tuf gaming"],
+    "msi": ["msi", "gaming x", "ventus", "suprim"],
+    "gigabyte": ["gigabyte", "aorus", "windforce", "eagle", "gaming oc"],
+    "zotac": ["zotac", "amp", "trinity"],
+    "evga": ["evga", "ftw3", "xc3"],
+    "sapphire": ["sapphire", "nitro+", "nitro"],
+    "powercolor": ["powercolor", "red devil", "hellhound"],
+    "palit": ["palit", "gamerock", "jetstream"],
+    "apple": ["apple", "macbook"],
+    "samsung": ["samsung"],
+    "ek": ["ek", "ek water blocks", "ek quantum"],
+    "corsair": ["corsair", "hydro x"],
+    "bykski": ["bykski"]
+  },
+  "chipset_manufacturers": {
+    "nvidia": ["nvidia", "geforce", "rtx", "gtx"],
+    "amd": ["amd", "radeon", "rx"],
+    "intel": ["intel", "arc"]
+  },
+  "families": {
+    "rtx 4090": ["rtx 4090", "geforce rtx 4090", "4090"],
+    "rtx 4090 laptop gpu": ["rtx 4090 laptop", "laptop rtx 4090", "rtx 4090 mobile", "rtx 4090 laptop gpu"],
+    "rtx 4080 super": ["rtx 4080 super", "rtx 4080 s", "geforce rtx 4080 super"],
+    "rtx 4080": ["rtx 4080", "geforce rtx 4080"],
+    "rtx 4070 ti super": ["rtx 4070 ti super"],
+    "rtx 4070 ti": ["rtx 4070 ti"],
+    "rtx 4070 super": ["rtx 4070 super"],
+    "rtx 4070": ["rtx 4070", "geforce rtx 4070"],
+    "rtx 3060": ["rtx 3060", "geforce rtx 3060"],
+    "rx 7900 xtx": ["rx 7900 xtx", "radeon rx 7900 xtx"],
+    "rx 7800 xt": ["rx 7800 xt", "radeon rx 7800 xt"],
+    "arc a770": ["arc a770", "intel arc a770"],
+    "arc a750": ["arc a750", "intel arc a750"]
+  },
+  "product_type_terms": {
+    "graphics_card": ["graphics card", "gpu", "video card", "founders edition", "gaming oc", "complete card", "graphics processor"]
+  },
+  "accessory_component_terms": {
+    "gpu_water_block": ["water block", "waterblock", "water-block", "cooling block", "full cover", "full-cover", "gpu block"],
+    "gpu_fan": ["replacement fan", "fan set", "fan replacement", "cooling fan", "gpu fan"],
+    "gpu_cooler": ["cooler", "heatsink", "heat sink", "shroud"],
+    "gpu_backplate": ["backplate", "back plate"],
+    "gpu_bracket": ["bracket", "support bracket", "anti sag", "mounting bracket", "gpu holder", "gpu brace"],
+    "power_adapter": ["power adapter", "12vhpwr", "12vhpwr adapter", "power cable", "power lead", "power cord", "adapter cable"],
+    "riser_cable": ["riser cable", "riser", "extension cable"],
+    "housing": ["housing", "enclosure"]
+  },
+  "packaging_terms": [
+    "box only",
+    "empty box",
+    "retail box",
+    "packaging only",
+    "original box",
+    "no card",
+    "empty retail box"
+  ],
+  "box_included_terms": [
+    "box included",
+    "with original box",
+    "comes with box",
+    "retail box included"
+  ],
+  "compatibility_terms": [
+    "for the",
+    "compatible with",
+    "replacement for",
+    "designed for",
+    "for use with",
+    "fits",
+    "for"
+  ],
+  "exclusion_terms": {
+    "gpu_not_included": ["gpu not included", "card not included", "graphics card not included", "not included"],
+    "for_parts": ["for parts", "spares or repair", "non-working", "not working", "faulty", "damaged", "for parts not working"]
+  },
+  "bundle_terms": [
+    "bundle",
+    "with psu",
+    "with water block",
+    "+ psu",
+    "plus psu",
+    "psu bundle"
+  ],
+  "condition_terms": {
+    "for_parts": ["for parts", "spares or repair", "non-working", "not working", "faulty"],
+    "excellent": ["excellent condition", "mint condition", "like new"],
+    "used_good": ["good condition", "used"]
+  },
+  "capacity_units": ["gb", "mb"],
+  "desktop_terms": ["desktop"],
+  "mobile_terms": ["laptop", "mobile", "notebook"],
+  "generic_gpu_terms": [
+    "graphics card",
+    "gpu",
+    "video card"
+  ],
+  "non_gpu_domain_hints": [
+    "phone",
+    "smartphone",
+    "macbook",
+    "laptop good condition",
+    "tv",
+    "monitor only",
+    "keyboard",
+    "mouse"
+  ]
+}

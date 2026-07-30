@@ -1,0 +1,899 @@
+{
+  "candidate_evaluations": [
+    {
+      "agreements": [
+        {
+          "candidate_value": "complete_product",
+          "evidence_ids": [],
+          "explanation": "Listing and Candidate product form agree.",
+          "field": "product_form",
+          "observed_value": "complete_product",
+          "result": "agree",
+          "severity": null
+        },
+        {
+          "candidate_value": "rtx 4090",
+          "evidence_ids": [
+            "id-000004",
+            "id-000003",
+            "id-000005"
+          ],
+          "explanation": "Listing and Candidate family agree.",
+          "field": "family",
+          "observed_value": "rtx 4090",
+          "result": "agree",
+          "severity": null
+        }
+      ],
+      "attribute_fit": 0.5,
+      "candidate_evaluation_id": "id-000020",
+      "candidate_instance_id": "id-000010",
+      "contradictions": [],
+      "evaluation_outcome": "supported",
+      "evidence_coverage": 0.3333,
+      "hard_rejected": false,
+      "hypothesis_id": "id-000009",
+      "identity_fit": 0.7,
+      "missing_information": [
+        {
+          "candidate_value": "nvidia",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a board partner; not penalized.",
+          "field": "brand",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": 24,
+          "evidence_ids": [],
+          "explanation": "Capacity not stated on one side; not penalized.",
+          "field": "capacity_gb",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        }
+      ],
+      "policy_version": "gpu-policy-0.1.0",
+      "product_form_fit": 1.0
+    },
+    {
+      "agreements": [
+        {
+          "candidate_value": "complete_product",
+          "evidence_ids": [],
+          "explanation": "Listing and Candidate product form agree.",
+          "field": "product_form",
+          "observed_value": "complete_product",
+          "result": "agree",
+          "severity": null
+        }
+      ],
+      "attribute_fit": 0.5,
+      "candidate_evaluation_id": "id-000021",
+      "candidate_instance_id": "id-000011",
+      "contradictions": [
+        {
+          "candidate_value": "rtx 4090 laptop gpu",
+          "evidence_ids": [
+            "id-000004",
+            "id-000003",
+            "id-000005"
+          ],
+          "explanation": "Listing family conflicts with Candidate family.",
+          "field": "family",
+          "observed_value": "rtx 4090",
+          "result": "contradict",
+          "severity": "hard"
+        }
+      ],
+      "evaluation_outcome": "rejected",
+      "evidence_coverage": 0.3333,
+      "hard_rejected": true,
+      "hypothesis_id": "id-000009",
+      "identity_fit": 0.0,
+      "missing_information": [
+        {
+          "candidate_value": "nvidia",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a board partner; not penalized.",
+          "field": "brand",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": 16,
+          "evidence_ids": [],
+          "explanation": "Capacity not stated on one side; not penalized.",
+          "field": "capacity_gb",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        }
+      ],
+      "policy_version": "gpu-policy-0.1.0",
+      "product_form_fit": 1.0
+    },
+    {
+      "agreements": [],
+      "attribute_fit": 0.5,
+      "candidate_evaluation_id": "id-000022",
+      "candidate_instance_id": "id-000012",
+      "contradictions": [],
+      "evaluation_outcome": "unevaluable",
+      "evidence_coverage": 0.3333,
+      "hard_rejected": false,
+      "hypothesis_id": "id-000009",
+      "identity_fit": 0.0,
+      "missing_information": [
+        {
+          "candidate_value": "replacement_part",
+          "evidence_ids": [],
+          "explanation": "Product form relationship not directly comparable.",
+          "field": "product_form",
+          "observed_value": "complete_product",
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": "nvidia",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a board partner; not penalized.",
+          "field": "brand",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": null,
+          "evidence_ids": [],
+          "explanation": "Capacity not stated on one side; not penalized.",
+          "field": "capacity_gb",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        }
+      ],
+      "policy_version": "gpu-policy-0.1.0",
+      "product_form_fit": 0.0
+    },
+    {
+      "agreements": [],
+      "attribute_fit": 0.5,
+      "candidate_evaluation_id": "id-000023",
+      "candidate_instance_id": "id-000013",
+      "contradictions": [],
+      "evaluation_outcome": "unevaluable",
+      "evidence_coverage": 0.3333,
+      "hard_rejected": false,
+      "hypothesis_id": "id-000009",
+      "identity_fit": 0.0,
+      "missing_information": [
+        {
+          "candidate_value": "packaging_only",
+          "evidence_ids": [],
+          "explanation": "Product form relationship not directly comparable.",
+          "field": "product_form",
+          "observed_value": "complete_product",
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": "nvidia",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a board partner; not penalized.",
+          "field": "brand",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": null,
+          "evidence_ids": [],
+          "explanation": "Capacity not stated on one side; not penalized.",
+          "field": "capacity_gb",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        }
+      ],
+      "policy_version": "gpu-policy-0.1.0",
+      "product_form_fit": 0.0
+    },
+    {
+      "agreements": [
+        {
+          "candidate_value": "complete_product",
+          "evidence_ids": [],
+          "explanation": "Listing and Candidate product form agree.",
+          "field": "product_form",
+          "observed_value": "complete_product",
+          "result": "agree",
+          "severity": null
+        },
+        {
+          "candidate_value": "rtx 4090",
+          "evidence_ids": [
+            "id-000004",
+            "id-000003",
+            "id-000005"
+          ],
+          "explanation": "Listing and Candidate family agree.",
+          "field": "family",
+          "observed_value": "rtx 4090",
+          "result": "agree",
+          "severity": null
+        }
+      ],
+      "attribute_fit": 0.5,
+      "candidate_evaluation_id": "id-000024",
+      "candidate_instance_id": "id-000014",
+      "contradictions": [],
+      "evaluation_outcome": "supported",
+      "evidence_coverage": 0.3333,
+      "hard_rejected": false,
+      "hypothesis_id": "id-000009",
+      "identity_fit": 0.7,
+      "missing_information": [
+        {
+          "candidate_value": "gigabyte",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a board partner; not penalized.",
+          "field": "brand",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": 24,
+          "evidence_ids": [],
+          "explanation": "Capacity not stated on one side; not penalized.",
+          "field": "capacity_gb",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        }
+      ],
+      "policy_version": "gpu-policy-0.1.0",
+      "product_form_fit": 1.0
+    },
+    {
+      "agreements": [
+        {
+          "candidate_value": "complete_product",
+          "evidence_ids": [],
+          "explanation": "Listing and Candidate product form agree.",
+          "field": "product_form",
+          "observed_value": "complete_product",
+          "result": "agree",
+          "severity": null
+        },
+        {
+          "candidate_value": "rtx 4090",
+          "evidence_ids": [
+            "id-000004",
+            "id-000003",
+            "id-000005"
+          ],
+          "explanation": "Listing and Candidate family agree.",
+          "field": "family",
+          "observed_value": "rtx 4090",
+          "result": "agree",
+          "severity": null
+        }
+      ],
+      "attribute_fit": 0.5,
+      "candidate_evaluation_id": "id-000025",
+      "candidate_instance_id": "id-000015",
+      "contradictions": [],
+      "evaluation_outcome": "supported",
+      "evidence_coverage": 0.3333,
+      "hard_rejected": false,
+      "hypothesis_id": "id-000009",
+      "identity_fit": 0.7,
+      "missing_information": [
+        {
+          "candidate_value": "asus",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a board partner; not penalized.",
+          "field": "brand",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": 24,
+          "evidence_ids": [],
+          "explanation": "Capacity not stated on one side; not penalized.",
+          "field": "capacity_gb",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        }
+      ],
+      "policy_version": "gpu-policy-0.1.0",
+      "product_form_fit": 1.0
+    },
+    {
+      "agreements": [
+        {
+          "candidate_value": "complete_product",
+          "evidence_ids": [],
+          "explanation": "Listing and Candidate product form agree.",
+          "field": "product_form",
+          "observed_value": "complete_product",
+          "result": "agree",
+          "severity": null
+        },
+        {
+          "candidate_value": "rtx 4090",
+          "evidence_ids": [
+            "id-000004",
+            "id-000003",
+            "id-000005"
+          ],
+          "explanation": "Listing and Candidate family agree.",
+          "field": "family",
+          "observed_value": "rtx 4090",
+          "result": "agree",
+          "severity": null
+        }
+      ],
+      "attribute_fit": 0.5,
+      "candidate_evaluation_id": "id-000026",
+      "candidate_instance_id": "id-000016",
+      "contradictions": [],
+      "evaluation_outcome": "supported",
+      "evidence_coverage": 0.3333,
+      "hard_rejected": false,
+      "hypothesis_id": "id-000009",
+      "identity_fit": 0.7,
+      "missing_information": [
+        {
+          "candidate_value": "asus",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a board partner; not penalized.",
+          "field": "brand",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": 24,
+          "evidence_ids": [],
+          "explanation": "Capacity not stated on one side; not penalized.",
+          "field": "capacity_gb",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        }
+      ],
+      "policy_version": "gpu-policy-0.1.0",
+      "product_form_fit": 1.0
+    },
+    {
+      "agreements": [
+        {
+          "candidate_value": "complete_product",
+          "evidence_ids": [],
+          "explanation": "Listing and Candidate product form agree.",
+          "field": "product_form",
+          "observed_value": "complete_product",
+          "result": "agree",
+          "severity": null
+        },
+        {
+          "candidate_value": "rtx 4090",
+          "evidence_ids": [
+            "id-000004",
+            "id-000003",
+            "id-000005"
+          ],
+          "explanation": "Listing and Candidate family agree.",
+          "field": "family",
+          "observed_value": "rtx 4090",
+          "result": "agree",
+          "severity": null
+        }
+      ],
+      "attribute_fit": 0.5,
+      "candidate_evaluation_id": "id-000027",
+      "candidate_instance_id": "id-000017",
+      "contradictions": [],
+      "evaluation_outcome": "supported",
+      "evidence_coverage": 0.3333,
+      "hard_rejected": false,
+      "hypothesis_id": "id-000009",
+      "identity_fit": 0.7,
+      "missing_information": [
+        {
+          "candidate_value": "msi",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a board partner; not penalized.",
+          "field": "brand",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": 24,
+          "evidence_ids": [],
+          "explanation": "Capacity not stated on one side; not penalized.",
+          "field": "capacity_gb",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        }
+      ],
+      "policy_version": "gpu-policy-0.1.0",
+      "product_form_fit": 1.0
+    },
+    {
+      "agreements": [
+        {
+          "candidate_value": "complete_product",
+          "evidence_ids": [],
+          "explanation": "Listing and Candidate product form agree.",
+          "field": "product_form",
+          "observed_value": "complete_product",
+          "result": "agree",
+          "severity": null
+        },
+        {
+          "candidate_value": "rtx 4090",
+          "evidence_ids": [
+            "id-000004",
+            "id-000003",
+            "id-000005"
+          ],
+          "explanation": "Listing and Candidate family agree.",
+          "field": "family",
+          "observed_value": "rtx 4090",
+          "result": "agree",
+          "severity": null
+        }
+      ],
+      "attribute_fit": 0.5,
+      "candidate_evaluation_id": "id-000028",
+      "candidate_instance_id": "id-000018",
+      "contradictions": [],
+      "evaluation_outcome": "supported",
+      "evidence_coverage": 0.3333,
+      "hard_rejected": false,
+      "hypothesis_id": "id-000009",
+      "identity_fit": 0.7,
+      "missing_information": [
+        {
+          "candidate_value": "zotac",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a board partner; not penalized.",
+          "field": "brand",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": 24,
+          "evidence_ids": [],
+          "explanation": "Capacity not stated on one side; not penalized.",
+          "field": "capacity_gb",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        }
+      ],
+      "policy_version": "gpu-policy-0.1.0",
+      "product_form_fit": 1.0
+    },
+    {
+      "agreements": [],
+      "attribute_fit": 0.5,
+      "candidate_evaluation_id": "id-000029",
+      "candidate_instance_id": "id-000019",
+      "contradictions": [],
+      "evaluation_outcome": "unevaluable",
+      "evidence_coverage": 0.3333,
+      "hard_rejected": false,
+      "hypothesis_id": "id-000009",
+      "identity_fit": 0.0,
+      "missing_information": [
+        {
+          "candidate_value": "component",
+          "evidence_ids": [],
+          "explanation": "Product form relationship not directly comparable.",
+          "field": "product_form",
+          "observed_value": "complete_product",
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": "bykski",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a board partner; not penalized.",
+          "field": "brand",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": null,
+          "evidence_ids": [],
+          "explanation": "Capacity not stated on one side; not penalized.",
+          "field": "capacity_gb",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        }
+      ],
+      "policy_version": "gpu-policy-0.1.0",
+      "product_form_fit": 0.0
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_instance_id": "id-000010",
+      "catalogue_product_id": "gpu-nvidia-rtx4090-fe",
+      "hypothesis_id": "id-000009",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [
+        "family",
+        "product_type",
+        "product_form"
+      ],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 1,
+      "retrieval_score": 68.1
+    },
+    {
+      "candidate_instance_id": "id-000011",
+      "catalogue_product_id": "gpu-nvidia-rtx4090-laptop",
+      "hypothesis_id": "id-000009",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [
+        "product_type",
+        "product_form"
+      ],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 2,
+      "retrieval_score": 66.65
+    },
+    {
+      "candidate_instance_id": "id-000012",
+      "catalogue_product_id": "part-nvidia-rtx4090-fe-backplate",
+      "hypothesis_id": "id-000009",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [
+        "family"
+      ],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 3,
+      "retrieval_score": 61.01
+    },
+    {
+      "candidate_instance_id": "id-000013",
+      "catalogue_product_id": "pkg-nvidia-rtx4090-fe-empty-box",
+      "hypothesis_id": "id-000009",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [
+        "family"
+      ],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 4,
+      "retrieval_score": 59.34
+    },
+    {
+      "candidate_instance_id": "id-000014",
+      "catalogue_product_id": "gpu-gigabyte-aorus-rtx4090-master",
+      "hypothesis_id": "id-000009",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [
+        "family",
+        "product_type",
+        "product_form"
+      ],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 5,
+      "retrieval_score": 51.89
+    },
+    {
+      "candidate_instance_id": "id-000015",
+      "catalogue_product_id": "gpu-asus-tuf-rtx4090-o24g",
+      "hypothesis_id": "id-000009",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [
+        "family",
+        "product_type",
+        "product_form"
+      ],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 6,
+      "retrieval_score": 51.41
+    },
+    {
+      "candidate_instance_id": "id-000016",
+      "catalogue_product_id": "gpu-asus-rog-strix-rtx4090-o24g",
+      "hypothesis_id": "id-000009",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [
+        "family",
+        "product_type",
+        "product_form"
+      ],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 7,
+      "retrieval_score": 51.3
+    },
+    {
+      "candidate_instance_id": "id-000017",
+      "catalogue_product_id": "gpu-msi-rtx4090-gamingx-trio",
+      "hypothesis_id": "id-000009",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [
+        "family",
+        "product_type",
+        "product_form"
+      ],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 8,
+      "retrieval_score": 50.73
+    },
+    {
+      "candidate_instance_id": "id-000018",
+      "catalogue_product_id": "gpu-zotac-rtx4090-trinity-oc",
+      "hypothesis_id": "id-000009",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [
+        "family",
+        "product_type",
+        "product_form"
+      ],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 9,
+      "retrieval_score": 50.12
+    },
+    {
+      "candidate_instance_id": "id-000019",
+      "catalogue_product_id": "acc-bykski-rtx4090-waterblock",
+      "hypothesis_id": "id-000009",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [
+        "family"
+      ],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 10,
+      "retrieval_score": 44.01
+    }
+  ],
+  "case_id": "id-000001",
+  "claims": [
+    {
+      "capability_version": "pue-0.1.0",
+      "claim_id": "id-000006",
+      "contradicting_evidence_ids": [],
+      "created_by": "claim_construction_v0.1",
+      "observation_id": "id-000002",
+      "predicate": "product_family",
+      "qualifying_evidence_ids": [],
+      "status": "supported",
+      "support_level": "strong",
+      "supporting_evidence_ids": [
+        "id-000004"
+      ],
+      "value": "rtx 4090"
+    },
+    {
+      "capability_version": "pue-0.1.0",
+      "claim_id": "id-000007",
+      "contradicting_evidence_ids": [],
+      "created_by": "claim_construction_v0.1",
+      "observation_id": "id-000002",
+      "predicate": "chipset_manufacturer",
+      "qualifying_evidence_ids": [],
+      "status": "supported",
+      "support_level": "strong",
+      "supporting_evidence_ids": [
+        "id-000003"
+      ],
+      "value": "nvidia"
+    },
+    {
+      "capability_version": "pue-0.1.0",
+      "claim_id": "id-000008",
+      "contradicting_evidence_ids": [],
+      "created_by": "claim_construction_v0.1",
+      "observation_id": "id-000002",
+      "predicate": "model",
+      "qualifying_evidence_ids": [],
+      "status": "supported",
+      "support_level": "strong",
+      "supporting_evidence_ids": [
+        "id-000005"
+      ],
+      "value": "rtx 4090"
+    }
+  ],
+  "created_at": "2026-07-29T12:00:00+00:00",
+  "decision": {
+    "abstention_reason": null,
+    "alternative_candidate_ids": [
+      "id-000010",
+      "id-000012",
+      "id-000013",
+      "id-000014",
+      "id-000015",
+      "id-000016",
+      "id-000017",
+      "id-000018",
+      "id-000019"
+    ],
+    "capability_version": "pue-0.1.0",
+    "case_id": "id-000001",
+    "comparability_status": "comparable_at_broader_level",
+    "contradiction_codes": [
+      "hard_contradiction:family"
+    ],
+    "decision_id": "id-000030",
+    "decision_type": "partially_identified",
+    "identification_level": "model",
+    "identified_brand": null,
+    "identified_family": "rtx 4090",
+    "identified_model": "rtx 4090",
+    "identified_variant": null,
+    "knowledge_version": "gpu-seed-0.1.0",
+    "observation_id": "id-000002",
+    "policy_version": "gpu-policy-0.1.0",
+    "product_form": "complete_product",
+    "product_type": "graphics_card",
+    "review_recommended": false,
+    "selected_candidate_instance_id": null,
+    "selected_hypothesis_id": "id-000009",
+    "uncertainty": {
+      "calibration_status": "uncalibrated",
+      "candidate_fit": "moderate",
+      "claim_support": "moderate",
+      "contradiction_level": "high",
+      "distinguishability": "low",
+      "evidence_coverage": "moderate",
+      "observation_quality": "moderate"
+    },
+    "unresolved_fields": [
+      "brand",
+      "variant"
+    ]
+  },
+  "evidence": [
+    {
+      "capability_version": "pue-0.1.0",
+      "evidence_id": "id-000003",
+      "evidence_type": "brand_token",
+      "extraction_confidence": 1.0,
+      "extraction_method": "gpu_terms_deterministic_v0.1",
+      "normalized_value": "nvidia",
+      "observation_id": "id-000002",
+      "polarity_hint": "supporting",
+      "raw_value": "NVIDIA",
+      "source_end": 6,
+      "source_field": "normalized_title",
+      "source_start": 0
+    },
+    {
+      "capability_version": "pue-0.1.0",
+      "evidence_id": "id-000004",
+      "evidence_type": "product_family_token",
+      "extraction_confidence": 1.0,
+      "extraction_method": "gpu_terms_deterministic_v0.1",
+      "normalized_value": "rtx 4090",
+      "observation_id": "id-000002",
+      "polarity_hint": "supporting",
+      "raw_value": "RTX 4090",
+      "source_end": 15,
+      "source_field": "normalized_title",
+      "source_start": 7
+    },
+    {
+      "capability_version": "pue-0.1.0",
+      "evidence_id": "id-000005",
+      "evidence_type": "model_token",
+      "extraction_confidence": 1.0,
+      "extraction_method": "gpu_terms_deterministic_v0.1",
+      "normalized_value": "rtx 4090",
+      "observation_id": "id-000002",
+      "polarity_hint": "supporting",
+      "raw_value": "RTX 4090",
+      "source_end": 15,
+      "source_field": "normalized_title",
+      "source_start": 7
+    }
+  ],
+  "explanation": {
+    "contradictory_points": [
+      "family (hard): Listing family conflicts with Candidate family."
+    ],
+    "decision_id": "id-000030",
+    "evidence_ids": [
+      "id-000004",
+      "id-000003",
+      "id-000005"
+    ],
+    "explanation_id": "id-000031",
+    "profile": "operator",
+    "rejected_alternatives": [
+      "Candidate id-000011 rejected: Listing family conflicts with Candidate family."
+    ],
+    "summary": "Identified as an rtx 4090 graphics card. The exact board-partner variant could not be established.",
+    "supporting_points": [
+      "product_form: Listing and Candidate product form agree.",
+      "family: Listing and Candidate family agree.",
+      "product_form: Listing and Candidate product form agree.",
+      "product_form: Listing and Candidate product form agree.",
+      "family: Listing and Candidate family agree.",
+      "product_form: Listing and Candidate product form agree.",
+      "family: Listing and Candidate family agree.",
+      "product_form: Listing and Candidate product form agree.",
+      "family: Listing and Candidate family agree.",
+      "product_form: Listing and Candidate product form agree.",
+      "family: Listing and Candidate family agree.",
+      "product_form: Listing and Candidate product form agree.",
+      "family: Listing and Candidate family agree."
+    ],
+    "unresolved_points": [
+      "brand could not be established from the available evidence.",
+      "variant could not be established from the available evidence."
+    ]
+  },
+  "hypotheses": [
+    {
+      "brand": null,
+      "claim_ids": [
+        "id-000006",
+        "id-000007",
+        "id-000008"
+      ],
+      "coherence": 1.0,
+      "compatibility_target": null,
+      "evidence_coverage": 0.3333,
+      "family": "rtx 4090",
+      "hypothesis_id": "id-000009",
+      "model": "rtx 4090",
+      "observation_id": "id-000002",
+      "product_form": "complete_product",
+      "product_type": "graphics_card",
+      "status": "active",
+      "unresolved_fields": [
+        "brand",
+        "variant"
+      ],
+      "variant": null
+    }
+  ],
+  "observation": {
+    "acquired_at": "2026-07-29T12:00:00+00:00",
+    "case_id": "id-000001",
+    "image_refs": [],
+    "normalized_title": "NVIDIA RTX 4090",
+    "observation_id": "id-000002",
+    "provider": "golden-provider",
+    "provider_listing_id": "golden-1",
+    "raw_attributes": {},
+    "raw_category": null,
+    "raw_condition": "unknown",
+    "raw_description": null,
+    "raw_title": "NVIDIA RTX 4090",
+    "schema_version": "0.1",
+    "source_fingerprint": "39e6f2e562ca69bcb8f05d072a29f5eaefd78202c385c90a8574d59cde8c411c"
+  },
+  "operational_metrics": {
+    "candidate_count": 10,
+    "claim_count": 3,
+    "claims_hypotheses_ms": 0.0495,
+    "decision_explanation_ms": 0.0559,
+    "evaluation_ms": 0.1213,
+    "evidence_count": 3,
+    "extraction_ms": 0.0988,
+    "hypothesis_count": 1,
+    "retrieval_ms": 0.2331,
+    "total_ms": 0.5586
+  },
+  "schema_version": "0.1"
+}

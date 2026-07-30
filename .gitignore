@@ -25,8 +25,10 @@ dist/
 configs/config.toml
 configs/*.local.*
 
-# Data / models (keep out of Git)
-data/
+# Data / models (keep out of Git). Uses "data/*" rather than "data/" so the
+# negation below can still reach inside the directory (git cannot re-include
+# paths under a directory that was itself excluded outright).
+data/*
 datasets/
 models/
 checkpoints/
@@ -36,6 +38,12 @@ checkpoints/
 *.onnx
 *.safetensors
 *.h5
+
+# Exception: the hand-seeded, version-controlled PUE catalogue and knowledge
+# artifacts are source, not generated data/model output (see
+# docs/architecture/PUE_v0.1_VERTICAL_SLICE_SPECIFICATION.md section 12).
+!data/pue/
+!data/pue/**
 
 # OS / editor
 .DS_Store
