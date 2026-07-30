@@ -246,8 +246,17 @@ is added by subclassing `LiveProvider` and implementing two small hooks:
 
 ```python
 from digital_arbitrage.providers.live import (
-    HttpClient, HttpRequest, HttpResponse, LiveProvider, LiveProviderConfig,
-    Page, ProviderCapabilities, ensure_mapping, parse_json, require, resolve_url,
+    HttpClient,
+    HttpRequest,
+    HttpResponse,
+    LiveProvider,
+    LiveProviderConfig,
+    Page,
+    ProviderCapabilities,
+    ensure_mapping,
+    parse_json,
+    require,
+    resolve_url,
 )
 from digital_arbitrage.product_scanner.models import Listing
 
@@ -327,11 +336,13 @@ header per request. Three strategies ship (ADR-017):
 
 ```python
 from digital_arbitrage.providers.live import (
-    LiveProviderConfig, OAuthClientCredentialsAuthProvider, create_live_provider,
+    LiveProviderConfig,
+    OAuthClientCredentialsAuthProvider,
+    create_live_provider,
 )
 
 auth = OAuthClientCredentialsAuthProvider(
-    client_id=os.environ["EBAY_CLIENT_ID"],       # from a secret, never the repo
+    client_id=os.environ["EBAY_CLIENT_ID"],  # from a secret, never the repo
     client_secret=os.environ["EBAY_CLIENT_SECRET"],
     token_url="https://api.ebay.com/identity/v1/oauth2/token",
     scope="https://api.ebay.com/oauth/api_scope",
@@ -381,7 +392,8 @@ present on marketplaces/queries where eBay returns it.
 ```python
 import os
 from digital_arbitrage.providers.live import (
-    EbayBrowseConfig, build_ebay_browse_provider_from_env,
+    EbayBrowseConfig,
+    build_ebay_browse_provider_from_env,
 )
 
 config = EbayBrowseConfig(base_url="https://api.ebay.com", marketplace_id="EBAY_IE")
@@ -395,6 +407,7 @@ live registry, so it can also be built by name:
 
 ```python
 from digital_arbitrage.providers.live import create_live_provider
+
 provider = create_live_provider("ebay_browse", config, auth=auth)
 ```
 

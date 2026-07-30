@@ -203,16 +203,16 @@ The Browse API fits the framework with **no changes to the mock providers** and
 
 ```python
 class EbayBrowseProvider(LiveProvider):
-    name = "ebay_browse"                      # NOT "ebay" — see below
+    name = "ebay_browse"  # NOT "ebay" — see below
     capabilities = ProviderCapabilities(
         supports_free_text_search=True,
         supports_pagination=True,
         supports_price_filter=True,
         supports_condition_filter=True,
         supports_sorting=True,
-        requires_api_key=True,                # client_id/secret required
+        requires_api_key=True,  # client_id/secret required
         max_page_size=200,
-        max_results=10_000,                   # eBay's offset cap
+        max_results=10_000,  # eBay's offset cap
         supported_currencies=("EUR", "GBP", "USD"),
     )
 
@@ -319,7 +319,7 @@ cheapest first:
 
    ```python
    class AuthProvider(Protocol):
-       def authorization(self) -> str | None: ...   # e.g. "Bearer <token>"
+       def authorization(self) -> str | None: ...  # e.g. "Bearer <token>"
    ```
 
    Provide an `OAuthClientCredentialsAuth(token_url, client_id, client_secret,

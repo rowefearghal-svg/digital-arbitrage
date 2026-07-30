@@ -25,7 +25,7 @@ arb = "digital_arbitrage.pipeline.cli:main"
 
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.6",
+    "ruff==0.16.0",
     "black>=24.8",
     "mypy>=1.11",
     "pytest>=8.3",
