@@ -131,60 +131,12 @@ def extract_evidence(observation: Observation, context: ProcessingContext) -> tu
                 )
             )
 
-    # -- family / model (longest alias first, across all families) ---- #
-    families: Mapping[str, list[str]] = terms.get("families", {})  # type: ignore[assignment]
-    flat_family_aliases: list[tuple[str, str]] = [
-        (alias, family) for family, aliases in families.items() for alias in aliases
-    ]
-    for alias, family in sorted(flat_family_aliases, key=lambda t: len(t[0]), reverse=True):
-        for span in _find_all(text_lower, alias):
-            if _overlaps(span, taken_spans):
-                continue
-            taken_spans.append(span)
-            raw = text[span[0] : span[1]]
-            evidence.append(
-                _emit(
-                    observation=observation,
-                    context=context,
-                    evidence_type=EvidenceType.PRODUCT_FAMILY_TOKEN,
-                    raw_value=raw,
-                    normalized_value=family,
-                    source_field="normalized_title",
-                    span=span,
-                    polarity=EvidencePolarity.SUPPORTING,
-                )
-            )
-            evidence.append(
-                _emit(
-                    observation=observation,
-                    context=context,
-                    evidence_type=EvidenceType.MODEL_TOKEN,
-                    raw_value=raw,
-                    normalized_value=family,
-                    source_field="normalized_title",
-                    span=span,
-                    polarity=EvidencePolarity.SUPPORTING,
-                )
-            )
-
-    # -- product-type / complete-product hint terms -------------------- #
-    product_type_terms: Mapping[str, list[str]] = terms.get("product_type_terms", {})  # type: ignore[assignment]
-    for ptype, phrases in product_type_terms.items():
-        for _phrase, span in _match_term_group(text_lower, phrases, taken_spans):
-            evidence.append(
-                _emit(
-                    observation=observation,
-                    context=context,
-                    evidence_type=EvidenceType.PRODUCT_TYPE_TERM,
-                    raw_value=text[span[0] : span[1]],
-                    normalized_value=ptype,
-                    source_field="normalized_title",
-                    span=span,
-                    polarity=EvidencePolarity.SUPPORTING,
-                )
-            )
-
-    # -- accessory / component / replacement-part terms ----------------- #
+    # -- accessory / component / replacement-part terms (checked BEFORE
+    #    family/model and the generic product_type_terms block below so a
+    #    specific phrase like "gpu fan"/"gpu block"/"gpu holder" is never
+    #    suppressed by the broad, overlapping "gpu" token: whichever match
+    #    claims a character span first wins, and a specific term must win
+    #    over a broad one - spec 9.5/10.1 precedence). -------------------- #
     accessory_terms: Mapping[str, list[str]] = terms.get("accessory_component_terms", {})  # type: ignore[assignment]
     for ptype, phrases in accessory_terms.items():
         for _phrase, span in _match_term_group(text_lower, phrases, taken_spans):
@@ -295,6 +247,66 @@ def extract_evidence(observation: Observation, context: ProcessingContext) -> tu
                 polarity=EvidencePolarity.QUALIFYING,
             )
         )
+
+    # -- family / model (longest alias first, across all families). Checked
+    #    AFTER all the specific categories above so an explicit accessory/
+    #    packaging/exclusion/compatibility/bundle phrase always wins a
+    #    contested character span over a family mention (spec 9.5/10.1). --- #
+    families: Mapping[str, list[str]] = terms.get("families", {})  # type: ignore[assignment]
+    flat_family_aliases: list[tuple[str, str]] = [
+        (alias, family) for family, aliases in families.items() for alias in aliases
+    ]
+    for alias, family in sorted(flat_family_aliases, key=lambda t: len(t[0]), reverse=True):
+        for span in _find_all(text_lower, alias):
+            if _overlaps(span, taken_spans):
+                continue
+            taken_spans.append(span)
+            raw = text[span[0] : span[1]]
+            evidence.append(
+                _emit(
+                    observation=observation,
+                    context=context,
+                    evidence_type=EvidenceType.PRODUCT_FAMILY_TOKEN,
+                    raw_value=raw,
+                    normalized_value=family,
+                    source_field="normalized_title",
+                    span=span,
+                    polarity=EvidencePolarity.SUPPORTING,
+                )
+            )
+            evidence.append(
+                _emit(
+                    observation=observation,
+                    context=context,
+                    evidence_type=EvidenceType.MODEL_TOKEN,
+                    raw_value=raw,
+                    normalized_value=family,
+                    source_field="normalized_title",
+                    span=span,
+                    polarity=EvidencePolarity.SUPPORTING,
+                )
+            )
+
+    # -- product-type / complete-product hint terms (generic "gpu"/
+    #    "graphics card"/"video card" etc.; checked LAST among the phrase
+    #    categories above so it can never suppress a more specific
+    #    accessory/packaging/exclusion/compatibility/bundle/family match -
+    #    spec 9.5/10.1 precedence). ---------------------------------------- #
+    product_type_terms: Mapping[str, list[str]] = terms.get("product_type_terms", {})  # type: ignore[assignment]
+    for ptype, phrases in product_type_terms.items():
+        for _phrase, span in _match_term_group(text_lower, phrases, taken_spans):
+            evidence.append(
+                _emit(
+                    observation=observation,
+                    context=context,
+                    evidence_type=EvidenceType.PRODUCT_TYPE_TERM,
+                    raw_value=text[span[0] : span[1]],
+                    normalized_value=ptype,
+                    source_field="normalized_title",
+                    span=span,
+                    polarity=EvidencePolarity.SUPPORTING,
+                )
+            )
 
     # -- condition terms ----------------------------------------------------- #
     condition_terms: Mapping[str, list[str]] = terms.get("condition_terms", {})  # type: ignore[assignment]

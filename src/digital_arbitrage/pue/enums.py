@@ -58,6 +58,7 @@ class ClaimPredicate(StrEnum):
     BUNDLE_CONTENT = "bundle_content"
     INCLUDED = "included"
     NOT_INCLUDED = "not_included"
+    FORM_FACTOR = "form_factor"
 
 
 class ClaimStatus(StrEnum):

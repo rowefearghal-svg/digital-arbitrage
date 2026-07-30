@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 
 from .admission import admit_observation
 from .catalogue import CandidateRepository, JsonCandidateRepository
-from .claims import construct_claims
+from .claims import construct_claims, validate_identifier_claims
 from .decisions import form_decision
 from .enums import (
     CalibrationStatus,
@@ -230,7 +230,12 @@ def process_one(
     callable with just ``(listing, context)`` while still allowing injection
     for tests.
     """
-    repo = repository or JsonCandidateRepository()
+    try:
+        repo = repository or JsonCandidateRepository()
+    except PueValidationError as exc:
+        return _failure_record(
+            listing, context, ProcessingFailureCategory.CATALOGUE_UNAVAILABLE, str(exc)
+        )
     active_policy = policy or DEFAULT_POLICY
 
     try:
@@ -245,6 +250,7 @@ def process_one(
         evidence = extract_evidence(observation, context)
         t1 = time.perf_counter()
         claims = construct_claims(observation, evidence, context)
+        claims = validate_identifier_claims(claims, context, repo)
         hypotheses = generate_hypotheses(observation, claims, context)
         t2 = time.perf_counter()
         candidates = retrieve_candidates(
@@ -307,9 +313,23 @@ def process_many(
 ) -> tuple[ReasoningRecord, ...]:
     """Batch wrapper. Semantically equivalent to calling :func:`process_one`
     for each listing in order (spec 18.3): batching never changes a case's
-    Decision.
+    Decision - including when the default catalogue is unavailable, in
+    which case every listing gets its own PROCESSING_FAILED/
+    CATALOGUE_UNAVAILABLE record, exactly as an individual
+    ``process_one(listing, context)`` call would produce.
     """
-    repo = repository or JsonCandidateRepository()
+    if repository is not None:
+        repo: CandidateRepository | None = repository
+    else:
+        try:
+            repo = JsonCandidateRepository()
+        except PueValidationError as exc:
+            return tuple(
+                _failure_record(
+                    listing, context, ProcessingFailureCategory.CATALOGUE_UNAVAILABLE, str(exc)
+                )
+                for listing in listings
+            )
     return tuple(
         process_one(listing, context, repository=repo, policy=policy) for listing in listings
     )

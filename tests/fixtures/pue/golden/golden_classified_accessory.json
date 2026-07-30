@@ -167,10 +167,68 @@
         {
           "candidate_value": "complete_product",
           "evidence_ids": [
-            "id-000006",
-            "id-000008",
-            "id-000010",
-            "id-000003"
+            "id-000003",
+            "id-000005",
+            "id-000007",
+            "id-000009"
+          ],
+          "explanation": "Listing is supported as component, not a complete graphics card.",
+          "field": "product_form",
+          "observed_value": "component",
+          "result": "contradict",
+          "severity": "hard"
+        }
+      ],
+      "evaluation_outcome": "rejected",
+      "evidence_coverage": 1.0,
+      "hard_rejected": true,
+      "hypothesis_id": "id-000022",
+      "identity_fit": 0.0,
+      "missing_information": [
+        {
+          "candidate_value": "rtx 4090 laptop gpu",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a family; not penalized.",
+          "field": "family",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": "nvidia",
+          "evidence_ids": [],
+          "explanation": "Listing does not state a board partner; not penalized.",
+          "field": "brand",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        },
+        {
+          "candidate_value": 16,
+          "evidence_ids": [],
+          "explanation": "Capacity not stated on one side; not penalized.",
+          "field": "capacity_gb",
+          "observed_value": null,
+          "result": "missing",
+          "severity": null
+        }
+      ],
+      "policy_version": "gpu-policy-0.1.0",
+      "product_form_fit": 0.0
+    },
+    {
+      "agreements": [],
+      "attribute_fit": 0.5,
+      "candidate_evaluation_id": "id-000037",
+      "candidate_instance_id": "id-000027",
+      "contradictions": [
+        {
+          "candidate_value": "complete_product",
+          "evidence_ids": [
+            "id-000003",
+            "id-000005",
+            "id-000007",
+            "id-000009"
           ],
           "explanation": "Listing is supported as component, not a complete graphics card.",
           "field": "product_form",
@@ -219,16 +277,16 @@
     {
       "agreements": [],
       "attribute_fit": 0.5,
-      "candidate_evaluation_id": "id-000037",
-      "candidate_instance_id": "id-000027",
+      "candidate_evaluation_id": "id-000038",
+      "candidate_instance_id": "id-000028",
       "contradictions": [
         {
           "candidate_value": "complete_product",
           "evidence_ids": [
-            "id-000006",
-            "id-000008",
-            "id-000010",
-            "id-000003"
+            "id-000003",
+            "id-000005",
+            "id-000007",
+            "id-000009"
           ],
           "explanation": "Listing is supported as component, not a complete graphics card.",
           "field": "product_form",
@@ -277,16 +335,16 @@
     {
       "agreements": [],
       "attribute_fit": 0.5,
-      "candidate_evaluation_id": "id-000038",
-      "candidate_instance_id": "id-000028",
+      "candidate_evaluation_id": "id-000039",
+      "candidate_instance_id": "id-000029",
       "contradictions": [
         {
           "candidate_value": "complete_product",
           "evidence_ids": [
-            "id-000006",
-            "id-000008",
-            "id-000010",
-            "id-000003"
+            "id-000003",
+            "id-000005",
+            "id-000007",
+            "id-000009"
           ],
           "explanation": "Listing is supported as component, not a complete graphics card.",
           "field": "product_form",
@@ -335,8 +393,8 @@
     {
       "agreements": [],
       "attribute_fit": 0.5,
-      "candidate_evaluation_id": "id-000039",
-      "candidate_instance_id": "id-000029",
+      "candidate_evaluation_id": "id-000040",
+      "candidate_instance_id": "id-000030",
       "contradictions": [],
       "evaluation_outcome": "unevaluable",
       "evidence_coverage": 1.0,
@@ -387,16 +445,16 @@
     {
       "agreements": [],
       "attribute_fit": 0.5,
-      "candidate_evaluation_id": "id-000040",
-      "candidate_instance_id": "id-000030",
+      "candidate_evaluation_id": "id-000041",
+      "candidate_instance_id": "id-000031",
       "contradictions": [
         {
           "candidate_value": "complete_product",
           "evidence_ids": [
-            "id-000006",
-            "id-000008",
-            "id-000010",
-            "id-000003"
+            "id-000003",
+            "id-000005",
+            "id-000007",
+            "id-000009"
           ],
           "explanation": "Listing is supported as component, not a complete graphics card.",
           "field": "product_form",
@@ -445,16 +503,16 @@
     {
       "agreements": [],
       "attribute_fit": 0.5,
-      "candidate_evaluation_id": "id-000041",
-      "candidate_instance_id": "id-000031",
+      "candidate_evaluation_id": "id-000042",
+      "candidate_instance_id": "id-000032",
       "contradictions": [
         {
           "candidate_value": "complete_product",
           "evidence_ids": [
-            "id-000006",
-            "id-000008",
-            "id-000010",
-            "id-000003"
+            "id-000003",
+            "id-000005",
+            "id-000007",
+            "id-000009"
           ],
           "explanation": "Listing is supported as component, not a complete graphics card.",
           "field": "product_form",
@@ -480,64 +538,6 @@
         },
         {
           "candidate_value": "gigabyte",
-          "evidence_ids": [],
-          "explanation": "Listing does not state a board partner; not penalized.",
-          "field": "brand",
-          "observed_value": null,
-          "result": "missing",
-          "severity": null
-        },
-        {
-          "candidate_value": 24,
-          "evidence_ids": [],
-          "explanation": "Capacity not stated on one side; not penalized.",
-          "field": "capacity_gb",
-          "observed_value": null,
-          "result": "missing",
-          "severity": null
-        }
-      ],
-      "policy_version": "gpu-policy-0.1.0",
-      "product_form_fit": 0.0
-    },
-    {
-      "agreements": [],
-      "attribute_fit": 0.5,
-      "candidate_evaluation_id": "id-000042",
-      "candidate_instance_id": "id-000032",
-      "contradictions": [
-        {
-          "candidate_value": "complete_product",
-          "evidence_ids": [
-            "id-000006",
-            "id-000008",
-            "id-000010",
-            "id-000003"
-          ],
-          "explanation": "Listing is supported as component, not a complete graphics card.",
-          "field": "product_form",
-          "observed_value": "component",
-          "result": "contradict",
-          "severity": "hard"
-        }
-      ],
-      "evaluation_outcome": "rejected",
-      "evidence_coverage": 1.0,
-      "hard_rejected": true,
-      "hypothesis_id": "id-000022",
-      "identity_fit": 0.5,
-      "missing_information": [
-        {
-          "candidate_value": "rtx 4090",
-          "evidence_ids": [],
-          "explanation": "Listing does not state a family; not penalized.",
-          "field": "family",
-          "observed_value": null,
-          "result": "missing",
-          "severity": null
-        },
-        {
-          "candidate_value": "nvidia",
           "evidence_ids": [],
           "explanation": "Listing does not state a board partner; not penalized.",
           "field": "brand",
@@ -602,6 +602,16 @@
     },
     {
       "candidate_instance_id": "id-000026",
+      "catalogue_product_id": "gpu-nvidia-rtx4090-laptop",
+      "hypothesis_id": "id-000022",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 4,
+      "retrieval_score": 37.21
+    },
+    {
+      "candidate_instance_id": "id-000027",
       "catalogue_product_id": "gpu-asus-tuf-rtx4090-o24g",
       "hypothesis_id": "id-000022",
       "knowledge_version": "gpu-seed-0.1.0",
@@ -609,11 +619,11 @@
         "family"
       ],
       "retrieval_method": "fuzzy_title_match",
-      "retrieval_rank": 4,
+      "retrieval_rank": 5,
       "retrieval_score": 37.12
     },
     {
-      "candidate_instance_id": "id-000027",
+      "candidate_instance_id": "id-000028",
       "catalogue_product_id": "gpu-zotac-rtx4090-trinity-oc",
       "hypothesis_id": "id-000022",
       "knowledge_version": "gpu-seed-0.1.0",
@@ -621,11 +631,11 @@
         "family"
       ],
       "retrieval_method": "fuzzy_title_match",
-      "retrieval_rank": 5,
+      "retrieval_rank": 6,
       "retrieval_score": 35.69
     },
     {
-      "candidate_instance_id": "id-000028",
+      "candidate_instance_id": "id-000029",
       "catalogue_product_id": "gpu-msi-rtx4090-gamingx-trio",
       "hypothesis_id": "id-000022",
       "knowledge_version": "gpu-seed-0.1.0",
@@ -633,11 +643,11 @@
         "family"
       ],
       "retrieval_method": "fuzzy_title_match",
-      "retrieval_rank": 6,
+      "retrieval_rank": 7,
       "retrieval_score": 35.68
     },
     {
-      "candidate_instance_id": "id-000029",
+      "candidate_instance_id": "id-000030",
       "catalogue_product_id": "part-nvidia-rtx4090-fe-backplate",
       "hypothesis_id": "id-000022",
       "knowledge_version": "gpu-seed-0.1.0",
@@ -645,11 +655,11 @@
         "family"
       ],
       "retrieval_method": "fuzzy_title_match",
-      "retrieval_rank": 7,
+      "retrieval_rank": 8,
       "retrieval_score": 35.17
     },
     {
-      "candidate_instance_id": "id-000030",
+      "candidate_instance_id": "id-000031",
       "catalogue_product_id": "gpu-asus-rog-strix-rtx4090-o24g",
       "hypothesis_id": "id-000022",
       "knowledge_version": "gpu-seed-0.1.0",
@@ -657,11 +667,11 @@
         "family"
       ],
       "retrieval_method": "fuzzy_title_match",
-      "retrieval_rank": 8,
+      "retrieval_rank": 9,
       "retrieval_score": 34.53
     },
     {
-      "candidate_instance_id": "id-000031",
+      "candidate_instance_id": "id-000032",
       "catalogue_product_id": "gpu-gigabyte-aorus-rtx4090-master",
       "hypothesis_id": "id-000022",
       "knowledge_version": "gpu-seed-0.1.0",
@@ -669,20 +679,8 @@
         "family"
       ],
       "retrieval_method": "fuzzy_title_match",
-      "retrieval_rank": 9,
-      "retrieval_score": 33.59
-    },
-    {
-      "candidate_instance_id": "id-000032",
-      "catalogue_product_id": "gpu-nvidia-rtx4090-fe",
-      "hypothesis_id": "id-000022",
-      "knowledge_version": "gpu-seed-0.1.0",
-      "matched_fields": [
-        "family"
-      ],
-      "retrieval_method": "fuzzy_title_match",
       "retrieval_rank": 10,
-      "retrieval_score": 33.55
+      "retrieval_score": 33.59
     }
   ],
   "case_id": "id-000001",
@@ -698,7 +696,7 @@
       "status": "qualified",
       "support_level": "strong",
       "supporting_evidence_ids": [
-        "id-000003"
+        "id-000009"
       ],
       "value": "rtx 4090"
     },
@@ -713,7 +711,7 @@
       "status": "supported",
       "support_level": "moderate",
       "supporting_evidence_ids": [
-        "id-000003"
+        "id-000009"
       ],
       "value": "rtx 4090"
     },
@@ -723,14 +721,14 @@
       "contradicting_evidence_ids": [],
       "created_by": "claim_construction_v0.1",
       "observation_id": "id-000002",
-      "predicate": "model",
+      "predicate": "product_form",
       "qualifying_evidence_ids": [],
       "status": "supported",
-      "support_level": "strong",
+      "support_level": "deterministic",
       "supporting_evidence_ids": [
-        "id-000004"
+        "id-000003"
       ],
-      "value": "rtx 4090"
+      "value": "component"
     },
     {
       "capability_version": "pue-0.1.0",
@@ -741,11 +739,11 @@
       "predicate": "product_type",
       "qualifying_evidence_ids": [],
       "status": "supported",
-      "support_level": "moderate",
+      "support_level": "deterministic",
       "supporting_evidence_ids": [
-        "id-000005"
+        "id-000003"
       ],
-      "value": "graphics_card"
+      "value": "gpu_water_block"
     },
     {
       "capability_version": "pue-0.1.0",
@@ -758,7 +756,7 @@
       "status": "supported",
       "support_level": "deterministic",
       "supporting_evidence_ids": [
-        "id-000006"
+        "id-000005"
       ],
       "value": "component"
     },
@@ -773,7 +771,7 @@
       "status": "supported",
       "support_level": "deterministic",
       "supporting_evidence_ids": [
-        "id-000006"
+        "id-000005"
       ],
       "value": "gpu_water_block"
     },
@@ -788,7 +786,7 @@
       "status": "supported",
       "support_level": "deterministic",
       "supporting_evidence_ids": [
-        "id-000008"
+        "id-000007"
       ],
       "value": "component"
     },
@@ -803,7 +801,7 @@
       "status": "supported",
       "support_level": "deterministic",
       "supporting_evidence_ids": [
-        "id-000008"
+        "id-000007"
       ],
       "value": "gpu_water_block"
     },
@@ -813,14 +811,14 @@
       "contradicting_evidence_ids": [],
       "created_by": "claim_construction_v0.1",
       "observation_id": "id-000002",
-      "predicate": "product_form",
+      "predicate": "model",
       "qualifying_evidence_ids": [],
       "status": "supported",
-      "support_level": "deterministic",
+      "support_level": "strong",
       "supporting_evidence_ids": [
         "id-000010"
       ],
-      "value": "component"
+      "value": "rtx 4090"
     },
     {
       "capability_version": "pue-0.1.0",
@@ -831,11 +829,11 @@
       "predicate": "product_type",
       "qualifying_evidence_ids": [],
       "status": "supported",
-      "support_level": "deterministic",
+      "support_level": "moderate",
       "supporting_evidence_ids": [
-        "id-000010"
+        "id-000011"
       ],
-      "value": "gpu_water_block"
+      "value": "graphics_card"
     }
   ],
   "created_at": "2026-07-29T12:00:00+00:00",
@@ -844,7 +842,7 @@
     "alternative_candidate_ids": [
       "id-000024",
       "id-000025",
-      "id-000029"
+      "id-000030"
     ],
     "capability_version": "pue-0.1.0",
     "case_id": "id-000001",
@@ -884,6 +882,90 @@
     {
       "capability_version": "pue-0.1.0",
       "evidence_id": "id-000003",
+      "evidence_type": "product_form_term",
+      "extraction_confidence": 1.0,
+      "extraction_method": "gpu_terms_deterministic_v0.1",
+      "normalized_value": "gpu_water_block",
+      "observation_id": "id-000002",
+      "polarity_hint": "supporting",
+      "raw_value": "Cooling Block",
+      "source_end": 48,
+      "source_field": "normalized_title",
+      "source_start": 35
+    },
+    {
+      "capability_version": "pue-0.1.0",
+      "evidence_id": "id-000004",
+      "evidence_type": "product_type_term",
+      "extraction_confidence": 1.0,
+      "extraction_method": "gpu_terms_deterministic_v0.1",
+      "normalized_value": "gpu_water_block",
+      "observation_id": "id-000002",
+      "polarity_hint": "supporting",
+      "raw_value": "Cooling Block",
+      "source_end": 48,
+      "source_field": "normalized_title",
+      "source_start": 35
+    },
+    {
+      "capability_version": "pue-0.1.0",
+      "evidence_id": "id-000005",
+      "evidence_type": "product_form_term",
+      "extraction_confidence": 1.0,
+      "extraction_method": "gpu_terms_deterministic_v0.1",
+      "normalized_value": "gpu_water_block",
+      "observation_id": "id-000002",
+      "polarity_hint": "supporting",
+      "raw_value": "Full Cover",
+      "source_end": 30,
+      "source_field": "normalized_title",
+      "source_start": 20
+    },
+    {
+      "capability_version": "pue-0.1.0",
+      "evidence_id": "id-000006",
+      "evidence_type": "product_type_term",
+      "extraction_confidence": 1.0,
+      "extraction_method": "gpu_terms_deterministic_v0.1",
+      "normalized_value": "gpu_water_block",
+      "observation_id": "id-000002",
+      "polarity_hint": "supporting",
+      "raw_value": "Full Cover",
+      "source_end": 30,
+      "source_field": "normalized_title",
+      "source_start": 20
+    },
+    {
+      "capability_version": "pue-0.1.0",
+      "evidence_id": "id-000007",
+      "evidence_type": "product_form_term",
+      "extraction_confidence": 1.0,
+      "extraction_method": "gpu_terms_deterministic_v0.1",
+      "normalized_value": "gpu_water_block",
+      "observation_id": "id-000002",
+      "polarity_hint": "supporting",
+      "raw_value": "Waterblock",
+      "source_end": 19,
+      "source_field": "normalized_title",
+      "source_start": 9
+    },
+    {
+      "capability_version": "pue-0.1.0",
+      "evidence_id": "id-000008",
+      "evidence_type": "product_type_term",
+      "extraction_confidence": 1.0,
+      "extraction_method": "gpu_terms_deterministic_v0.1",
+      "normalized_value": "gpu_water_block",
+      "observation_id": "id-000002",
+      "polarity_hint": "supporting",
+      "raw_value": "Waterblock",
+      "source_end": 19,
+      "source_field": "normalized_title",
+      "source_start": 9
+    },
+    {
+      "capability_version": "pue-0.1.0",
+      "evidence_id": "id-000009",
       "evidence_type": "product_family_token",
       "extraction_confidence": 1.0,
       "extraction_method": "gpu_terms_deterministic_v0.1",
@@ -897,7 +979,7 @@
     },
     {
       "capability_version": "pue-0.1.0",
-      "evidence_id": "id-000004",
+      "evidence_id": "id-000010",
       "evidence_type": "model_token",
       "extraction_confidence": 1.0,
       "extraction_method": "gpu_terms_deterministic_v0.1",
@@ -911,7 +993,7 @@
     },
     {
       "capability_version": "pue-0.1.0",
-      "evidence_id": "id-000005",
+      "evidence_id": "id-000011",
       "evidence_type": "product_type_term",
       "extraction_confidence": 1.0,
       "extraction_method": "gpu_terms_deterministic_v0.1",
@@ -922,90 +1004,6 @@
       "source_end": 34,
       "source_field": "normalized_title",
       "source_start": 31
-    },
-    {
-      "capability_version": "pue-0.1.0",
-      "evidence_id": "id-000006",
-      "evidence_type": "product_form_term",
-      "extraction_confidence": 1.0,
-      "extraction_method": "gpu_terms_deterministic_v0.1",
-      "normalized_value": "gpu_water_block",
-      "observation_id": "id-000002",
-      "polarity_hint": "supporting",
-      "raw_value": "Cooling Block",
-      "source_end": 48,
-      "source_field": "normalized_title",
-      "source_start": 35
-    },
-    {
-      "capability_version": "pue-0.1.0",
-      "evidence_id": "id-000007",
-      "evidence_type": "product_type_term",
-      "extraction_confidence": 1.0,
-      "extraction_method": "gpu_terms_deterministic_v0.1",
-      "normalized_value": "gpu_water_block",
-      "observation_id": "id-000002",
-      "polarity_hint": "supporting",
-      "raw_value": "Cooling Block",
-      "source_end": 48,
-      "source_field": "normalized_title",
-      "source_start": 35
-    },
-    {
-      "capability_version": "pue-0.1.0",
-      "evidence_id": "id-000008",
-      "evidence_type": "product_form_term",
-      "extraction_confidence": 1.0,
-      "extraction_method": "gpu_terms_deterministic_v0.1",
-      "normalized_value": "gpu_water_block",
-      "observation_id": "id-000002",
-      "polarity_hint": "supporting",
-      "raw_value": "Full Cover",
-      "source_end": 30,
-      "source_field": "normalized_title",
-      "source_start": 20
-    },
-    {
-      "capability_version": "pue-0.1.0",
-      "evidence_id": "id-000009",
-      "evidence_type": "product_type_term",
-      "extraction_confidence": 1.0,
-      "extraction_method": "gpu_terms_deterministic_v0.1",
-      "normalized_value": "gpu_water_block",
-      "observation_id": "id-000002",
-      "polarity_hint": "supporting",
-      "raw_value": "Full Cover",
-      "source_end": 30,
-      "source_field": "normalized_title",
-      "source_start": 20
-    },
-    {
-      "capability_version": "pue-0.1.0",
-      "evidence_id": "id-000010",
-      "evidence_type": "product_form_term",
-      "extraction_confidence": 1.0,
-      "extraction_method": "gpu_terms_deterministic_v0.1",
-      "normalized_value": "gpu_water_block",
-      "observation_id": "id-000002",
-      "polarity_hint": "supporting",
-      "raw_value": "Waterblock",
-      "source_end": 19,
-      "source_field": "normalized_title",
-      "source_start": 9
-    },
-    {
-      "capability_version": "pue-0.1.0",
-      "evidence_id": "id-000011",
-      "evidence_type": "product_type_term",
-      "extraction_confidence": 1.0,
-      "extraction_method": "gpu_terms_deterministic_v0.1",
-      "normalized_value": "gpu_water_block",
-      "observation_id": "id-000002",
-      "polarity_hint": "supporting",
-      "raw_value": "Waterblock",
-      "source_end": 19,
-      "source_field": "normalized_title",
-      "source_start": 9
     }
   ],
   "explanation": {
@@ -1019,10 +1017,10 @@
     ],
     "decision_id": "id-000043",
     "evidence_ids": [
-      "id-000006",
-      "id-000008",
-      "id-000010",
-      "id-000003"
+      "id-000003",
+      "id-000005",
+      "id-000007",
+      "id-000009"
     ],
     "explanation_id": "id-000044",
     "profile": "operator",
@@ -1030,7 +1028,7 @@
       "Candidate id-000026 rejected: Listing is supported as component, not a complete graphics card.",
       "Candidate id-000027 rejected: Listing is supported as component, not a complete graphics card.",
       "Candidate id-000028 rejected: Listing is supported as component, not a complete graphics card.",
-      "Candidate id-000030 rejected: Listing is supported as component, not a complete graphics card.",
+      "Candidate id-000029 rejected: Listing is supported as component, not a complete graphics card.",
       "Candidate id-000031 rejected: Listing is supported as component, not a complete graphics card.",
       "Candidate id-000032 rejected: Listing is supported as component, not a complete graphics card."
     ],
@@ -1047,12 +1045,12 @@
     {
       "brand": null,
       "claim_ids": [
+        "id-000014",
         "id-000016",
         "id-000018",
-        "id-000020",
+        "id-000015",
         "id-000017",
         "id-000019",
-        "id-000021",
         "id-000012"
       ],
       "coherence": 1.0,
@@ -1088,14 +1086,14 @@
   "operational_metrics": {
     "candidate_count": 10,
     "claim_count": 10,
-    "claims_hypotheses_ms": 0.1095,
-    "decision_explanation_ms": 0.0747,
-    "evaluation_ms": 0.1696,
+    "claims_hypotheses_ms": 0.0797,
+    "decision_explanation_ms": 0.048,
+    "evaluation_ms": 0.1277,
     "evidence_count": 9,
-    "extraction_ms": 0.1772,
+    "extraction_ms": 0.1117,
     "hypothesis_count": 1,
-    "retrieval_ms": 0.3141,
-    "total_ms": 0.8451
+    "retrieval_ms": 0.2491,
+    "total_ms": 0.6162
   },
   "schema_version": "0.1"
 }

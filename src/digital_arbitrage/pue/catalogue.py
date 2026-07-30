@@ -22,6 +22,23 @@ DEFAULT_CATALOGUE_PATH = (
     Path(__file__).resolve().parents[3] / "data" / "pue" / "catalogues" / "gpu_seed_v0.1.json"
 )
 
+#: Suffixes that mark a family name as a mobile/laptop variant of a base
+#: desktop family (e.g. "rtx 4090 laptop gpu" -> "rtx 4090"). Stripping them
+#: lets retrieval treat the desktop and mobile variants of the same chip as
+#: a related pool - Candidate Evaluation is where the mobile-vs-desktop hard
+#: contradiction (spec 15.6-style rule) is actually enforced; retrieval must
+#: stay permissive enough to surface the contradiction in the first place
+#: (mirrors the existing product-form permissiveness in this method).
+_MOBILE_FAMILY_SUFFIXES = (" laptop gpu", " laptop", " mobile")
+
+
+def _base_family(name: str) -> str:
+    lowered = name.strip().lower()
+    for suffix in _MOBILE_FAMILY_SUFFIXES:
+        if lowered.endswith(suffix):
+            return lowered[: -len(suffix)]
+    return lowered
+
 
 class RetrievedCatalogueProduct(Protocol):
     """Structural type returned by repository ``retrieve`` (spec section 13)."""
@@ -155,6 +172,7 @@ class JsonCandidateRepository:
                 if (
                     product.family != query.family
                     and query.family not in product.compatibility_targets
+                    and _base_family(product.family) != _base_family(query.family)
                 ):
                     continue
             elif query.product_type is not None:

@@ -34,7 +34,8 @@
             "id-000004",
             "id-000005",
             "id-000007",
-            "id-000009"
+            "id-000009",
+            "id-000010"
           ],
           "explanation": "Listing and Candidate family agree.",
           "field": "family",
@@ -109,7 +110,8 @@
             "id-000004",
             "id-000005",
             "id-000007",
-            "id-000009"
+            "id-000009",
+            "id-000010"
           ],
           "explanation": "Listing and Candidate family agree.",
           "field": "family",
@@ -170,7 +172,8 @@
             "id-000004",
             "id-000005",
             "id-000007",
-            "id-000009"
+            "id-000009",
+            "id-000010"
           ],
           "explanation": "Listing and Candidate family agree.",
           "field": "family",
@@ -236,7 +239,8 @@
             "id-000004",
             "id-000005",
             "id-000007",
-            "id-000009"
+            "id-000009",
+            "id-000010"
           ],
           "explanation": "Listing and Candidate family agree.",
           "field": "family",
@@ -350,7 +354,8 @@
             "id-000004",
             "id-000005",
             "id-000007",
-            "id-000009"
+            "id-000009",
+            "id-000010"
           ],
           "explanation": "Listing and Candidate family agree.",
           "field": "family",
@@ -425,7 +430,8 @@
             "id-000004",
             "id-000005",
             "id-000007",
-            "id-000009"
+            "id-000009",
+            "id-000010"
           ],
           "explanation": "Listing and Candidate family agree.",
           "field": "family",
@@ -500,7 +506,8 @@
             "id-000004",
             "id-000005",
             "id-000007",
-            "id-000009"
+            "id-000009",
+            "id-000010"
           ],
           "explanation": "Listing and Candidate family agree.",
           "field": "family",
@@ -575,7 +582,8 @@
             "id-000004",
             "id-000005",
             "id-000007",
-            "id-000009"
+            "id-000009",
+            "id-000010"
           ],
           "explanation": "Listing and Candidate family agree.",
           "field": "family",
@@ -631,13 +639,41 @@
       "product_form_fit": 1.0
     },
     {
-      "agreements": [],
+      "agreements": [
+        {
+          "candidate_value": "complete_product",
+          "evidence_ids": [],
+          "explanation": "Listing and Candidate product form agree.",
+          "field": "product_form",
+          "observed_value": "complete_product",
+          "result": "agree",
+          "severity": null
+        }
+      ],
       "attribute_fit": 0.5,
       "candidate_evaluation_id": "id-000040",
       "candidate_instance_id": "id-000029",
       "contradictions": [
         {
-          "candidate_value": "bykski",
+          "candidate_value": "rtx 4090 laptop gpu",
+          "evidence_ids": [
+            "id-000006",
+            "id-000008",
+            "id-000003",
+            "id-000004",
+            "id-000005",
+            "id-000007",
+            "id-000009",
+            "id-000010"
+          ],
+          "explanation": "Listing family conflicts with Candidate family.",
+          "field": "family",
+          "observed_value": "rtx 4090",
+          "result": "contradict",
+          "severity": "hard"
+        },
+        {
+          "candidate_value": "nvidia",
           "evidence_ids": [],
           "explanation": "Board-partner brand differs (soft signal only).",
           "field": "brand",
@@ -646,23 +682,14 @@
           "severity": "soft"
         }
       ],
-      "evaluation_outcome": "contradicted",
+      "evaluation_outcome": "rejected",
       "evidence_coverage": 1.0,
-      "hard_rejected": false,
+      "hard_rejected": true,
       "hypothesis_id": "id-000019",
       "identity_fit": 0.0,
       "missing_information": [
         {
-          "candidate_value": "component",
-          "evidence_ids": [],
-          "explanation": "Product form relationship not directly comparable.",
-          "field": "product_form",
-          "observed_value": "complete_product",
-          "result": "missing",
-          "severity": null
-        },
-        {
-          "candidate_value": null,
+          "candidate_value": 16,
           "evidence_ids": [],
           "explanation": "Capacity not stated on one side; not penalized.",
           "field": "capacity_gb",
@@ -672,7 +699,7 @@
         }
       ],
       "policy_version": "gpu-policy-0.1.0",
-      "product_form_fit": 0.0
+      "product_form_fit": 1.0
     }
   ],
   "candidates": [
@@ -802,6 +829,19 @@
     },
     {
       "candidate_instance_id": "id-000029",
+      "catalogue_product_id": "gpu-nvidia-rtx4090-laptop",
+      "hypothesis_id": "id-000019",
+      "knowledge_version": "gpu-seed-0.1.0",
+      "matched_fields": [
+        "product_type",
+        "product_form"
+      ],
+      "retrieval_method": "fuzzy_title_match",
+      "retrieval_rank": 9,
+      "retrieval_score": 31.75
+    },
+    {
+      "candidate_instance_id": "id-000030",
       "catalogue_product_id": "acc-bykski-rtx4090-waterblock",
       "hypothesis_id": "id-000019",
       "knowledge_version": "gpu-seed-0.1.0",
@@ -809,20 +849,8 @@
         "family"
       ],
       "retrieval_method": "fuzzy_title_match",
-      "retrieval_rank": 9,
-      "retrieval_score": 29.1
-    },
-    {
-      "candidate_instance_id": "id-000030",
-      "catalogue_product_id": "acc-generic-gpu-riser-cable",
-      "hypothesis_id": "id-000019",
-      "knowledge_version": "gpu-seed-0.1.0",
-      "matched_fields": [
-        "family"
-      ],
-      "retrieval_method": "fuzzy_title_match",
       "retrieval_rank": 10,
-      "retrieval_score": 27.72
+      "retrieval_score": 29.1
     }
   ],
   "case_id": "id-000001",
@@ -940,7 +968,7 @@
       "observation_id": "id-000002",
       "predicate": "mpn",
       "qualifying_evidence_ids": [],
-      "status": "proposed",
+      "status": "supported",
       "support_level": "moderate",
       "supporting_evidence_ids": [
         "id-000010"
@@ -954,14 +982,14 @@
     "alternative_candidate_ids": [
       "id-000021",
       "id-000023",
-      "id-000024",
-      "id-000029"
+      "id-000024"
     ],
     "capability_version": "pue-0.1.0",
     "case_id": "id-000001",
     "comparability_status": "directly_comparable",
     "contradiction_codes": [
-      "hard_contradiction:mpn"
+      "hard_contradiction:mpn",
+      "hard_contradiction:family"
     ],
     "decision_id": "id-000041",
     "decision_type": "identified",
@@ -1114,6 +1142,7 @@
       "brand (soft): Board-partner brand differs (soft signal only).",
       "mpn (hard): Listing MPN does not match this Candidate's MPN.",
       "brand (soft): Board-partner brand differs (soft signal only).",
+      "family (hard): Listing family conflicts with Candidate family.",
       "brand (soft): Board-partner brand differs (soft signal only)."
     ],
     "decision_id": "id-000041",
@@ -1134,7 +1163,8 @@
       "Candidate id-000025 rejected: Listing MPN does not match this Candidate's MPN.",
       "Candidate id-000026 rejected: Listing MPN does not match this Candidate's MPN.",
       "Candidate id-000027 rejected: Listing MPN does not match this Candidate's MPN.",
-      "Candidate id-000028 rejected: Listing MPN does not match this Candidate's MPN."
+      "Candidate id-000028 rejected: Listing MPN does not match this Candidate's MPN.",
+      "Candidate id-000029 rejected: Listing family conflicts with Candidate family."
     ],
     "summary": "Identified as asus rtx 4090 tuf gaming oc. No material contradiction was found.",
     "supporting_points": [
@@ -1159,7 +1189,8 @@
       "product_form: Listing and Candidate product form agree.",
       "family: Listing and Candidate family agree.",
       "product_form: Listing and Candidate product form agree.",
-      "family: Listing and Candidate family agree."
+      "family: Listing and Candidate family agree.",
+      "product_form: Listing and Candidate product form agree."
     ],
     "unresolved_points": []
   },
@@ -1173,7 +1204,8 @@
         "id-000014",
         "id-000015",
         "id-000016",
-        "id-000017"
+        "id-000017",
+        "id-000018"
       ],
       "coherence": 1.0,
       "compatibility_target": null,
@@ -1208,14 +1240,14 @@
   "operational_metrics": {
     "candidate_count": 11,
     "claim_count": 8,
-    "claims_hypotheses_ms": 0.1371,
-    "decision_explanation_ms": 0.1161,
-    "evaluation_ms": 0.2266,
+    "claims_hypotheses_ms": 0.1293,
+    "decision_explanation_ms": 0.0946,
+    "evaluation_ms": 0.182,
     "evidence_count": 8,
-    "extraction_ms": 0.6991,
+    "extraction_ms": 0.3728,
     "hypothesis_count": 1,
-    "retrieval_ms": 0.4397,
-    "total_ms": 1.6186
+    "retrieval_ms": 0.3403,
+    "total_ms": 1.119
   },
   "schema_version": "0.1"
 }

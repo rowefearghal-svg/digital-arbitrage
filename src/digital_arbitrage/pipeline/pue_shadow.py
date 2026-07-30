@@ -42,6 +42,13 @@ class ShadowConfig:
     enabled: bool = False
     db_path: str | Path | None = DEFAULT_SHADOW_DB_PATH
     policy: DecisionPolicy | None = None
+    #: Explicitly marks this run as replay/evaluation activity (e.g.
+    #: benchmarking a new policy against historical listings) rather than
+    #: normal shadow processing. Normal processing must not accumulate
+    #: duplicate completed records for the same listing under the same
+    #: capability/policy/knowledge versions; replay activity may retain
+    #: another record (see PueCaseStore.save_case).
+    replay: bool = False
 
 
 def run_pue_shadow(
@@ -58,17 +65,20 @@ def run_pue_shadow(
 
     try:
         context = build_default_context()
-        records = process_many(listings, context)
+        records = process_many(listings, context, policy=config.policy)
 
         if config.db_path is not None:
             with PueCaseStore(config.db_path) as store:
                 for record in records:
                     try:
-                        store.save_case(record)
+                        store.save_case(record, replay=config.replay)
                     except PueValidationError:
-                        # Already persisted for this exact case_id (e.g. a
-                        # replay); this is expected idempotent behavior, not
-                        # a pipeline failure.
+                        # Either this exact case_id was already persisted, or
+                        # (normal, non-replay processing only) an equivalent
+                        # completed record already exists for this listing's
+                        # source_fingerprint under the same capability/
+                        # policy/knowledge versions. Both are expected,
+                        # idempotent outcomes, not a pipeline failure.
                         continue
 
         return records

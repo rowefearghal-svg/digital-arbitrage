@@ -514,8 +514,21 @@ class PueCaseStore:
     ) -> None:
         self.close()
 
-    def save_case(self, record: ReasoningRecord, *, created_at: str | None = None) -> str:
-        """Persist ``record``. Raises if ``case_id`` already exists (no overwrite)."""
+    def save_case(
+        self, record: ReasoningRecord, *, created_at: str | None = None, replay: bool = False
+    ) -> str:
+        """Persist ``record``. Raises if ``case_id`` already exists (no overwrite).
+
+        Equivalent-record detection (application level, not a DB constraint):
+        when ``replay`` is ``False`` (normal shadow processing), a case whose
+        ``source_fingerprint`` and full version triple (capability/policy/
+        knowledge) already match a previously persisted, completed record is
+        rejected - re-running the identical listing under identical versions
+        must not accumulate duplicate completed records. Pass ``replay=True``
+        for explicitly marked replay/evaluation activity (e.g. benchmarking a
+        new policy against historical listings), which may retain another
+        record for the same fingerprint/version triple.
+        """
         existing = self.get_case(record.case_id)
         if existing is not None:
             raise PueValidationError(
@@ -523,6 +536,21 @@ class PueCaseStore:
                 "are never overwritten (create a new case for a rerun)"
             )
         decision = record.decision
+        if not replay:
+            equivalent = self.find_equivalent(
+                source_fingerprint=record.observation.source_fingerprint,
+                capability_version=decision.capability_version,
+                policy_version=decision.policy_version,
+                knowledge_version=decision.knowledge_version,
+            )
+            if equivalent is not None:
+                raise PueValidationError(
+                    "an equivalent completed record already exists for "
+                    f"source_fingerprint {record.observation.source_fingerprint!r} under "
+                    "the same capability/policy/knowledge versions "
+                    f"(case_id={equivalent.case_id!r}); pass replay=True to retain "
+                    "another record for explicitly marked replay/evaluation activity"
+                )
         selected_catalogue_product_id = None
         if decision.selected_candidate_instance_id is not None:
             for c in record.candidates:
@@ -563,6 +591,27 @@ class PueCaseStore:
     def get_case(self, case_id: str) -> ReasoningRecord | None:
         row = self._conn.execute(
             "SELECT reasoning_record_json FROM pue_cases WHERE case_id = ?", (case_id,)
+        ).fetchone()
+        if row is None:
+            return None
+        return reasoning_record_from_json(row["reasoning_record_json"])
+
+    def find_equivalent(
+        self,
+        *,
+        source_fingerprint: str,
+        capability_version: str,
+        policy_version: str,
+        knowledge_version: str,
+    ) -> ReasoningRecord | None:
+        """Return the earliest persisted case equivalent to this fingerprint
+        and version triple, if any (application-level duplicate detection;
+        see :meth:`save_case`)."""
+        row = self._conn.execute(
+            "SELECT reasoning_record_json FROM pue_cases WHERE source_fingerprint = ? "
+            "AND capability_version = ? AND policy_version = ? AND knowledge_version = ? "
+            "ORDER BY created_at ASC LIMIT 1",
+            (source_fingerprint, capability_version, policy_version, knowledge_version),
         ).fetchone()
         if row is None:
             return None

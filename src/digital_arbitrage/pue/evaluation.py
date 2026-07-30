@@ -15,6 +15,7 @@ from .catalogue import CandidateRepository
 from .enums import (
     CandidateOutcome,
     ClaimPredicate,
+    ClaimStatus,
     ComparisonResult,
     ContradictionSeverity,
     ProductForm,
@@ -55,7 +56,21 @@ def _hypothesis_for(
 
 
 def _mpn_claims(claims: Sequence[Claim]) -> list[Claim]:
-    return [c for c in claims if c.predicate is ClaimPredicate.MPN]
+    # A PROPOSED identifier Claim has not yet been validated against the
+    # catalogue (see claims.validate_identifier_claims) and must never be
+    # treated as agreement here; only a validated, SUPPORTED MPN Claim may
+    # materially affect a Decision (spec 10.4-style rule; regression test:
+    # test_invariants.py::test_exact_decision_never_depends_on_proposed_claim).
+    return [
+        c for c in claims if c.predicate is ClaimPredicate.MPN and c.status is ClaimStatus.SUPPORTED
+    ]
+
+
+def _mobile_form_factor_claim(claims: Sequence[Claim]) -> Claim | None:
+    for c in claims:
+        if c.predicate is ClaimPredicate.FORM_FACTOR and c.value == "mobile":
+            return c
+    return None
 
 
 def _capacity_claim(claims: Sequence[Claim]) -> Claim | None:
@@ -84,6 +99,7 @@ def evaluate_candidates(
     evaluations: list[CandidateEvaluation] = []
     mpn_claims = _mpn_claims(state.claims)
     capacity_claim = _capacity_claim(state.claims)
+    mobile_claim = _mobile_form_factor_claim(state.claims)
 
     for candidate in state.candidates[: context.max_candidate_evaluations]:
         hypothesis = _hypothesis_for(candidate.hypothesis_id, state.hypotheses)
@@ -248,6 +264,24 @@ def evaluate_candidates(
                     explanation="Listing does not state a family; not penalized.",
                 )
             )
+
+        # -- rule 6: mobile listing vs. desktop Candidate (hard) ------------ #
+        if mobile_claim is not None and product.attributes.get("form_factor") == "desktop":
+            contradictions.append(
+                ComparisonFinding(
+                    field="form_factor",
+                    observed_value="mobile",
+                    candidate_value="desktop",
+                    result=ComparisonResult.CONTRADICT,
+                    severity=ContradictionSeverity.HARD,
+                    evidence_ids=mobile_claim.supporting_evidence_ids,
+                    explanation=(
+                        "Listing explicitly describes a laptop/mobile GPU; this "
+                        "Candidate is a desktop product and cannot be the same item."
+                    ),
+                )
+            )
+            hard_rejected = True
 
         # -- rule 7: compatibility relationship treated as identity -------- #
         if hypothesis.product_form == ProductForm.COMPATIBLE_ITEM and product.product_form != (

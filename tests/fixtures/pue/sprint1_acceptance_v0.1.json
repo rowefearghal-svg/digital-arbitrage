@@ -111,8 +111,9 @@
       "difficulty": "hard",
       "annotation_source": "spec_section_21_row_9",
       "annotation_confidence": "medium",
-      "allowed_decision_types": ["ambiguous", "classified"],
-      "forbidden_decision_types": ["identified"],
+      "allowed_decision_types": ["ambiguous"],
+      "forbidden_decision_types": ["identified", "classified", "partially_identified"],
+      "require_multiple_hypotheses": true,
       "min_evidence_count": 3
     },
     {
@@ -121,8 +122,9 @@
       "difficulty": "medium",
       "annotation_source": "spec_section_21_row_10",
       "annotation_confidence": "high",
-      "allowed_decision_types": ["partially_identified", "identified"],
-      "forbidden_decision_types": ["outside_supported_domain", "abstained"],
+      "allowed_decision_types": ["partially_identified"],
+      "forbidden_decision_types": ["outside_supported_domain", "abstained", "identified"],
+      "expected_identification_levels": ["model"],
       "min_evidence_count": 1
     },
     {
@@ -175,6 +177,10 @@
       "annotation_confidence": "high",
       "allowed_decision_types": ["identified", "partially_identified", "classified"],
       "forbidden_decision_types": ["outside_supported_domain"],
+      "expected_identified_family": "rtx 4090 laptop gpu",
+      "required_evidence_types": ["product_family_token"],
+      "require_hard_rejected_candidate": true,
+      "require_hard_rejected_candidate_with_field": "form_factor",
       "forbidden_selected_catalogue_product_ids": [
         "gpu-nvidia-rtx4090-fe", "gpu-asus-tuf-rtx4090-o24g", "gpu-asus-rog-strix-rtx4090-o24g",
         "gpu-msi-rtx4090-gamingx-trio", "gpu-gigabyte-aorus-rtx4090-master", "gpu-zotac-rtx4090-trinity-oc"
@@ -262,8 +268,9 @@
       "difficulty": "medium",
       "annotation_source": "spec_section_21_row_23",
       "annotation_confidence": "medium",
-      "allowed_decision_types": ["partially_identified", "classified", "identified"],
-      "forbidden_decision_types": ["outside_supported_domain"],
+      "allowed_decision_types": ["partially_identified", "classified"],
+      "forbidden_decision_types": ["outside_supported_domain", "identified"],
+      "expected_product_form": "bundle",
       "expected_comparability": ["not_comparable_bundle"],
       "min_evidence_count": 1
     },
@@ -288,6 +295,67 @@
       "allowed_decision_types": ["processing_failed"],
       "forbidden_decision_types": ["abstained", "identified", "classified"],
       "min_evidence_count": 0
+    },
+    {
+      "case_id": "case_26_gpu_fan_precedence_regression",
+      "title": "GPU fan",
+      "difficulty": "medium",
+      "annotation_source": "pre_merge_correction_evidence_precedence",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["classified", "abstained"],
+      "forbidden_decision_types": ["identified", "partially_identified", "outside_supported_domain"],
+      "expected_product_form": "replacement_part",
+      "forbidden_product_forms": ["complete_product"],
+      "required_evidence_types": ["product_form_term"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_27_gpu_block_precedence_regression",
+      "title": "GPU block",
+      "difficulty": "medium",
+      "annotation_source": "pre_merge_correction_evidence_precedence",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["classified", "abstained"],
+      "forbidden_decision_types": ["identified", "partially_identified", "outside_supported_domain"],
+      "expected_product_form": "component",
+      "forbidden_product_forms": ["complete_product"],
+      "required_evidence_types": ["product_form_term"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_28_gpu_holder_precedence_regression",
+      "title": "GPU holder",
+      "difficulty": "medium",
+      "annotation_source": "pre_merge_correction_evidence_precedence",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["classified", "abstained"],
+      "forbidden_decision_types": ["identified", "partially_identified", "outside_supported_domain"],
+      "expected_product_form": "accessory",
+      "forbidden_product_forms": ["complete_product"],
+      "required_evidence_types": ["product_form_term"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_29_for_rtx4090_precedence_regression",
+      "title": "For RTX 4090",
+      "difficulty": "medium",
+      "annotation_source": "pre_merge_correction_evidence_precedence",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["abstained", "ambiguous", "classified"],
+      "forbidden_decision_types": ["identified", "partially_identified", "outside_supported_domain"],
+      "forbidden_product_forms": ["complete_product"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_30_fits_rtx4090_precedence_regression",
+      "title": "Fits RTX 4090",
+      "difficulty": "medium",
+      "annotation_source": "pre_merge_correction_evidence_precedence",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["abstained", "ambiguous", "classified"],
+      "forbidden_decision_types": ["identified", "partially_identified", "outside_supported_domain"],
+      "forbidden_product_forms": ["complete_product"],
+      "min_evidence_count": 1
     }
   ]
 }

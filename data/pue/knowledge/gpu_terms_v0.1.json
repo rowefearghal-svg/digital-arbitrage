@@ -71,13 +71,13 @@
     "retail box included"
   ],
   "compatibility_terms": [
-    "for rtx",
-    "for the rtx",
+    "for the",
     "compatible with",
-    "fits rtx",
     "replacement for",
     "designed for",
-    "for use with"
+    "for use with",
+    "fits",
+    "for"
   ],
   "exclusion_terms": {
     "gpu_not_included": ["gpu not included", "card not included", "graphics card not included", "not included"],

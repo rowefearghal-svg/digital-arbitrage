@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from digital_arbitrage.pue.admission import admit_observation
-from digital_arbitrage.pue.claims import construct_claims
+from digital_arbitrage.pue.claims import construct_claims, validate_identifier_claims
 from digital_arbitrage.pue.enums import CandidateOutcome, ContradictionSeverity
 from digital_arbitrage.pue.evaluation import evaluate_candidates
 from digital_arbitrage.pue.evidence import extract_evidence
@@ -18,6 +18,7 @@ def _evaluate(title, context, repository, extra=None):
     obs = admit_observation(make_normalized(title, extra=extra), context)
     evidence = extract_evidence(obs, context)
     claims = construct_claims(obs, evidence, context)
+    claims = validate_identifier_claims(claims, context, repository)
     hyps = generate_hypotheses(obs, claims, context)
     candidates = retrieve_candidates(hyps, repository, context, observation=obs, claims=claims)
     state = CaseReasoningState(
@@ -84,6 +85,53 @@ def test_missing_information_is_neutral_not_contradiction(
             assert not ev.hard_rejected or any(
                 f.severity.value == "hard" for f in ev.contradictions if f.field != "brand"
             )
+
+
+def test_mobile_listing_hard_rejects_desktop_candidate(deterministic_context, repository) -> None:
+    """A desktop GPU Candidate must be hard-rejected when the listing
+    explicitly describes a laptop/mobile GPU (mobile-vs-desktop hard
+    contradiction)."""
+    state, evaluations = _evaluate("Laptop RTX 4090 GPU", deterministic_context, repository)
+    desktop_evals = []
+    for ev in evaluations:
+        cand = next(
+            c for c in state.candidates if c.candidate_instance_id == ev.candidate_instance_id
+        )
+        product = repository.get_by_id(cand.catalogue_product_id)
+        if product is not None and product.attributes.get("form_factor") == "desktop":
+            desktop_evals.append(ev)
+    assert desktop_evals, "expected at least one desktop Candidate to be retrieved"
+    for ev in desktop_evals:
+        assert ev.hard_rejected
+        assert any(
+            f.field == "form_factor" and f.severity == ContradictionSeverity.HARD
+            for f in ev.contradictions
+        )
+
+    # The mobile Candidate itself must not be rejected on this ground.
+    mobile_evals = []
+    for ev in evaluations:
+        cand = next(
+            c for c in state.candidates if c.candidate_instance_id == ev.candidate_instance_id
+        )
+        product = repository.get_by_id(cand.catalogue_product_id)
+        if product is not None and product.attributes.get("form_factor") == "mobile":
+            mobile_evals.append(ev)
+    assert mobile_evals, "expected the mobile Candidate to be retrieved"
+    for ev in mobile_evals:
+        assert not any(f.field == "form_factor" for f in ev.contradictions)
+
+
+def test_desktop_listing_does_not_reject_desktop_candidate(
+    deterministic_context, repository
+) -> None:
+    """The mobile-vs-desktop rule must not fire for an ordinary desktop
+    listing (no mobile Claim present)."""
+    _, evaluations = _evaluate(
+        "ASUS TUF RTX 4090 OC TUF-RTX4090-O24G", deterministic_context, repository
+    )
+    for ev in evaluations:
+        assert not any(f.field == "form_factor" for f in ev.contradictions)
 
 
 def test_exact_mpn_candidate_evaluation_references_candidate_and_hypothesis(

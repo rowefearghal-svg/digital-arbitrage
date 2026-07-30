@@ -6,6 +6,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from digital_arbitrage.classification.classifier import ListingClassifier, build_search_profile
+from digital_arbitrage.pipeline.pipeline import ArbitragePipeline, PipelineConfig
 from digital_arbitrage.pipeline.pue_shadow import ShadowConfig, run_pue_shadow
 from digital_arbitrage.pue.enums import DecisionType
 from digital_arbitrage.pue.orchestration import process_many, process_one
@@ -80,6 +81,26 @@ def test_shadow_isolation_does_not_change_classifier_output() -> None:
     assert shadow_result is not None
 
 
+def test_repeated_shadow_run_avoids_duplicate_completed_records(tmp_path: Path) -> None:
+    """Running shadow mode twice over the identical listing must not
+    accumulate a second completed record for the same source_fingerprint
+    (normal, non-replay processing; see PueCaseStore.save_case)."""
+    listing = make_normalized("RTX 4090 water block")
+    db_path = tmp_path / "shadow.db"
+    config = ShadowConfig(enabled=True, db_path=db_path)
+
+    first_run = run_pue_shadow([listing], config=config)
+    second_run = run_pue_shadow([listing], config=config)
+    assert len(first_run) == 1
+    assert len(second_run) == 1
+    assert first_run[0].case_id != second_run[0].case_id
+
+    with PueCaseStore(db_path) as store:
+        persisted = store.find_by_fingerprint(first_run[0].observation.source_fingerprint)
+    assert len(persisted) == 1
+    assert persisted[0].case_id == first_run[0].case_id
+
+
 def test_shadow_disabled_by_default_is_a_no_op() -> None:
     listing = make_normalized("RTX 4090")
     config = ShadowConfig(enabled=False)
@@ -99,3 +120,35 @@ def test_shadow_exception_does_not_propagate(monkeypatch) -> None:
     config = ShadowConfig(enabled=True)
     result = run_pue_shadow([listing], config=config)
     assert result == ()
+
+
+def test_arbitrage_pipeline_analyze_identical_with_shadow_enabled(tmp_path: Path) -> None:
+    """A real end-to-end ArbitragePipeline.analyze() call must return an
+    identical PipelineResult whether PUE shadow mode is disabled or enabled
+    (spec 5.3): the PUE must never influence deduplication, pricing,
+    opportunity analysis, or scoring. Uses the default mock providers (no
+    network) for a fully deterministic comparison."""
+    query = "rtx 4090"
+
+    disabled = ArbitragePipeline(PipelineConfig(pue_shadow_config=None)).analyze(query)
+
+    shadow_db = tmp_path / "shadow.db"
+    enabled_pipeline = ArbitragePipeline(
+        PipelineConfig(pue_shadow_config=ShadowConfig(enabled=True, db_path=shadow_db))
+    )
+    enabled = enabled_pipeline.analyze(query)
+
+    assert disabled.query == enabled.query
+    assert disabled.total_listings_scanned == enabled.total_listings_scanned
+    assert disabled.total_groups == enabled.total_groups
+    assert len(disabled.items) == len(enabled.items)
+    for a, b in zip(disabled.items, enabled.items, strict=True):
+        assert a.group.canonical.source.listing_id == b.group.canonical.source.listing_id
+        assert a.recommendation == b.recommendation
+        assert a.score == b.score
+        assert a.opportunity == b.opportunity
+        assert a.market_price == b.market_price
+
+    # Shadow mode actually ran and produced output for this call, otherwise
+    # the comparison above would be vacuous.
+    assert enabled_pipeline.last_pue_shadow_records != ()

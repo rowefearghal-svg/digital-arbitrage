@@ -103,3 +103,70 @@ def test_in_memory_store_works(deterministic_context, repository) -> None:
     with PueCaseStore(":memory:") as store:
         store.save_case(record)
         assert store.get_case(record.case_id) is not None
+
+
+def test_find_equivalent_matches_fingerprint_and_versions(
+    tmp_path: Path, deterministic_context, repository
+) -> None:
+    record = process_one(
+        make_normalized("RTX 4080 Super Gaming OC"), deterministic_context, repository=repository
+    )
+    with PueCaseStore(tmp_path / "pue.db") as store:
+        store.save_case(record)
+        found = store.find_equivalent(
+            source_fingerprint=record.observation.source_fingerprint,
+            capability_version=record.decision.capability_version,
+            policy_version=record.decision.policy_version,
+            knowledge_version=record.decision.knowledge_version,
+        )
+        assert found is not None
+        assert found.case_id == record.case_id
+
+        # A different fingerprint never matches.
+        assert (
+            store.find_equivalent(
+                source_fingerprint="not-a-real-fingerprint",
+                capability_version=record.decision.capability_version,
+                policy_version=record.decision.policy_version,
+                knowledge_version=record.decision.knowledge_version,
+            )
+            is None
+        )
+
+
+def test_repeated_shadow_run_does_not_duplicate_completed_record(
+    tmp_path: Path, deterministic_context, repository
+) -> None:
+    """Normal (non-replay) processing of the identical listing under the
+    identical capability/policy/knowledge versions must not accumulate a
+    second completed record for the same source_fingerprint."""
+    listing = make_normalized("RTX 4090 water block")
+    first = process_one(listing, deterministic_context, repository=repository)
+    second = process_one(listing, deterministic_context, repository=repository)
+    # Same content -> same fingerprint; different process_one() calls ->
+    # different case_id (spec: historical records are never overwritten).
+    assert first.case_id != second.case_id
+    assert first.observation.source_fingerprint == second.observation.source_fingerprint
+
+    with PueCaseStore(tmp_path / "pue.db") as store:
+        store.save_case(first)
+        with pytest.raises(PueValidationError):
+            store.save_case(second)
+        # Exactly one completed record persisted for this fingerprint.
+        assert len(store.find_by_fingerprint(first.observation.source_fingerprint)) == 1
+
+
+def test_replay_flag_retains_another_record_for_same_fingerprint(
+    tmp_path: Path, deterministic_context, repository
+) -> None:
+    """Explicitly marked replay/evaluation activity (``replay=True``) may
+    retain another record for a fingerprint/version triple that already has
+    a completed record."""
+    listing = make_normalized("RTX 4090 water block")
+    first = process_one(listing, deterministic_context, repository=repository)
+    second = process_one(listing, deterministic_context, repository=repository)
+
+    with PueCaseStore(tmp_path / "pue.db") as store:
+        store.save_case(first)
+        store.save_case(second, replay=True)
+        assert len(store.find_by_fingerprint(first.observation.source_fingerprint)) == 2

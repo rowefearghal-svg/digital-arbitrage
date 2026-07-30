@@ -7,6 +7,7 @@ retained side by side rather than silently merged (spec 10.2).
 
 from __future__ import annotations
 
+from .catalogue import CandidateRepository
 from .enums import (
     ClaimPredicate,
     ClaimStatus,
@@ -15,6 +16,14 @@ from .enums import (
 )
 from .models import Claim, Evidence, Observation, ProcessingContext
 from .validation import PueValidationError
+
+#: ClaimPredicate -> CatalogueProduct.identifiers key, for the identifier
+#: Claims that require explicit catalogue validation (spec 10.4-style rule:
+#: an exact identifier must never affect a Decision while still PROPOSED).
+_IDENTIFIER_PREDICATES: dict[ClaimPredicate, str] = {
+    ClaimPredicate.MPN: "mpn",
+    ClaimPredicate.GTIN: "gtin",
+}
 
 #: Evidence PRODUCT_FORM_TERM/PRODUCT_TYPE_TERM normalized values that
 #: indicate the item itself is not a complete graphics card (spec 10.1/10.3).
@@ -38,6 +47,22 @@ _COMPATIBILITY_ADJACENCY_CHARS = 6
 #: specific board-partner identity (spec case: generic "NVIDIA RTX 4090"
 #: stays board-partner-unresolved -> PARTIALLY_IDENTIFIED).
 _CHIPSET_BRANDS = {"nvidia", "amd", "intel"}
+
+#: Substrings that mark a matched family *name* itself as a mobile/laptop
+#: variant (e.g. "rtx 4090 laptop gpu"). A family alias like "laptop rtx
+#: 4090" is longer than the bare "laptop" mobile-form-term phrase and wins
+#: the character span during extraction (spec 9.5 longest-match), so the
+#: standalone "laptop"/"mobile" PRODUCT_FORM_TERM Evidence is never emitted
+#: for these titles; the mobile signal must also be derivable from the
+#: family value itself so the mobile-vs-desktop hard contradiction (spec
+#: 15.6-style rule) has something to act on.
+_MOBILE_FAMILY_MARKERS = ("laptop", "mobile")
+
+
+def _is_mobile_family_value(value: object) -> bool:
+    lowered = str(value).lower()
+    return any(marker in lowered for marker in _MOBILE_FAMILY_MARKERS)
+
 
 #: Brand tokens that are recognized but clearly outside the GPU domain
 #: (used only for traceability; never treated as GPU-domain evidence).
@@ -141,6 +166,16 @@ def construct_claims(
                     + tuple(c.evidence_id for c in compatibility_evidence if _adjacent(c, fam)),
                 )
             )
+        if _is_mobile_family_value(fam.normalized_value):
+            claims.append(
+                new_claim(
+                    ClaimPredicate.FORM_FACTOR,
+                    "mobile",
+                    status=ClaimStatus.SUPPORTED,
+                    support_level=SupportLevel.STRONG,
+                    supporting=(fam.evidence_id,),
+                )
+            )
 
     for e in evidence:
         if e.evidence_type == EvidenceType.MODEL_TOKEN:
@@ -201,7 +236,17 @@ def construct_claims(
             )
         elif e.evidence_type == EvidenceType.PRODUCT_FORM_TERM:
             value = str(e.normalized_value)
-            if value in _NON_COMPLETE_FORM_TYPES:
+            if value.startswith("form_factor:"):
+                claims.append(
+                    new_claim(
+                        ClaimPredicate.FORM_FACTOR,
+                        value.split(":", 1)[1],
+                        status=ClaimStatus.SUPPORTED,
+                        support_level=SupportLevel.STRONG,
+                        supporting=(e.evidence_id,),
+                    )
+                )
+            elif value in _NON_COMPLETE_FORM_TYPES:
                 claims.append(
                     new_claim(
                         ClaimPredicate.PRODUCT_FORM,
@@ -326,3 +371,49 @@ def construct_claims(
                 )
 
     return tuple(claims)
+
+
+def validate_identifier_claims(
+    claims: tuple[Claim, ...],
+    context: ProcessingContext,
+    repository: CandidateRepository,
+) -> tuple[Claim, ...]:
+    """Validate PROPOSED MPN/GTIN Claims against the catalogue.
+
+    An identifier Claim must never remain PROPOSED once a catalogue is
+    available to check it against: it becomes SUPPORTED when the value
+    matches at least one catalogue product's identifier of the same type,
+    otherwise UNRESOLVED (the catalogue has no record of it - not
+    necessarily wrong, just unconfirmed). Every other Claim passes through
+    unchanged. Downstream components (:mod:`evaluation`, :mod:`decisions`)
+    must only treat a SUPPORTED identifier Claim as agreement; a PROPOSED
+    identifier Claim must never materially affect an exact Decision.
+    """
+    validated: list[Claim] = []
+    for claim in claims:
+        identifier_type = _IDENTIFIER_PREDICATES.get(claim.predicate)
+        if identifier_type is None or claim.status != ClaimStatus.PROPOSED:
+            validated.append(claim)
+            continue
+        matches = repository.get_by_identifier(
+            identifier_type=identifier_type,
+            value=str(claim.value),
+            knowledge_version=context.knowledge_version,
+        )
+        new_status = ClaimStatus.SUPPORTED if matches else ClaimStatus.UNRESOLVED
+        validated.append(
+            Claim(
+                claim_id=claim.claim_id,
+                observation_id=claim.observation_id,
+                predicate=claim.predicate,
+                value=claim.value,
+                status=new_status,
+                supporting_evidence_ids=claim.supporting_evidence_ids,
+                contradicting_evidence_ids=claim.contradicting_evidence_ids,
+                qualifying_evidence_ids=claim.qualifying_evidence_ids,
+                support_level=claim.support_level,
+                created_by=claim.created_by,
+                capability_version=claim.capability_version,
+            )
+        )
+    return tuple(validated)

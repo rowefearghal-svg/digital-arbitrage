@@ -34,7 +34,7 @@ def _load_cases() -> list[dict]:
 
 
 CASES = _load_cases()
-assert len(CASES) == 25, f"expected 25 mandatory acceptance cases, found {len(CASES)}"
+assert len(CASES) == 30, f"expected 30 mandatory acceptance cases, found {len(CASES)}"
 
 
 @pytest.fixture(scope="module")
@@ -122,6 +122,31 @@ def test_acceptance_case(case: dict, repo, context) -> None:
 
     if case.get("require_contradicted_claim"):
         assert any(c.status == ClaimStatus.CONTRADICTED for c in record.claims)
+
+    if case.get("require_multiple_hypotheses"):
+        assert len(record.hypotheses) > 1, (
+            f"{case['case_id']}: expected multiple active hypotheses (ambiguity preserved), "
+            f"got {len(record.hypotheses)}"
+        )
+
+    if "require_hard_rejected_candidate_with_field" in case:
+        expected_field = case["require_hard_rejected_candidate_with_field"]
+        assert any(
+            f.severity == ContradictionSeverity.HARD and f.field == expected_field
+            for ev in record.candidate_evaluations
+            for f in ev.contradictions
+        ), f"{case['case_id']}: expected a hard contradiction on field {expected_field!r}"
+
+    if "expected_identified_family" in case:
+        actual_family = decision.identified_family or (
+            record.hypotheses[0].family or record.hypotheses[0].compatibility_target
+            if record.hypotheses
+            else None
+        )
+        assert actual_family == case["expected_identified_family"], (
+            f"{case['case_id']}: expected identified family "
+            f"{case['expected_identified_family']!r}, got {actual_family!r}"
+        )
 
     assert len(record.evidence) >= case.get("min_evidence_count", 0)
 
