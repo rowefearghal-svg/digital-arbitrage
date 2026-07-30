@@ -69,14 +69,14 @@
   "operational_metrics": {
     "candidate_count": 0,
     "claim_count": 0,
-    "claims_hypotheses_ms": 0.0114,
-    "decision_explanation_ms": 0.0242,
-    "evaluation_ms": 0.0022,
+    "claims_hypotheses_ms": 0.0123,
+    "decision_explanation_ms": 0.0258,
+    "evaluation_ms": 0.0023,
     "evidence_count": 0,
     "extraction_ms": 0.0017,
     "hypothesis_count": 0,
-    "retrieval_ms": 0.0004,
-    "total_ms": 0.0399
+    "retrieval_ms": 0.0005,
+    "total_ms": 0.0426
   },
   "schema_version": "0.1"
 }

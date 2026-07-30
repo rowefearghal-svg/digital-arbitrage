@@ -34,7 +34,7 @@ def _load_cases() -> list[dict]:
 
 
 CASES = _load_cases()
-assert len(CASES) == 30, f"expected 30 mandatory acceptance cases, found {len(CASES)}"
+assert len(CASES) == 36, f"expected 36 mandatory acceptance cases, found {len(CASES)}"
 
 
 @pytest.fixture(scope="module")

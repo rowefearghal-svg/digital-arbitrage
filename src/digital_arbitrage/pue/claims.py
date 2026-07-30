@@ -38,9 +38,11 @@ _NON_COMPLETE_FORM_TYPES: dict[str, str] = {
     "housing": "accessory",
 }
 
-#: Maximum character gap between a compatibility phrase and the family
-#: mention it qualifies, e.g. "compatible with " + "RTX 4090".
-_COMPATIBILITY_ADJACENCY_CHARS = 6
+#: A compatibility phrase qualifies a following family mention only when
+#: every intervening character is whitespace or punctuation - never an
+#: arbitrary word, however short the gap (pre-merge correction: adjacency
+#: must not be a bare character-count heuristic, e.g. "For sale RTX 4090"
+#: must not be read as "for" + "RTX 4090" just because "sale" is short).
 
 #: Chipset-level brand tokens ("NVIDIA"/"AMD"/"Intel") describe the chip
 #: inside many different board-partner cards; they must not be read as a
@@ -69,13 +71,15 @@ def _is_mobile_family_value(value: object) -> bool:
 _NON_GPU_BRANDS = {"apple", "samsung"}
 
 
-def _adjacent(a: Evidence, b: Evidence) -> bool:
+def _adjacent(a: Evidence, b: Evidence, text: str) -> bool:
     if a.source_start is None or a.source_end is None:
         return False
     if b.source_start is None or b.source_end is None:
         return False
-    gap = b.source_start - a.source_end
-    return 0 <= gap <= _COMPATIBILITY_ADJACENCY_CHARS
+    if a.source_end > b.source_start:
+        return False
+    between = text[a.source_end : b.source_start]
+    return not any(ch.isalnum() for ch in between)
 
 
 def construct_claims(
@@ -111,6 +115,7 @@ def construct_claims(
             capability_version=context.capability_version,
         )
 
+    title_text = observation.normalized_title or ""
     family_evidence = [e for e in evidence if e.evidence_type == EvidenceType.PRODUCT_FAMILY_TOKEN]
     compatibility_evidence = [
         e for e in evidence if e.evidence_type == EvidenceType.COMPATIBILITY_TERM
@@ -133,7 +138,7 @@ def construct_claims(
 
     explicit_compat_targets: set[str] = set()
     for fam in family_evidence:
-        if any(_adjacent(comp, fam) for comp in compatibility_evidence):
+        if any(_adjacent(comp, fam, title_text) for comp in compatibility_evidence):
             explicit_compat_targets.add(str(fam.normalized_value))
 
     for fam in family_evidence:
@@ -151,7 +156,7 @@ def construct_claims(
                 support_level=SupportLevel.STRONG,
                 supporting=(fam.evidence_id,),
                 qualifying=tuple(
-                    c.evidence_id for c in compatibility_evidence if _adjacent(c, fam)
+                    c.evidence_id for c in compatibility_evidence if _adjacent(c, fam, title_text)
                 ),
             )
         )
@@ -163,7 +168,11 @@ def construct_claims(
                     status=ClaimStatus.SUPPORTED,
                     support_level=SupportLevel.MODERATE,
                     supporting=(fam.evidence_id,)
-                    + tuple(c.evidence_id for c in compatibility_evidence if _adjacent(c, fam)),
+                    + tuple(
+                        c.evidence_id
+                        for c in compatibility_evidence
+                        if _adjacent(c, fam, title_text)
+                    ),
                 )
             )
         if _is_mobile_family_value(fam.normalized_value):

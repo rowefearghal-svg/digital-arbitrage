@@ -81,6 +81,51 @@ def test_shadow_isolation_does_not_change_classifier_output() -> None:
     assert shadow_result is not None
 
 
+def test_shadow_custom_policy_version_is_recorded_end_to_end(tmp_path: Path) -> None:
+    """A caller-injected DecisionPolicy with a custom ``policy_version``
+    (e.g. via ShadowConfig.policy) must be reflected in the resulting
+    Decision, the persisted DB row, and the equivalent-record key - not
+    silently replaced by the ProcessingContext's static default (pre-merge
+    correction)."""
+    from digital_arbitrage.pue.policies import DecisionPolicy
+
+    custom_policy = DecisionPolicy(policy_version="custom-policy-9.9.9")
+    listing = make_normalized("ASUS TUF RTX 4090 OC TUF-RTX4090-O24G")
+    db_path = tmp_path / "shadow.db"
+    config = ShadowConfig(enabled=True, db_path=db_path, policy=custom_policy)
+
+    records = run_pue_shadow([listing], config=config)
+    assert len(records) == 1
+    record = records[0]
+    assert record.decision.policy_version == "custom-policy-9.9.9"
+
+    with PueCaseStore(db_path) as store:
+        row = store._conn.execute(
+            "SELECT policy_version FROM pue_cases WHERE case_id = ?", (record.case_id,)
+        ).fetchone()
+        assert row["policy_version"] == "custom-policy-9.9.9"
+
+        equivalent = store.find_equivalent(
+            source_fingerprint=record.observation.source_fingerprint,
+            capability_version=record.decision.capability_version,
+            policy_version="custom-policy-9.9.9",
+            knowledge_version=record.decision.knowledge_version,
+        )
+        assert equivalent is not None
+        assert equivalent.case_id == record.case_id
+
+        # The default policy version never matches this custom-policy run.
+        assert (
+            store.find_equivalent(
+                source_fingerprint=record.observation.source_fingerprint,
+                capability_version=record.decision.capability_version,
+                policy_version="gpu-policy-0.1.0",
+                knowledge_version=record.decision.knowledge_version,
+            )
+            is None
+        )
+
+
 def test_repeated_shadow_run_avoids_duplicate_completed_records(tmp_path: Path) -> None:
     """Running shadow mode twice over the identical listing must not
     accumulate a second completed record for the same source_fingerprint

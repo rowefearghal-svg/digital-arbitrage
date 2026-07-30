@@ -76,3 +76,19 @@ def test_mpn_claim_is_proposed_until_validated(deterministic_context) -> None:
     mpn_claims = [c for c in claims if c.predicate is ClaimPredicate.MPN]
     assert mpn_claims
     assert all(c.status == ClaimStatus.PROPOSED for c in mpn_claims)
+
+
+def test_compatibility_adjacency_requires_whitespace_or_punctuation_only(
+    deterministic_context,
+) -> None:
+    """A compatibility phrase only qualifies a following family mention when
+    every intervening character is whitespace/punctuation - an intervening
+    word (however short) must break the adjacency (pre-merge correction)."""
+    _, word_between_claims = _claims("For sale RTX 4090", deterministic_context)
+    assert not any(c.predicate is ClaimPredicate.COMPATIBLE_WITH for c in word_between_claims)
+    family_claims = [c for c in word_between_claims if c.predicate is ClaimPredicate.PRODUCT_FAMILY]
+    assert family_claims
+    assert all(c.status == ClaimStatus.SUPPORTED for c in family_claims)
+
+    _, adjacent_claims = _claims("For RTX 4090", deterministic_context)
+    assert any(c.predicate is ClaimPredicate.COMPATIBLE_WITH for c in adjacent_claims)

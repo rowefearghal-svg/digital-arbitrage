@@ -886,14 +886,14 @@
   "operational_metrics": {
     "candidate_count": 10,
     "claim_count": 3,
-    "claims_hypotheses_ms": 0.0629,
-    "decision_explanation_ms": 0.0687,
-    "evaluation_ms": 0.131,
+    "claims_hypotheses_ms": 0.0495,
+    "decision_explanation_ms": 0.0559,
+    "evaluation_ms": 0.1213,
     "evidence_count": 3,
-    "extraction_ms": 0.0969,
+    "extraction_ms": 0.0988,
     "hypothesis_count": 1,
-    "retrieval_ms": 0.2328,
-    "total_ms": 0.5923
+    "retrieval_ms": 0.2331,
+    "total_ms": 0.5586
   },
   "schema_version": "0.1"
 }

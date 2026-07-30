@@ -138,12 +138,19 @@ def _compute_uncertainty(
     )
 
 
-def _base_decision_kwargs(state: CaseReasoningState, context: ProcessingContext) -> dict:
+def _base_decision_kwargs(
+    state: CaseReasoningState, policy: DecisionPolicy, context: ProcessingContext
+) -> dict:
     return dict(
         decision_id=context.id_factory(),
         case_id=state.observation.case_id,
         observation_id=state.observation.observation_id,
-        policy_version=context.policy_version,
+        # The actual active policy's version, not the ProcessingContext's
+        # static default: a caller-injected DecisionPolicy (e.g. via
+        # ShadowConfig.policy) must be reflected in the Decision, not
+        # silently replaced by context.policy_version (pre-merge
+        # correction).
+        policy_version=policy.policy_version,
         knowledge_version=context.knowledge_version,
         capability_version=context.capability_version,
     )
@@ -151,12 +158,13 @@ def _base_decision_kwargs(state: CaseReasoningState, context: ProcessingContext)
 
 def _abstained(
     state: CaseReasoningState,
+    policy: DecisionPolicy,
     context: ProcessingContext,
     reason: AbstentionReason,
     uncertainty: DecisionUncertainty,
 ) -> Decision:
     return Decision(
-        **_base_decision_kwargs(state, context),
+        **_base_decision_kwargs(state, policy, context),
         decision_type=DecisionType.ABSTAINED,
         identification_level=IdentificationLevel.UNKNOWN,
         selected_hypothesis_id=None,
@@ -178,10 +186,13 @@ def _abstained(
 
 
 def _outside_domain(
-    state: CaseReasoningState, context: ProcessingContext, uncertainty: DecisionUncertainty
+    state: CaseReasoningState,
+    policy: DecisionPolicy,
+    context: ProcessingContext,
+    uncertainty: DecisionUncertainty,
 ) -> Decision:
     return Decision(
-        **_base_decision_kwargs(state, context),
+        **_base_decision_kwargs(state, policy, context),
         decision_type=DecisionType.OUTSIDE_SUPPORTED_DOMAIN,
         identification_level=IdentificationLevel.UNKNOWN,
         selected_hypothesis_id=None,
@@ -225,8 +236,10 @@ def form_decision(
     if not hypotheses:
         uncertainty = _compute_uncertainty(observation, None, [], False, False, False)
         if not observation.normalized_title.strip():
-            return _abstained(state, context, AbstentionReason.INSUFFICIENT_EVIDENCE, uncertainty)
-        return _outside_domain(state, context, uncertainty)
+            return _abstained(
+                state, policy, context, AbstentionReason.INSUFFICIENT_EVIDENCE, uncertainty
+            )
+        return _outside_domain(state, policy, context, uncertainty)
 
     # Title/structured-attribute family conflicts take priority: a Decision
     # cannot be more specific than its (conflicting) supporting Claims.
@@ -242,7 +255,7 @@ def form_decision(
     if len(hypotheses) > 1:
         uncertainty = _compute_uncertainty(observation, hypotheses[0], [], False, False, True)
         return Decision(
-            **_base_decision_kwargs(state, context),
+            **_base_decision_kwargs(state, policy, context),
             decision_type=DecisionType.AMBIGUOUS,
             identification_level=IdentificationLevel.UNKNOWN,
             selected_hypothesis_id=None,
@@ -280,7 +293,7 @@ def form_decision(
             ]
         )
         return Decision(
-            **_base_decision_kwargs(state, context),
+            **_base_decision_kwargs(state, policy, context),
             decision_type=DecisionType.CLASSIFIED,
             identification_level=IdentificationLevel.PRODUCT_TYPE,
             selected_hypothesis_id=hypothesis.hypothesis_id,
@@ -314,7 +327,7 @@ def form_decision(
             observation, hypothesis, surviving, bool(codes), False, False
         )
         return Decision(
-            **_base_decision_kwargs(state, context),
+            **_base_decision_kwargs(state, policy, context),
             decision_type=DecisionType.CLASSIFIED,
             identification_level=IdentificationLevel.PRODUCT_TYPE,
             selected_hypothesis_id=hypothesis.hypothesis_id,
@@ -339,7 +352,9 @@ def form_decision(
     # -- compatible item, no sold-item noun -------------------------------- #
     if hypothesis.product_form == ProductForm.COMPATIBLE_ITEM:
         uncertainty = _compute_uncertainty(observation, hypothesis, [], False, False, False)
-        return _abstained(state, context, AbstentionReason.INSUFFICIENT_EVIDENCE, uncertainty)
+        return _abstained(
+            state, policy, context, AbstentionReason.INSUFFICIENT_EVIDENCE, uncertainty
+        )
 
     # -- bundle: never directly comparable to a single product ------------- #
     if hypothesis.product_form == ProductForm.BUNDLE:
@@ -359,7 +374,7 @@ def form_decision(
             DecisionType.PARTIALLY_IDENTIFIED if hypothesis.family else DecisionType.CLASSIFIED
         )
         return Decision(
-            **_base_decision_kwargs(state, context),
+            **_base_decision_kwargs(state, policy, context),
             decision_type=decision_type,
             identification_level=level,
             selected_hypothesis_id=hypothesis.hypothesis_id,
@@ -399,7 +414,7 @@ def form_decision(
     if contradicted_family_claims:
         uncertainty = _compute_uncertainty(observation, hypothesis, surviving, True, has_soft, True)
         return Decision(
-            **_base_decision_kwargs(state, context),
+            **_base_decision_kwargs(state, policy, context),
             decision_type=DecisionType.AMBIGUOUS,
             identification_level=IdentificationLevel.UNKNOWN,
             selected_hypothesis_id=hypothesis.hypothesis_id,
@@ -429,7 +444,7 @@ def form_decision(
                 else IdentificationLevel.PRODUCT_TYPE
             )
             return Decision(
-                **_base_decision_kwargs(state, context),
+                **_base_decision_kwargs(state, policy, context),
                 decision_type=DecisionType.CLASSIFIED,
                 identification_level=level,
                 selected_hypothesis_id=hypothesis.hypothesis_id,
@@ -452,7 +467,9 @@ def form_decision(
                 ),
                 uncertainty=uncertainty,
             )
-        return _abstained(state, context, AbstentionReason.NO_SUITABLE_CANDIDATE, uncertainty)
+        return _abstained(
+            state, policy, context, AbstentionReason.NO_SUITABLE_CANDIDATE, uncertainty
+        )
 
     top_candidate, top_eval = surviving[0]
     distinct_products = {c.catalogue_product_id for c, _ in surviving}
@@ -483,7 +500,7 @@ def form_decision(
     )
     if is_exact and product is not None:
         return Decision(
-            **_base_decision_kwargs(state, context),
+            **_base_decision_kwargs(state, policy, context),
             decision_type=DecisionType.IDENTIFIED,
             identification_level=IdentificationLevel.EXACT_CATALOGUE_PRODUCT,
             selected_hypothesis_id=hypothesis.hypothesis_id,
@@ -513,7 +530,7 @@ def form_decision(
         and top_eval.evidence_coverage >= policy.minimum_usable_evidence_coverage
     ):
         return Decision(
-            **_base_decision_kwargs(state, context),
+            **_base_decision_kwargs(state, policy, context),
             decision_type=DecisionType.PARTIALLY_IDENTIFIED,
             identification_level=IdentificationLevel.MODEL,
             selected_hypothesis_id=hypothesis.hypothesis_id,
@@ -540,7 +557,7 @@ def form_decision(
     # -- classified (product type/form known, catalogue identity absent) - #
     if hypothesis.product_type == "graphics_card":
         return Decision(
-            **_base_decision_kwargs(state, context),
+            **_base_decision_kwargs(state, policy, context),
             decision_type=DecisionType.CLASSIFIED,
             identification_level=IdentificationLevel.PRODUCT_TYPE,
             selected_hypothesis_id=hypothesis.hypothesis_id,
@@ -560,4 +577,6 @@ def form_decision(
             uncertainty=uncertainty,
         )
 
-    return _abstained(state, context, AbstentionReason.CANDIDATES_INDISTINGUISHABLE, uncertainty)
+    return _abstained(
+        state, policy, context, AbstentionReason.CANDIDATES_INDISTINGUISHABLE, uncertainty
+    )

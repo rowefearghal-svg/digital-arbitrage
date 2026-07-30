@@ -64,36 +64,55 @@ class CandidateRepository(Protocol):
 
 
 def _product_from_json(entry: Mapping[str, object], knowledge_version: str) -> CatalogueProduct:
-    identifiers_raw = entry.get("identifiers", {})
-    if not isinstance(identifiers_raw, Mapping):
-        raise PueValidationError("catalogue entry 'identifiers' must be an object")
-    identifiers = {str(k): tuple(v) for k, v in identifiers_raw.items()}
+    """Build one :class:`CatalogueProduct` from a raw JSON entry.
 
-    attributes_raw = entry.get("attributes", {})
-    if not isinstance(attributes_raw, Mapping):
-        raise PueValidationError("catalogue entry 'attributes' must be an object")
+    Any malformed entry - a missing required field, an invalid enum value
+    (e.g. an unrecognized ``product_form``), or a field of the wrong type -
+    must surface as :class:`PueValidationError`, never as an uncaught
+    ``KeyError``/``ValueError``/``TypeError``: default processing must
+    convert an unusable catalogue into PROCESSING_FAILED /
+    CATALOGUE_UNAVAILABLE (see orchestration.process_one), not crash
+    (pre-merge correction).
+    """
+    if not isinstance(entry, Mapping):
+        raise PueValidationError(f"catalogue entry must be an object, got {type(entry).__name__}")
 
-    return CatalogueProduct(
-        catalogue_product_id=str(entry["catalogue_product_id"]),
-        canonical_title=str(entry["canonical_title"]),
-        brand=str(entry["brand"]),
-        chipset_manufacturer=(
-            str(entry["chipset_manufacturer"]) if entry.get("chipset_manufacturer") else None
-        ),
-        family=str(entry["family"]),
-        model=str(entry["model"]),
-        variant=(str(entry["variant"]) if entry.get("variant") else None),
-        product_form=ProductForm(str(entry["product_form"])),
-        product_type=str(entry["product_type"]),
-        identifiers=identifiers,
-        aliases=tuple(str(a) for a in entry.get("aliases", ())),  # type: ignore[attr-defined]
-        attributes=dict(attributes_raw),
-        compatibility_targets=tuple(
-            str(c)
-            for c in entry.get("compatibility_targets", ())  # type: ignore[attr-defined]
-        ),
-        knowledge_version=str(entry.get("knowledge_version", knowledge_version)),
-    )
+    identifier = entry.get("catalogue_product_id", "<unknown>")
+    try:
+        identifiers_raw = entry.get("identifiers", {})
+        if not isinstance(identifiers_raw, Mapping):
+            raise PueValidationError("catalogue entry 'identifiers' must be an object")
+        identifiers = {str(k): tuple(v) for k, v in identifiers_raw.items()}
+
+        attributes_raw = entry.get("attributes", {})
+        if not isinstance(attributes_raw, Mapping):
+            raise PueValidationError("catalogue entry 'attributes' must be an object")
+
+        return CatalogueProduct(
+            catalogue_product_id=str(entry["catalogue_product_id"]),
+            canonical_title=str(entry["canonical_title"]),
+            brand=str(entry["brand"]),
+            chipset_manufacturer=(
+                str(entry["chipset_manufacturer"]) if entry.get("chipset_manufacturer") else None
+            ),
+            family=str(entry["family"]),
+            model=str(entry["model"]),
+            variant=(str(entry["variant"]) if entry.get("variant") else None),
+            product_form=ProductForm(str(entry["product_form"])),
+            product_type=str(entry["product_type"]),
+            identifiers=identifiers,
+            aliases=tuple(str(a) for a in entry.get("aliases", ())),  # type: ignore[attr-defined]
+            attributes=dict(attributes_raw),
+            compatibility_targets=tuple(
+                str(c)
+                for c in entry.get("compatibility_targets", ())  # type: ignore[attr-defined]
+            ),
+            knowledge_version=str(entry.get("knowledge_version", knowledge_version)),
+        )
+    except PueValidationError:
+        raise
+    except (KeyError, ValueError, TypeError) as exc:
+        raise PueValidationError(f"malformed catalogue entry {identifier!r}: {exc}") from exc
 
 
 def load_catalogue(path: Path | str = DEFAULT_CATALOGUE_PATH) -> tuple[CatalogueProduct, ...]:

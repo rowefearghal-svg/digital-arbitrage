@@ -34,19 +34,42 @@ def load_terms(path: str = str(DEFAULT_TERMS_PATH)) -> Mapping[str, object]:
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+def _is_word_char(ch: str) -> bool:
+    return ch.isalnum() or ch == "_"
+
+
 def _find_all(haystack_lower: str, needle: str) -> list[tuple[int, int]]:
-    """Return non-overlapping (start, end) spans of ``needle`` in ``haystack_lower``."""
+    """Return non-overlapping, word-boundary-aware (start, end) spans of
+    ``needle`` in ``haystack_lower``.
+
+    A match is only accepted when the character immediately before its
+    start (if any) and immediately after its end (if any) are not word
+    characters - equivalent to a regex ``\\bneedle\\b`` match, but for a
+    literal (already-lowercased) phrase. This prevents a short, word-like
+    term (e.g. "for", "amp") from matching inside an unrelated word (e.g.
+    "performance", "before", "example") while still matching multi-word
+    phrases, hyphenated terms, and identifier-shaped tokens normally, since
+    only the OUTER edges of the matched span are checked (pre-merge
+    correction: deterministic term matching must be boundary-aware).
+    """
     spans: list[tuple[int, int]] = []
     start = 0
     needle_lower = needle.lower()
     if not needle_lower:
         return spans
+    n = len(haystack_lower)
     while True:
         idx = haystack_lower.find(needle_lower, start)
         if idx == -1:
             break
-        spans.append((idx, idx + len(needle_lower)))
-        start = idx + len(needle_lower)
+        end = idx + len(needle_lower)
+        before_ok = idx == 0 or not _is_word_char(haystack_lower[idx - 1])
+        after_ok = end == n or not _is_word_char(haystack_lower[end])
+        if before_ok and after_ok:
+            spans.append((idx, end))
+            start = end
+        else:
+            start = idx + 1
     return spans
 
 

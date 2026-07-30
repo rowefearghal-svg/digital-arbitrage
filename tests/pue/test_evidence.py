@@ -88,6 +88,36 @@ def test_structured_attributes_become_evidence(deterministic_context) -> None:
     assert any(e.normalized_value == "RTX 4070" for e in structured)
 
 
+def test_word_like_term_does_not_match_inside_unrelated_word(deterministic_context) -> None:
+    """'for' must not match inside 'performance'/'before'; 'amp' must not
+    match inside 'example' (pre-merge correction: deterministic term
+    matching must be word-boundary-aware)."""
+    _, before_evidence = _extract("Before RTX 4090", deterministic_context)
+    assert not any(e.evidence_type == EvidenceType.COMPATIBILITY_TERM for e in before_evidence)
+
+    _, perf_evidence = _extract("High performance RTX 4090", deterministic_context)
+    assert not any(e.evidence_type == EvidenceType.COMPATIBILITY_TERM for e in perf_evidence)
+
+    _, example_evidence = _extract("Example RTX 4090 card", deterministic_context)
+    assert not any(e.evidence_type == EvidenceType.BRAND_TOKEN for e in example_evidence)
+
+
+def test_word_like_term_still_matches_as_a_whole_word(deterministic_context) -> None:
+    """The boundary fix must not break ordinary matching of the same terms
+    when they legitimately appear as standalone words."""
+    _, for_evidence = _extract("For RTX 4090", deterministic_context)
+    assert any(e.evidence_type == EvidenceType.COMPATIBILITY_TERM for e in for_evidence)
+
+    _, fits_evidence = _extract("Fits RTX 4090", deterministic_context)
+    assert any(e.evidence_type == EvidenceType.COMPATIBILITY_TERM for e in fits_evidence)
+
+    _, amp_evidence = _extract("RTX 4090 AMP Extreme", deterministic_context)
+    assert any(
+        e.evidence_type == EvidenceType.BRAND_TOKEN and e.normalized_value == "zotac"
+        for e in amp_evidence
+    )
+
+
 def test_extraction_is_bounded_no_arbitrary_tokens(deterministic_context) -> None:
     """A word with no defined term/evidence type produces no Evidence for
     it specifically (spec 9.5 recall/bounding policy)."""

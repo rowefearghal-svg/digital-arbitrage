@@ -356,6 +356,76 @@
       "forbidden_decision_types": ["identified", "partially_identified", "outside_supported_domain"],
       "forbidden_product_forms": ["complete_product"],
       "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_31_for_rtx4090_boundary_regression",
+      "title": "For RTX 4090",
+      "difficulty": "medium",
+      "annotation_source": "pre_merge_correction_boundary_and_adjacency",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["abstained"],
+      "forbidden_decision_types": ["identified", "partially_identified", "classified", "outside_supported_domain"],
+      "forbidden_product_forms": ["complete_product"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_32_fits_rtx4090_boundary_regression",
+      "title": "Fits RTX 4090",
+      "difficulty": "medium",
+      "annotation_source": "pre_merge_correction_boundary_and_adjacency",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["abstained"],
+      "forbidden_decision_types": ["identified", "partially_identified", "classified", "outside_supported_domain"],
+      "forbidden_product_forms": ["complete_product"],
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_33_for_sale_rtx4090_not_compatibility",
+      "title": "For sale RTX 4090",
+      "difficulty": "medium",
+      "annotation_source": "pre_merge_correction_boundary_and_adjacency",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["partially_identified"],
+      "forbidden_decision_types": ["identified", "abstained", "outside_supported_domain"],
+      "expected_product_form": "complete_product",
+      "expected_identified_family": "rtx 4090",
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_34_high_performance_rtx4090_not_compatibility",
+      "title": "High performance RTX 4090",
+      "difficulty": "medium",
+      "annotation_source": "pre_merge_correction_boundary_and_adjacency",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["partially_identified"],
+      "forbidden_decision_types": ["identified", "abstained", "outside_supported_domain"],
+      "expected_product_form": "complete_product",
+      "expected_identified_family": "rtx 4090",
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_35_before_rtx4090_boundary_regression",
+      "title": "Before RTX 4090",
+      "difficulty": "medium",
+      "annotation_source": "pre_merge_correction_boundary_and_adjacency",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["partially_identified"],
+      "forbidden_decision_types": ["identified", "abstained", "outside_supported_domain"],
+      "expected_product_form": "complete_product",
+      "expected_identified_family": "rtx 4090",
+      "min_evidence_count": 1
+    },
+    {
+      "case_id": "case_36_example_rtx4090_boundary_regression",
+      "title": "Example RTX 4090 card",
+      "difficulty": "medium",
+      "annotation_source": "pre_merge_correction_boundary_and_adjacency",
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["partially_identified"],
+      "forbidden_decision_types": ["identified", "abstained", "outside_supported_domain"],
+      "expected_product_form": "complete_product",
+      "expected_identified_family": "rtx 4090",
+      "min_evidence_count": 1
     }
   ]
 }
