@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import uuid
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from types import TracebackType
@@ -134,8 +136,233 @@ ON pue_classifier_comparisons(
 """
 
 
+#: Sentinel values recorded for the two comparison-equivalence columns that
+#: simply did not exist in a v2 (first-attempt Sprint 2) database, so a
+#: migrated row is never mistaken for a comparison genuinely computed under
+#: a real, known search profile or comparison-schema version.
+LEGACY_V2_SEARCH_PROFILE_FINGERPRINT = "legacy-v2-search-profile-not-recorded"
+LEGACY_V2_COMPARISON_SCHEMA_VERSION = "pue-comparison-0.1.0-legacy-v2-migrated"
+
+
 def _utc_now() -> str:
     return datetime.now(UTC).replace(microsecond=0).isoformat()
+
+
+def _run_in_transaction(
+    conn: sqlite3.Connection, body: Callable[[sqlite3.Connection], None]
+) -> None:
+    """Run ``body(conn)`` inside one explicit, genuinely rollback-able
+    transaction.
+
+    Python's sqlite3 module's default ("legacy") transaction control only
+    ever *implicitly* opens a transaction before a DML statement
+    (INSERT/UPDATE/DELETE/REPLACE) and commits implicitly before anything
+    else - a bare ``with conn:`` around DDL statements (CREATE/ALTER/DROP
+    TABLE) does **not** actually wrap them in a transaction, since no
+    implicit BEGIN is ever issued for DDL; each one silently autocommits
+    on its own the moment it runs. That defeats the "perform migration
+    transactionally" / rollback requirement entirely. Issuing an explicit
+    ``BEGIN`` first is the documented, correct way to make DDL genuinely
+    transactional under the sqlite3 module's default settings (verified
+    empirically: an explicit BEGIN/ROLLBACK around a table rename, create,
+    data copy, and drop correctly restores the original table).
+
+    Python 3.12's manual ``autocommit=False`` mode was deliberately not
+    used instead: it keeps a transaction open at all times, including at
+    connection start, which prevents ``PRAGMA foreign_keys`` from ever
+    being applied (that pragma is a no-op while any transaction is open).
+    """
+    conn.execute("BEGIN")
+    try:
+        body(conn)
+    except BaseException:
+        conn.execute("ROLLBACK")
+        raise
+    else:
+        conn.execute("COMMIT")
+
+
+def _apply_schema_statements(conn: sqlite3.Connection) -> None:
+    """Execute every statement in ``_SCHEMA`` individually via
+    ``execute()`` rather than ``conn.executescript()``.
+
+    ``executescript()`` issues an implicit ``COMMIT`` before it runs and
+    does not honour the caller's transaction - it is unsuitable anywhere
+    an all-or-nothing guarantee is required (schema creation/migration
+    must roll back completely on failure). Splitting on ``;`` is safe here:
+    none of this DDL contains a string literal or identifier with a
+    semicolon in it.
+    """
+    for statement in _SCHEMA.split(";"):
+        statement = statement.strip()
+        if statement:
+            conn.execute(statement)
+
+
+def _table_names(conn: sqlite3.Connection) -> set[str]:
+    return {
+        row[0]
+        for row in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall()
+    }
+
+
+def _column_names(conn: sqlite3.Connection, table: str) -> set[str]:
+    return {row[1] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+
+
+def _detect_schema_version(conn: sqlite3.Connection) -> int:
+    """Determine the on-disk schema version (SQLite-upgrade correction).
+
+    Prefers the persisted ``PRAGMA user_version`` once this store has
+    written it (every version from this correction onward does). A
+    database that predates version tracking entirely reports
+    ``user_version == 0`` indistinguishably from a genuinely brand-new,
+    empty database, so table/column shape is used to tell them apart:
+    no tables at all means genuinely new (version 0); a ``pue_cases``
+    table with no ``pue_classifier_comparisons`` table is Sprint 1 (v1);
+    a ``pue_classifier_comparisons`` table whose primary key is still
+    ``case_id`` (no ``comparison_id`` column) is the first-attempt
+    Sprint 2 shape (v2).
+    """
+    tables = _table_names(conn)
+    if not tables:
+        return 0
+    user_version = conn.execute("PRAGMA user_version").fetchone()[0]
+    if user_version:
+        return int(user_version)
+    if "pue_classifier_comparisons" not in tables:
+        return 1
+    columns = _column_names(conn, "pue_classifier_comparisons")
+    if "comparison_id" in columns:
+        return SCHEMA_VERSION
+    return 2
+
+
+def _migrate_v1_to_v3(conn: sqlite3.Connection) -> None:
+    """v1 (Sprint 1: ``pue_cases`` only) -> v3. Purely additive: v1 never
+    had a comparisons table at all, and ``pue_cases`` itself is unchanged
+    since v1, so this only needs to create the new table/indexes. One
+    transaction; every existing ``pue_cases`` row is untouched."""
+
+    def _body(c: sqlite3.Connection) -> None:
+        _apply_schema_statements(c)
+        c.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
+
+    _run_in_transaction(conn, _body)
+
+
+def _migrate_v2_to_v3(conn: sqlite3.Connection) -> None:
+    """v2 (first-attempt Sprint 2: ``case_id`` primary key, no
+    comparison-equivalence columns) -> v3.
+
+    SQLite cannot alter a PRIMARY KEY in place, so ``pue_classifier_
+    comparisons`` is rebuilt: create the v3-shaped table under a temporary
+    name, copy every existing row across (synthesizing a fresh
+    ``comparison_id`` and the new version columns - backfilling
+    ``pue_policy_version``/``pue_knowledge_version`` from the matching
+    ``pue_cases`` row where possible, since those values *are* recoverable;
+    ``classifier_search_profile_fingerprint`` and
+    ``comparison_schema_version`` were never recorded in v2, so an explicit
+    legacy sentinel is used instead of a guess), drop the old table, and
+    rename the new one into place. ``pue_cases`` itself is untouched.
+    Every existing ``comparison_json`` blob is also rewritten so it
+    deserializes cleanly through the current (v3) ``comparison_from_json``,
+    which now requires these same fields.
+
+    Runs as a single transaction (foreign-key checks briefly suspended for
+    the table-rebuild sequence, per SQLite's documented pattern for
+    altering a table involved in foreign-key relationships, then verified
+    on again afterwards) - the version is stamped only once every row has
+    been copied successfully.
+    """
+    old_rows = conn.execute(
+        "SELECT case_id, provider, provider_listing_id, source_fingerprint, "
+        "classifier_capability_version, pue_capability_version, category, "
+        "comparison_json, created_at FROM pue_classifier_comparisons"
+    ).fetchall()
+
+    # ``PRAGMA foreign_keys`` may only be toggled outside an open
+    # transaction, so it is switched off here (before the transaction
+    # opens) and restored in ``finally`` (after it closes) - never inside.
+    # ``PRAGMA foreign_key_check`` itself works regardless of this setting
+    # and is run *inside* the transaction below, so a violation raises
+    # before commit and the whole migration rolls back with it.
+    conn.execute("PRAGMA foreign_keys = OFF")
+
+    def _body(c: sqlite3.Connection) -> None:
+        c.execute("ALTER TABLE pue_classifier_comparisons RENAME TO _pue_comparisons_v2")
+        _apply_schema_statements(c)  # (re)creates the v3-shaped comparisons table + indexes
+
+        for row in old_rows:
+            comparison_id = str(uuid.uuid4())
+            case_row = c.execute(
+                "SELECT policy_version, knowledge_version FROM pue_cases WHERE case_id = ?",
+                (row["case_id"],),
+            ).fetchone()
+            pue_policy_version = case_row["policy_version"] if case_row else "unknown"
+            pue_knowledge_version = case_row["knowledge_version"] if case_row else "unknown"
+
+            payload = json.loads(row["comparison_json"])
+            payload.setdefault("comparison_id", comparison_id)
+            payload.setdefault("comparison_schema_version", LEGACY_V2_COMPARISON_SCHEMA_VERSION)
+            payload.setdefault(
+                "classifier_search_profile_fingerprint",
+                LEGACY_V2_SEARCH_PROFILE_FINGERPRINT,
+            )
+            payload.setdefault("pue_policy_version", pue_policy_version)
+            payload.setdefault("pue_knowledge_version", pue_knowledge_version)
+            migrated_json = json.dumps(payload, sort_keys=True)
+
+            c.execute(
+                "INSERT INTO pue_classifier_comparisons ("
+                "comparison_id, case_id, provider, provider_listing_id, "
+                "source_fingerprint, classifier_search_profile_fingerprint, "
+                "classifier_capability_version, pue_capability_version, "
+                "pue_policy_version, pue_knowledge_version, comparison_schema_version, "
+                "category, comparison_json, created_at"
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    comparison_id,
+                    row["case_id"],
+                    row["provider"],
+                    row["provider_listing_id"],
+                    row["source_fingerprint"],
+                    LEGACY_V2_SEARCH_PROFILE_FINGERPRINT,
+                    row["classifier_capability_version"],
+                    row["pue_capability_version"],
+                    pue_policy_version,
+                    pue_knowledge_version,
+                    LEGACY_V2_COMPARISON_SCHEMA_VERSION,
+                    row["category"],
+                    migrated_json,
+                    row["created_at"],
+                ),
+            )
+
+        c.execute("DROP TABLE _pue_comparisons_v2")
+
+        # ``PRAGMA foreign_key_check`` works regardless of whether FK
+        # enforcement is currently on or off, so it can safely run
+        # *inside* this still-open transaction: a violation raises here,
+        # before ``user_version`` is stamped and before the transaction
+        # commits, so the entire migration - the rename, every
+        # re-inserted row, and the drop - rolls back together with it
+        # (never a partially-migrated database).
+        fk_errors = c.execute("PRAGMA foreign_key_check(pue_classifier_comparisons)").fetchall()
+        if fk_errors:
+            raise PueValidationError(
+                f"v2 -> v3 migration produced {len(fk_errors)} foreign-key "
+                "violation(s) in pue_classifier_comparisons; migration was rolled back"
+            )
+
+        c.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
+
+    try:
+        _run_in_transaction(conn, _body)
+    finally:
+        # foreign_keys may only be toggled with no transaction open; by
+        # this point the transaction has already committed or rolled back.
+        conn.execute("PRAGMA foreign_keys = ON")
 
 
 # --------------------------------------------------------------------------- #
@@ -547,13 +774,43 @@ class PueCaseStore:
         self._conn.row_factory = sqlite3.Row
         # SQLite does not enforce foreign keys by default even when a
         # column declares REFERENCES; must be turned on per connection
-        # (Sprint 2 pre-merge correction item 2).
+        # (Sprint 2 pre-merge correction item 2). Must happen before any
+        # transaction is opened - see the note on ``_run_in_transaction``
+        # below for why this store never uses Python 3.12+ manual
+        # autocommit mode.
         self._conn.execute("PRAGMA foreign_keys = ON")
         self._init_schema()
 
     def _init_schema(self) -> None:
-        with self._conn:
-            self._conn.executescript(_SCHEMA)
+        """Bring the database to ``SCHEMA_VERSION`` (final SQLite-upgrade
+        correction): a brand-new database is created fresh; an existing
+        Sprint 1 (v1) or first-attempt Sprint 2 (v2) database is migrated
+        in place, transactionally, preserving every existing ``pue_cases``
+        row; an unrecognized future version is rejected with no changes at
+        all. Users are never required to manually delete their database."""
+        current = _detect_schema_version(self._conn)
+        if current in (0, SCHEMA_VERSION):
+            # 0: brand-new/empty database. SCHEMA_VERSION: already current
+            # (or a hand-built fixture at the current shape with no
+            # persisted user_version yet). Either way, the idempotent
+            # CREATE-IF-NOT-EXISTS schema is safe to (re)apply; then stamp
+            # the version so future opens skip detection ambiguity.
+            def _body(c: sqlite3.Connection) -> None:
+                _apply_schema_statements(c)
+                c.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
+
+            _run_in_transaction(self._conn, _body)
+        elif current == 1:
+            _migrate_v1_to_v3(self._conn)
+        elif current == 2:
+            _migrate_v2_to_v3(self._conn)
+        else:
+            raise PueValidationError(
+                f"Unrecognized pue_cases database schema version {current!r} at "
+                f"{self.path!r} (this store supports new/empty, v1, v2, and the "
+                f"current v{SCHEMA_VERSION}); refusing to modify a database from a "
+                "newer, unrecognized version of this application."
+            )
 
     def close(self) -> None:
         self._conn.close()
