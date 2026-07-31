@@ -32,7 +32,7 @@ from ..opportunity import (
 from ..product_scanner import Scanner, ScannerConfig
 from ..providers.live import LiveProviderSetting, build_scanner_from_config
 from .models import PipelineItemResult, PipelineResult
-from .pue_shadow import ShadowConfig, run_pue_shadow
+from .pue_shadow import PueShadowCaseResult, ShadowConfig, run_pue_shadow
 
 #: Sort priority for recommendations (higher is better).
 _RECOMMENDATION_RANK: dict[Recommendation, int] = {
@@ -108,7 +108,19 @@ class ArbitragePipeline:
         #: shadow mode is enabled (see ``PipelineConfig.pue_shadow_config``).
         #: Each element is a ``PueShadowCaseResult`` (ReasoningRecord +
         #: ProductUnderstandingResult + optional classifier/PUE comparison).
-        #: Never influences ``PipelineResult``.
+        #: Never influences ``PipelineResult``. This is the authoritative
+        #: attribute as of Sprint 2 Task 2 (``run_pue_shadow`` now returns
+        #: ``PueShadowCaseResult``, not bare ``ReasoningRecord``).
+        self.last_pue_shadow_results: tuple[PueShadowCaseResult, ...] = ()
+        #: Compatibility projection of ``last_pue_shadow_results`` restoring
+        #: this attribute's original Sprint 1 meaning: a tuple of the
+        #: ``ReasoningRecord`` for each shadow-processed listing (never the
+        #: ``PueShadowCaseResult`` envelope itself). Sprint 2 pre-merge
+        #: correction: before this fix, this attribute silently held
+        #: ``PueShadowCaseResult`` objects while its name and Sprint 1
+        #: history implied bare records - a caller doing
+        #: ``record.decision`` on an element would have broken. Prefer
+        #: ``last_pue_shadow_results`` in new code.
         self.last_pue_shadow_records: tuple = ()
 
     def analyze(self, query: str) -> PipelineResult:
@@ -119,17 +131,23 @@ class ArbitragePipeline:
         # annotates each listing's ``classification`` and never drops any, so
         # deduplication and later stages are unchanged. How classifications
         # affect scoring is deferred to a future sprint.
-        self._classifier.classify_many(normalized, self._classifier.profile_for(query))
+        search_profile = self._classifier.profile_for(query)
+        self._classifier.classify_many(normalized, search_profile)
 
         # Product Understanding Engine shadow execution (see
         # docs/architecture/PUE_v0.1_VERTICAL_SLICE_SPECIFICATION.md section
         # 5.3). Disabled by default; when enabled, runs after normalization
         # and persists its own output without altering anything below this
         # line. A PUE exception never reaches this pipeline (see
-        # ``run_pue_shadow``), so `self.last_pue_shadow_records` may be empty
-        # even when shadow mode is enabled.
-        self.last_pue_shadow_records = run_pue_shadow(
-            normalized, config=self.config.pue_shadow_config or ShadowConfig(enabled=False)
+        # ``run_pue_shadow``), so ``self.last_pue_shadow_results`` may be
+        # empty even when shadow mode is enabled.
+        self.last_pue_shadow_results = run_pue_shadow(
+            normalized,
+            config=self.config.pue_shadow_config or ShadowConfig(enabled=False),
+            search_profile=search_profile,
+        )
+        self.last_pue_shadow_records = tuple(
+            r.reasoning_record for r in self.last_pue_shadow_results
         )
 
         deduped = self._deduplicator.deduplicate(normalized)

@@ -53,8 +53,13 @@ from .validation import PueValidationError, thaw_value
 #: Current on-disk schema version for this table (bumped when the DDL changes).
 #: Bumped to 2 in Sprint 2: added ``pue_classifier_comparisons`` (same
 #: database file, no new database - spec: comparison records persist
-#: alongside Reasoning Records).
-SCHEMA_VERSION = 2
+#: alongside Reasoning Records). Bumped to 3 in the Sprint 2 pre-merge
+#: correction: ``comparison_id`` (not ``case_id``) is now the comparisons
+#: table's primary key, so one case can hold multiple comparisons (e.g. the
+#: same listing classified under different search profiles), plus the full
+#: comparison-equivalence key (search-profile/policy/knowledge/schema
+#: version columns).
+SCHEMA_VERSION = 3
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS pue_cases (
@@ -86,16 +91,24 @@ CREATE INDEX IF NOT EXISTS idx_pue_cases_versions
 ON pue_cases(capability_version, policy_version, knowledge_version);
 
 CREATE TABLE IF NOT EXISTS pue_classifier_comparisons (
-    case_id TEXT PRIMARY KEY REFERENCES pue_cases(case_id),
+    comparison_id TEXT PRIMARY KEY,
+    case_id TEXT NOT NULL REFERENCES pue_cases(case_id),
     provider TEXT NOT NULL,
     provider_listing_id TEXT NOT NULL,
     source_fingerprint TEXT NOT NULL,
+    classifier_search_profile_fingerprint TEXT NOT NULL,
     classifier_capability_version TEXT NOT NULL,
     pue_capability_version TEXT NOT NULL,
+    pue_policy_version TEXT NOT NULL,
+    pue_knowledge_version TEXT NOT NULL,
+    comparison_schema_version TEXT NOT NULL,
     category TEXT NOT NULL,
     comparison_json TEXT NOT NULL,
     created_at TEXT NOT NULL
 );
+
+CREATE INDEX IF NOT EXISTS idx_pue_comparisons_case
+ON pue_classifier_comparisons(case_id);
 
 CREATE INDEX IF NOT EXISTS idx_pue_comparisons_listing
 ON pue_classifier_comparisons(provider, provider_listing_id);
@@ -103,8 +116,21 @@ ON pue_classifier_comparisons(provider, provider_listing_id);
 CREATE INDEX IF NOT EXISTS idx_pue_comparisons_fingerprint
 ON pue_classifier_comparisons(source_fingerprint);
 
-CREATE INDEX IF NOT EXISTS idx_pue_comparisons_versions
-ON pue_classifier_comparisons(classifier_capability_version, pue_capability_version);
+-- Full comparison-equivalence key (Sprint 2 pre-merge correction item 1):
+-- every column here materially determines whether two comparisons are the
+-- same observation. Different policy/knowledge/search-profile versions
+-- must never be treated as equivalent merely because pue_capability_version
+-- is unchanged.
+CREATE INDEX IF NOT EXISTS idx_pue_comparisons_equivalence
+ON pue_classifier_comparisons(
+    source_fingerprint,
+    classifier_search_profile_fingerprint,
+    classifier_capability_version,
+    pue_capability_version,
+    pue_policy_version,
+    pue_knowledge_version,
+    comparison_schema_version
+);
 """
 
 
@@ -519,6 +545,10 @@ class PueCaseStore:
                 parent.mkdir(parents=True, exist_ok=True)
         self._conn = sqlite3.connect(self.path)
         self._conn.row_factory = sqlite3.Row
+        # SQLite does not enforce foreign keys by default even when a
+        # column declares REFERENCES; must be turned on per connection
+        # (Sprint 2 pre-merge correction item 2).
+        self._conn.execute("PRAGMA foreign_keys = ON")
         self._init_schema()
 
     def _init_schema(self) -> None:
@@ -539,29 +569,16 @@ class PueCaseStore:
     ) -> None:
         self.close()
 
-    def save_case(
-        self, record: ReasoningRecord, *, created_at: str | None = None, replay: bool = False
-    ) -> str:
-        """Persist ``record``. Raises if ``case_id`` already exists (no overwrite).
-
-        Equivalent-record detection (application level, not a DB constraint):
-        when ``replay`` is ``False`` (normal shadow processing), a case whose
-        ``source_fingerprint`` and full version triple (capability/policy/
-        knowledge) already match a previously persisted, completed record is
-        rejected - re-running the identical listing under identical versions
-        must not accumulate duplicate completed records. Pass ``replay=True``
-        for explicitly marked replay/evaluation activity (e.g. benchmarking a
-        new policy against historical listings), which may retain another
-        record for the same fingerprint/version triple.
-        """
+    def _check_case_insertable(self, record: ReasoningRecord, *, replay: bool) -> None:
+        """Raise if ``record`` cannot be newly inserted (see :meth:`save_case`)."""
         existing = self.get_case(record.case_id)
         if existing is not None:
             raise PueValidationError(
                 f"case_id {record.case_id!r} already persisted; historical records "
                 "are never overwritten (create a new case for a rerun)"
             )
-        decision = record.decision
         if not replay:
+            decision = record.decision
             equivalent = self.find_equivalent(
                 source_fingerprint=record.observation.source_fingerprint,
                 capability_version=decision.capability_version,
@@ -576,41 +593,105 @@ class PueCaseStore:
                     f"(case_id={equivalent.case_id!r}); pass replay=True to retain "
                     "another record for explicitly marked replay/evaluation activity"
                 )
+
+    def _insert_case_row(self, record: ReasoningRecord, timestamp: str) -> None:
+        """Execute the case INSERT only - caller controls the transaction
+        (see :meth:`save_case` and :meth:`save_case_with_comparison`)."""
+        decision = record.decision
         selected_catalogue_product_id = None
         if decision.selected_candidate_instance_id is not None:
             for c in record.candidates:
                 if c.candidate_instance_id == decision.selected_candidate_instance_id:
                     selected_catalogue_product_id = c.catalogue_product_id
                     break
+        self._conn.execute(
+            "INSERT INTO pue_cases ("
+            "case_id, observation_id, provider, provider_listing_id, source_fingerprint, "
+            "capability_version, policy_version, knowledge_version, schema_version, "
+            "decision_type, identification_level, product_form, "
+            "selected_catalogue_product_id, comparability_status, "
+            "reasoning_record_json, created_at"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                record.case_id,
+                record.observation.observation_id,
+                record.observation.provider,
+                record.observation.provider_listing_id,
+                record.observation.source_fingerprint,
+                decision.capability_version,
+                decision.policy_version,
+                decision.knowledge_version,
+                record.schema_version,
+                decision.decision_type.value,
+                decision.identification_level.value,
+                decision.product_form.value,
+                selected_catalogue_product_id,
+                decision.comparability_status.value,
+                reasoning_record_to_json(record),
+                timestamp,
+            ),
+        )
+
+    def save_case(
+        self, record: ReasoningRecord, *, created_at: str | None = None, replay: bool = False
+    ) -> str:
+        """Persist ``record``. Raises if ``case_id`` already exists (no overwrite).
+
+        Equivalent-record detection (application level, not a DB constraint):
+        when ``replay`` is ``False`` (normal shadow processing), a case whose
+        ``source_fingerprint`` and full version triple (capability/policy/
+        knowledge) already match a previously persisted, completed record is
+        rejected - re-running the identical listing under identical versions
+        must not accumulate duplicate completed records. Pass ``replay=True``
+        for explicitly marked replay/evaluation activity (e.g. benchmarking a
+        new policy against historical listings), which may retain another
+        record for the same fingerprint/version triple.
+
+        See :meth:`save_case_with_comparison` when a comparison must be
+        inserted transactionally alongside a brand-new case.
+        """
+        self._check_case_insertable(record, replay=replay)
         timestamp = created_at if created_at is not None else _utc_now()
         with self._conn:
-            self._conn.execute(
-                "INSERT INTO pue_cases ("
-                "case_id, observation_id, provider, provider_listing_id, source_fingerprint, "
-                "capability_version, policy_version, knowledge_version, schema_version, "
-                "decision_type, identification_level, product_form, "
-                "selected_catalogue_product_id, comparability_status, "
-                "reasoning_record_json, created_at"
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (
-                    record.case_id,
-                    record.observation.observation_id,
-                    record.observation.provider,
-                    record.observation.provider_listing_id,
-                    record.observation.source_fingerprint,
-                    decision.capability_version,
-                    decision.policy_version,
-                    decision.knowledge_version,
-                    record.schema_version,
-                    decision.decision_type.value,
-                    decision.identification_level.value,
-                    decision.product_form.value,
-                    selected_catalogue_product_id,
-                    decision.comparability_status.value,
-                    reasoning_record_to_json(record),
-                    timestamp,
-                ),
+            self._insert_case_row(record, timestamp)
+        return record.case_id
+
+    def save_case_with_comparison(
+        self,
+        record: ReasoningRecord,
+        comparison: ClassifierPueComparison | None,
+        *,
+        created_at: str | None = None,
+        replay: bool = False,
+    ) -> str:
+        """Persist a brand-new ``record`` and, if given, its ``comparison``
+        as a single transaction.
+
+        Either both writes commit or neither does: a successfully inserted
+        case must never be left without its expected comparison merely
+        because the second write failed (Sprint 2 pre-merge correction
+        item 2). ``comparison.case_id`` must equal ``record.case_id`` - use
+        :meth:`save_comparison` directly to backfill a comparison onto an
+        already-persisted case (e.g. an existing Sprint 1 case that has no
+        comparison yet).
+        """
+        if comparison is not None and comparison.case_id != record.case_id:
+            raise PueValidationError(
+                "comparison.case_id must equal record.case_id for a new case+comparison "
+                f"insert (got {comparison.case_id!r} vs {record.case_id!r}); use "
+                "save_comparison() directly to backfill onto an existing case"
             )
+        self._check_case_insertable(record, replay=replay)
+        if comparison is not None:
+            # Not _check_comparison_insertable: the case row does not exist
+            # yet at this point - it is inserted in the same transaction
+            # below - so only the comparison_id/equivalence checks apply.
+            self._check_comparison_id_and_equivalence(comparison, replay=replay)
+        timestamp = created_at if created_at is not None else _utc_now()
+        with self._conn:
+            self._insert_case_row(record, timestamp)
+            if comparison is not None:
+                self._insert_comparison_row(comparison, timestamp)
         return record.case_id
 
     def get_case(self, case_id: str) -> ReasoningRecord | None:
@@ -670,7 +751,90 @@ class PueCaseStore:
     # ----------------------------------------------------------------- #
     # Classifier/PUE comparison records (Sprint 2, Task 1) - same
     # database file as ``pue_cases``, not a new database.
+    #
+    # ``comparison_id`` (not ``case_id``) is the primary key: one PUE case
+    # may legitimately hold more than one comparison, e.g. the same
+    # listing classified under two different search profiles (Sprint 2
+    # pre-merge correction item 1/2).
     # ----------------------------------------------------------------- #
+    def _check_comparison_id_and_equivalence(
+        self, comparison: ClassifierPueComparison, *, replay: bool
+    ) -> None:
+        """Raise on a duplicate ``comparison_id`` or (unless ``replay``) an
+        equivalent comparison. Does **not** check that ``case_id`` already
+        exists - see :meth:`_check_comparison_insertable` for that, which
+        callers must skip when the case is being inserted in the very same
+        transaction (see :meth:`save_case_with_comparison`)."""
+        if self.get_comparison_by_id(comparison.comparison_id) is not None:
+            raise PueValidationError(
+                f"comparison_id {comparison.comparison_id!r} is already persisted; "
+                "historical records are never overwritten"
+            )
+        if not replay:
+            equivalent = self.find_comparison_equivalent(
+                source_fingerprint=comparison.source_fingerprint,
+                classifier_search_profile_fingerprint=(
+                    comparison.classifier_search_profile_fingerprint
+                ),
+                classifier_capability_version=comparison.classifier_capability_version,
+                pue_capability_version=comparison.pue_capability_version,
+                pue_policy_version=comparison.pue_policy_version,
+                pue_knowledge_version=comparison.pue_knowledge_version,
+                comparison_schema_version=comparison.comparison_schema_version,
+            )
+            if equivalent is not None:
+                raise PueValidationError(
+                    "an equivalent comparison already exists for source_fingerprint "
+                    f"{comparison.source_fingerprint!r} under the same search-profile/"
+                    "classifier/PUE versions "
+                    f"(comparison_id={equivalent.comparison_id!r}); pass replay=True "
+                    "to retain another record for explicitly marked replay/evaluation "
+                    "activity"
+                )
+
+    def _check_comparison_insertable(
+        self, comparison: ClassifierPueComparison, *, replay: bool
+    ) -> None:
+        """Full standalone insertability check (see :meth:`save_comparison`):
+        the referenced case must already exist, plus everything
+        :meth:`_check_comparison_id_and_equivalence` checks."""
+        if self.get_case(comparison.case_id) is None:
+            raise PueValidationError(
+                f"comparison.case_id {comparison.case_id!r} does not reference an "
+                "existing pue_cases row; a comparison cannot be persisted for a "
+                "nonexistent case"
+            )
+        self._check_comparison_id_and_equivalence(comparison, replay=replay)
+
+    def _insert_comparison_row(self, comparison: ClassifierPueComparison, timestamp: str) -> None:
+        """Execute the comparison INSERT only - caller controls the
+        transaction (see :meth:`save_comparison` and
+        :meth:`save_case_with_comparison`)."""
+        self._conn.execute(
+            "INSERT INTO pue_classifier_comparisons ("
+            "comparison_id, case_id, provider, provider_listing_id, source_fingerprint, "
+            "classifier_search_profile_fingerprint, classifier_capability_version, "
+            "pue_capability_version, pue_policy_version, pue_knowledge_version, "
+            "comparison_schema_version, category, comparison_json, created_at"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                comparison.comparison_id,
+                comparison.case_id,
+                comparison.provider,
+                comparison.provider_listing_id,
+                comparison.source_fingerprint,
+                comparison.classifier_search_profile_fingerprint,
+                comparison.classifier_capability_version,
+                comparison.pue_capability_version,
+                comparison.pue_policy_version,
+                comparison.pue_knowledge_version,
+                comparison.comparison_schema_version,
+                comparison.category.value,
+                comparison_to_json(comparison),
+                timestamp,
+            ),
+        )
+
     def save_comparison(
         self,
         comparison: ClassifierPueComparison,
@@ -678,80 +842,77 @@ class PueCaseStore:
         created_at: str | None = None,
         replay: bool = False,
     ) -> str:
-        """Persist ``comparison``. Raises if ``case_id`` already has a
-        comparison (no overwrite; mirrors :meth:`save_case`).
+        """Persist ``comparison`` against its already-existing ``case_id``.
 
-        Equivalent-record detection mirrors :meth:`save_case`: when
-        ``replay`` is ``False``, a comparison whose ``source_fingerprint``
-        and classifier/PUE version pair already match a previously
-        persisted comparison is rejected, so repeated normal processing of
-        the same listing under the same versions does not accumulate
-        duplicate comparison records.
+        Raises if ``comparison.case_id`` does not reference a persisted
+        case (also enforced at the database level by
+        ``PRAGMA foreign_keys = ON``), if ``comparison_id`` already exists,
+        or - unless ``replay=True`` - if an equivalent comparison (full
+        equivalence key: source fingerprint, search-profile fingerprint,
+        classifier capability version, PUE capability/policy/knowledge
+        version, and comparison schema version) already exists.
+
+        Use this directly to backfill a comparison onto an existing case
+        that has none yet; use :meth:`save_case_with_comparison` when both
+        the case and its first comparison are being newly inserted together.
         """
-        if self.get_comparison(comparison.case_id) is not None:
-            raise PueValidationError(
-                f"a comparison for case_id {comparison.case_id!r} is already persisted; "
-                "historical records are never overwritten"
-            )
-        if not replay:
-            equivalent = self.find_comparison_equivalent(
-                source_fingerprint=comparison.source_fingerprint,
-                classifier_capability_version=comparison.classifier_capability_version,
-                pue_capability_version=comparison.pue_capability_version,
-            )
-            if equivalent is not None:
-                raise PueValidationError(
-                    "an equivalent comparison already exists for source_fingerprint "
-                    f"{comparison.source_fingerprint!r} under the same classifier/PUE "
-                    f"versions (case_id={equivalent.case_id!r}); pass replay=True to "
-                    "retain another record for explicitly marked replay/evaluation activity"
-                )
+        self._check_comparison_insertable(comparison, replay=replay)
         timestamp = created_at if created_at is not None else _utc_now()
         with self._conn:
-            self._conn.execute(
-                "INSERT INTO pue_classifier_comparisons ("
-                "case_id, provider, provider_listing_id, source_fingerprint, "
-                "classifier_capability_version, pue_capability_version, category, "
-                "comparison_json, created_at"
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (
-                    comparison.case_id,
-                    comparison.provider,
-                    comparison.provider_listing_id,
-                    comparison.source_fingerprint,
-                    comparison.classifier_capability_version,
-                    comparison.pue_capability_version,
-                    comparison.category.value,
-                    comparison_to_json(comparison),
-                    timestamp,
-                ),
-            )
-        return comparison.case_id
+            self._insert_comparison_row(comparison, timestamp)
+        return comparison.comparison_id
 
-    def get_comparison(self, case_id: str) -> ClassifierPueComparison | None:
+    def get_comparison_by_id(self, comparison_id: str) -> ClassifierPueComparison | None:
         row = self._conn.execute(
-            "SELECT comparison_json FROM pue_classifier_comparisons WHERE case_id = ?",
-            (case_id,),
+            "SELECT comparison_json FROM pue_classifier_comparisons WHERE comparison_id = ?",
+            (comparison_id,),
         ).fetchone()
         if row is None:
             return None
         return comparison_from_json(row["comparison_json"])
 
+    def get_comparisons_for_case(self, case_id: str) -> list[ClassifierPueComparison]:
+        """Every comparison persisted for ``case_id``, oldest first. A case
+        may have zero, one, or several (e.g. distinct search profiles)."""
+        rows = self._conn.execute(
+            "SELECT comparison_json FROM pue_classifier_comparisons WHERE case_id = ? "
+            "ORDER BY created_at ASC",
+            (case_id,),
+        ).fetchall()
+        return [comparison_from_json(row["comparison_json"]) for row in rows]
+
     def find_comparison_equivalent(
         self,
         *,
         source_fingerprint: str,
+        classifier_search_profile_fingerprint: str,
         classifier_capability_version: str,
         pue_capability_version: str,
+        pue_policy_version: str,
+        pue_knowledge_version: str,
+        comparison_schema_version: str,
     ) -> ClassifierPueComparison | None:
-        """Return the earliest persisted comparison equivalent to this
-        fingerprint and version pair, if any (application-level duplicate
-        detection; see :meth:`save_comparison`)."""
+        """Return the earliest persisted comparison equivalent to this full
+        key, if any (application-level duplicate detection; see
+        :meth:`save_comparison`). Every argument is materially relevant: a
+        different search profile, policy version, or knowledge version is
+        never treated as equivalent merely because the capability versions
+        are unchanged (Sprint 2 pre-merge correction item 1)."""
         row = self._conn.execute(
             "SELECT comparison_json FROM pue_classifier_comparisons WHERE "
-            "source_fingerprint = ? AND classifier_capability_version = ? "
-            "AND pue_capability_version = ? ORDER BY created_at ASC LIMIT 1",
-            (source_fingerprint, classifier_capability_version, pue_capability_version),
+            "source_fingerprint = ? AND classifier_search_profile_fingerprint = ? "
+            "AND classifier_capability_version = ? AND pue_capability_version = ? "
+            "AND pue_policy_version = ? AND pue_knowledge_version = ? "
+            "AND comparison_schema_version = ? ORDER BY created_at ASC LIMIT 1",
+            (
+                source_fingerprint,
+                classifier_search_profile_fingerprint,
+                classifier_capability_version,
+                pue_capability_version,
+                pue_policy_version,
+                pue_knowledge_version,
+                comparison_schema_version,
+            ),
         ).fetchone()
         if row is None:
             return None

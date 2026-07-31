@@ -74,7 +74,7 @@ def test_shadow_isolation_does_not_change_classifier_output() -> None:
     without_shadow = classifier.classify(listing, profile)
 
     config = ShadowConfig(enabled=True)
-    shadow_result = run_pue_shadow([listing], config=config)
+    shadow_result = run_pue_shadow([listing], config=config, search_profile=profile)
     with_shadow = classifier.classify(listing, profile)
 
     assert without_shadow == with_shadow
@@ -205,3 +205,28 @@ def test_arbitrage_pipeline_analyze_identical_with_shadow_enabled(tmp_path: Path
     # Shadow mode actually ran and produced output for this call, otherwise
     # the comparison above would be vacuous.
     assert enabled_pipeline.last_pue_shadow_records != ()
+
+
+def test_last_pue_shadow_results_and_records_are_both_exposed(tmp_path: Path) -> None:
+    """Sprint 2 pre-merge correction item 6: ``run_pue_shadow`` returns
+    ``PueShadowCaseResult`` envelopes, not bare ``ReasoningRecord``s.
+    ``last_pue_shadow_results`` is the authoritative attribute holding
+    those envelopes; ``last_pue_shadow_records`` is a genuine compatibility
+    projection restoring its original Sprint 1 meaning - a tuple of plain
+    ``ReasoningRecord``s, never the envelope itself."""
+    from digital_arbitrage.pipeline.pue_shadow import PueShadowCaseResult
+    from digital_arbitrage.pue.models import ReasoningRecord
+
+    pipeline = ArbitragePipeline(
+        PipelineConfig(pue_shadow_config=ShadowConfig(enabled=True, db_path=tmp_path / "shadow.db"))
+    )
+    pipeline.analyze("rtx 4090")
+
+    assert pipeline.last_pue_shadow_results != ()
+    assert all(isinstance(r, PueShadowCaseResult) for r in pipeline.last_pue_shadow_results)
+    assert pipeline.last_pue_shadow_records != ()
+    assert all(isinstance(r, ReasoningRecord) for r in pipeline.last_pue_shadow_records)
+    assert len(pipeline.last_pue_shadow_records) == len(pipeline.last_pue_shadow_results)
+    assert pipeline.last_pue_shadow_records == tuple(
+        r.reasoning_record for r in pipeline.last_pue_shadow_results
+    )
