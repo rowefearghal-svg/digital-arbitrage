@@ -154,6 +154,67 @@ def test_repeated_shadow_run_avoids_duplicate_completed_records(tmp_path: Path) 
     assert persisted[0].case_id == first_record.case_id
 
 
+def test_two_search_profiles_backfill_distinct_comparisons_onto_one_case(tmp_path: Path) -> None:
+    """Running shadow mode twice for the identical listing under two
+    different search profiles must persist exactly one PUE case (the
+    second run's case-level equivalent-record check correctly prevents a
+    duplicate case row) but two distinct comparison records, one per
+    search profile - and repeating either profile again must remain
+    idempotent (final Sprint 2 correction: backfilling must only skip a
+    genuinely *equivalent* comparison, not merely because the case already
+    holds some other comparison under a different search profile)."""
+    listing = make_normalized("ASUS TUF RTX 4090 OC TUF-RTX4090-O24G")
+    profile_a = build_search_profile("rtx 4090")
+    profile_b = build_search_profile("rtx 4090 oc")
+    classifier = ListingClassifier()
+    db_path = tmp_path / "shadow.db"
+    config = ShadowConfig(enabled=True, db_path=db_path)
+
+    classifier.classify(listing, profile_a)
+    run_a = run_pue_shadow([listing], config=config, search_profile=profile_a)
+    classifier.classify(listing, profile_b)
+    run_b = run_pue_shadow([listing], config=config, search_profile=profile_b)
+
+    assert len(run_a) == 1
+    assert len(run_b) == 1
+    fingerprint = run_a[0].reasoning_record.observation.source_fingerprint
+    assert run_b[0].reasoning_record.observation.source_fingerprint == fingerprint
+    comparison_a = run_a[0].comparison
+    comparison_b = run_b[0].comparison
+    assert comparison_a is not None
+    assert comparison_b is not None
+    assert (
+        comparison_a.classifier_search_profile_fingerprint
+        != comparison_b.classifier_search_profile_fingerprint
+    )
+
+    with PueCaseStore(db_path) as store:
+        cases = store.find_by_fingerprint(fingerprint)
+        assert len(cases) == 1
+        case_id = cases[0].case_id
+        comparisons = store.get_comparisons_for_case(case_id)
+
+    assert len(comparisons) == 2
+    fingerprints = {c.classifier_search_profile_fingerprint for c in comparisons}
+    assert fingerprints == {
+        comparison_a.classifier_search_profile_fingerprint,
+        comparison_b.classifier_search_profile_fingerprint,
+    }
+
+    # Repeating either profile again must remain idempotent: no third
+    # comparison is added, and still only one case exists.
+    classifier.classify(listing, profile_a)
+    run_pue_shadow([listing], config=config, search_profile=profile_a)
+    classifier.classify(listing, profile_b)
+    run_pue_shadow([listing], config=config, search_profile=profile_b)
+
+    with PueCaseStore(db_path) as store:
+        cases_after = store.find_by_fingerprint(fingerprint)
+        assert len(cases_after) == 1
+        assert cases_after[0].case_id == case_id
+        assert len(store.get_comparisons_for_case(case_id)) == 2
+
+
 def test_shadow_disabled_by_default_is_a_no_op() -> None:
     listing = make_normalized("RTX 4090")
     config = ShadowConfig(enabled=False)

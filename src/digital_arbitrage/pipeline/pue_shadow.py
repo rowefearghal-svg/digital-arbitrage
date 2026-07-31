@@ -142,9 +142,14 @@ def _persist_case_result(
 ) -> None:
     """Persist one case + its optional comparison, transactionally when
     both are new; backfill the comparison onto an existing equivalent case
-    when the case row already exists but has no comparison yet (Sprint 2
-    pre-merge correction item 2 - a duplicate/equivalent ``save_case`` must
-    not silently prevent an older case from ever receiving a comparison).
+    when the case row already exists but has no *equivalent* comparison
+    yet (Sprint 2 pre-merge correction item 2 - a duplicate/equivalent
+    ``save_case`` must not silently prevent an older case from ever
+    receiving a comparison). A case already holding a comparison under a
+    *different* search profile, policy, knowledge, or comparison-schema
+    version still gets this one backfilled - only a genuinely equivalent
+    comparison is skipped (final Sprint 2 correction: an "any comparison
+    exists" check previously skipped this incorrectly).
     """
     record = case_result.reasoning_record
     comparison = case_result.comparison
@@ -178,8 +183,22 @@ def _persist_case_result(
             target_case_id = equivalent.case_id
     if target_case_id is None:
         return
-    if store.get_comparisons_for_case(target_case_id):
-        # Already has at least one comparison; nothing to backfill.
+    equivalent_comparison = store.find_comparison_equivalent(
+        source_fingerprint=comparison.source_fingerprint,
+        classifier_search_profile_fingerprint=comparison.classifier_search_profile_fingerprint,
+        classifier_capability_version=comparison.classifier_capability_version,
+        pue_capability_version=comparison.pue_capability_version,
+        pue_policy_version=comparison.pue_policy_version,
+        pue_knowledge_version=comparison.pue_knowledge_version,
+        comparison_schema_version=comparison.comparison_schema_version,
+    )
+    if equivalent_comparison is not None:
+        # A genuinely equivalent comparison already exists for this case
+        # (same search profile/classifier/PUE versions) - nothing to
+        # backfill. A *different* search profile (or policy/knowledge/
+        # schema version) is never equivalent merely because the case
+        # already has some other comparison (Sprint 2 correction: the
+        # previous "any comparison exists" check wrongly skipped this).
         return
     backfilled = dataclasses.replace(
         comparison,

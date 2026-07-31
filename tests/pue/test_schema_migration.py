@@ -296,6 +296,34 @@ def test_v2_database_migrates_preserving_comparisons(tmp_path: Path) -> None:
         assert len(comparison_ids) == len(migrated)  # all unique
 
 
+def test_v2_migration_produces_complete_v3_index_set(tmp_path: Path) -> None:
+    """``ALTER TABLE ... RENAME`` does not rename the indexes bound to the
+    renamed-aside v2 table - they keep their original names (e.g.
+    ``idx_pue_comparisons_listing``) until that table is dropped. If the
+    v3 indexes were (re)created before the drop, ``CREATE INDEX IF NOT
+    EXISTS`` would silently no-op for every name still colliding with one
+    of those old indexes (index names are unique per schema, not per
+    table), leaving the final table missing them entirely. This asserts
+    the complete, correct v3 index set is present after migration."""
+    db_path = tmp_path / "v2.db"
+    _build_v2_db(db_path, ["ASUS TUF RTX 4090 OC TUF-RTX4090-O24G", "RTX 4090 water block"])
+
+    with PueCaseStore(db_path) as store:
+        index_names = {
+            row["name"]
+            for row in store._conn.execute(
+                "PRAGMA index_list(pue_classifier_comparisons)"
+            ).fetchall()
+        }
+        assert index_names == {
+            "idx_pue_comparisons_case",
+            "idx_pue_comparisons_listing",
+            "idx_pue_comparisons_fingerprint",
+            "idx_pue_comparisons_equivalence",
+            "sqlite_autoindex_pue_classifier_comparisons_1",
+        }
+
+
 def test_v2_migration_preserves_foreign_key_integrity(tmp_path: Path) -> None:
     db_path = tmp_path / "v2.db"
     _build_v2_db(db_path, ["RTX 4090 water block"])

@@ -63,7 +63,12 @@ from .validation import PueValidationError, thaw_value
 #: version columns).
 SCHEMA_VERSION = 3
 
-_SCHEMA = """
+#: Split into named pieces (table vs indexes) rather than one combined
+#: string, specifically so the v2 -> v3 migration below can create the
+#: ``pue_classifier_comparisons`` table *before* dropping the old,
+#: renamed-aside v2 table, but defer (re)creating its indexes until
+#: *after* that drop - see ``_migrate_v2_to_v3`` for why.
+_PUE_CASES_SCHEMA = """
 CREATE TABLE IF NOT EXISTS pue_cases (
     case_id TEXT PRIMARY KEY,
     observation_id TEXT NOT NULL,
@@ -91,7 +96,9 @@ ON pue_cases(source_fingerprint);
 
 CREATE INDEX IF NOT EXISTS idx_pue_cases_versions
 ON pue_cases(capability_version, policy_version, knowledge_version);
+"""
 
+_PUE_COMPARISONS_TABLE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS pue_classifier_comparisons (
     comparison_id TEXT PRIMARY KEY,
     case_id TEXT NOT NULL REFERENCES pue_cases(case_id),
@@ -108,7 +115,9 @@ CREATE TABLE IF NOT EXISTS pue_classifier_comparisons (
     comparison_json TEXT NOT NULL,
     created_at TEXT NOT NULL
 );
+"""
 
+_PUE_COMPARISONS_INDEXES_SCHEMA = """
 CREATE INDEX IF NOT EXISTS idx_pue_comparisons_case
 ON pue_classifier_comparisons(case_id);
 
@@ -134,6 +143,8 @@ ON pue_classifier_comparisons(
     comparison_schema_version
 );
 """
+
+_SCHEMA = _PUE_CASES_SCHEMA + _PUE_COMPARISONS_TABLE_SCHEMA + _PUE_COMPARISONS_INDEXES_SCHEMA
 
 
 #: Sentinel values recorded for the two comparison-equivalence columns that
@@ -182,9 +193,9 @@ def _run_in_transaction(
         conn.execute("COMMIT")
 
 
-def _apply_schema_statements(conn: sqlite3.Connection) -> None:
-    """Execute every statement in ``_SCHEMA`` individually via
-    ``execute()`` rather than ``conn.executescript()``.
+def _apply_ddl_statements(conn: sqlite3.Connection, ddl: str) -> None:
+    """Execute every statement in ``ddl`` individually via ``execute()``
+    rather than ``conn.executescript()``.
 
     ``executescript()`` issues an implicit ``COMMIT`` before it runs and
     does not honour the caller's transaction - it is unsuitable anywhere
@@ -193,10 +204,20 @@ def _apply_schema_statements(conn: sqlite3.Connection) -> None:
     none of this DDL contains a string literal or identifier with a
     semicolon in it.
     """
-    for statement in _SCHEMA.split(";"):
+    for statement in ddl.split(";"):
         statement = statement.strip()
         if statement:
             conn.execute(statement)
+
+
+def _apply_schema_statements(conn: sqlite3.Connection) -> None:
+    """Apply the complete current schema (``_SCHEMA``) - safe whenever
+    there is no risk of an index name colliding with one still bound to a
+    different, about-to-be-dropped table (see ``_migrate_v2_to_v3``,
+    which applies ``_PUE_COMPARISONS_TABLE_SCHEMA`` and
+    ``_PUE_COMPARISONS_INDEXES_SCHEMA`` separately instead, for exactly
+    that reason)."""
+    _apply_ddl_statements(conn, _SCHEMA)
 
 
 def _table_names(conn: sqlite3.Connection) -> set[str]:
@@ -291,7 +312,19 @@ def _migrate_v2_to_v3(conn: sqlite3.Connection) -> None:
 
     def _body(c: sqlite3.Connection) -> None:
         c.execute("ALTER TABLE pue_classifier_comparisons RENAME TO _pue_comparisons_v2")
-        _apply_schema_statements(c)  # (re)creates the v3-shaped comparisons table + indexes
+        _apply_ddl_statements(c, _PUE_CASES_SCHEMA)  # unchanged; idempotent
+        # Table only here, deliberately *not* its indexes yet: ``ALTER
+        # TABLE ... RENAME`` does not rename the indexes that were bound
+        # to the old v2 table - they keep their original names (e.g.
+        # idx_pue_comparisons_listing) and now belong to
+        # ``_pue_comparisons_v2``. If the v3 indexes (identically named)
+        # were created now, ``CREATE INDEX IF NOT EXISTS`` would silently
+        # no-op for every name that still collides with an old index -
+        # index names are unique per schema, not per table - leaving the
+        # final table missing those indexes entirely once the old table
+        # (and its indexes) is dropped below. Creating them only *after*
+        # the drop, once every colliding old name is gone, avoids this.
+        _apply_ddl_statements(c, _PUE_COMPARISONS_TABLE_SCHEMA)
 
         for row in old_rows:
             comparison_id = str(uuid.uuid4())
@@ -340,6 +373,11 @@ def _migrate_v2_to_v3(conn: sqlite3.Connection) -> None:
             )
 
         c.execute("DROP TABLE _pue_comparisons_v2")
+
+        # Only now - after the old table and every index still bound to
+        # its old names are gone - are the v3 indexes safe to create
+        # without a silent no-op (see the note above).
+        _apply_ddl_statements(c, _PUE_COMPARISONS_INDEXES_SCHEMA)
 
         # ``PRAGMA foreign_key_check`` works regardless of whether FK
         # enforcement is currently on or off, so it can safely run
