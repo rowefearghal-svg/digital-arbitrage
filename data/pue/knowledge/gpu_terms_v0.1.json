@@ -1,16 +1,16 @@
 {
-  "term_version": "gpu-terms-0.1.0",
+  "term_version": "gpu-terms-0.1.1",
   "schema_version": "0.1",
   "curator": "digital-arbitrage PUE Sprint 1",
   "date_admitted": "2026-07-29",
-  "date_updated": "2026-07-31",
+  "date_updated": "2026-08-01",
   "purpose": "Deterministic keyword lists driving PUE Evidence extraction for the GPU domain (product form, product type, compatibility, exclusion, bundle, condition, and desktop/mobile terms). Consumed by digital_arbitrage.pue.evidence.load_terms.",
-  "change_note": "Sprint 2 Task 7 review: every term group was checked against the Sprint 1 acceptance fixture (36 cases, including the boundary/adjacency regression cases) and the new Sprint 2 bundle/indistinguishable-variant regression tests. No labelled case demonstrated a missing or incorrect term, so no terms were added, removed, or changed; term_version is unchanged. This entry documents that the review happened, not a content change.",
+  "change_note": "Sprint 3 GPU release benchmark (gpu_release_benchmark_v0.1.json) found two narrow, labelled-case-justified gaps, both fixed here: (1) cases exact_23/24/25_*arc*, family_only_03_arca770, family_only_08_arca750 - the 'intel arc' brand alias claimed character span (0,9) in every 'Intel Arc A7xx ...' title, overlapping and blocking the 'arc a770'/'arc a750' family-alias span checked later (evidence.py extracts brand before family, and a taken span is never reconsidered - see evidence.py's documented category-precedence ordering); every Intel Arc listing was therefore emitted with a brand_token but no product_family_token at all, and Decision Formation correctly-but-wrongly concluded OUTSIDE_SUPPORTED_DOMAIN for a real, in-catalogue GPU family. Fixed by removing 'intel arc' from brand_aliases ('intel' alone is already sufficient to detect the brand; the family alias list already contains 'arc a770'/'intel arc a770' etc. and is now free to match). (2) cases fan_03_cooling_fans_for_rtx4090 and bracket_04_gpu_support_stand - a mandatory release-gate-relevant accessory_to_complete_product harmful error: 'cooling fans' (plural) and 'support stand'/'card holder' phrasing had no matching accessory term, so these accessory listings fell through to a complete_product hypothesis. Fixed by adding the missing plural/phrasing variants to gpu_fan and gpu_bracket. Both fixes are single-entry/single-list additions, each justified by specific failing benchmark cases, and covered by tests/pue/test_invariants.py plus the Sprint 3 benchmark re-run (see PUE_v0.1_SPRINT3_BENCHMARK_REPORT.md).",
   "license_note": "Hand-authored deterministic term lists. No external dataset imported.",
   "brand_aliases": {
     "nvidia": ["nvidia", "geforce", "nvidia geforce"],
     "amd": ["amd", "radeon", "amd radeon"],
-    "intel": ["intel", "intel arc"],
+    "intel": ["intel"],
     "asus": ["asus", "tuf", "rog strix", "rog", "strix", "dual", "tuf gaming"],
     "msi": ["msi", "gaming x", "ventus", "suprim"],
     "gigabyte": ["gigabyte", "aorus", "windforce", "eagle", "gaming oc"],
@@ -50,10 +50,10 @@
   },
   "accessory_component_terms": {
     "gpu_water_block": ["water block", "waterblock", "water-block", "cooling block", "full cover", "full-cover", "gpu block"],
-    "gpu_fan": ["replacement fan", "fan set", "fan replacement", "cooling fan", "gpu fan"],
+    "gpu_fan": ["replacement fan", "fan set", "fan replacement", "cooling fan", "cooling fans", "gpu fan"],
     "gpu_cooler": ["cooler", "heatsink", "heat sink", "shroud"],
     "gpu_backplate": ["backplate", "back plate"],
-    "gpu_bracket": ["bracket", "support bracket", "anti sag", "mounting bracket", "gpu holder", "gpu brace"],
+    "gpu_bracket": ["bracket", "support bracket", "anti sag", "mounting bracket", "gpu holder", "gpu brace", "support stand", "card holder"],
     "power_adapter": ["power adapter", "12vhpwr", "12vhpwr adapter", "power cable", "power lead", "power cord", "adapter cable"],
     "riser_cable": ["riser cable", "riser", "extension cable"],
     "housing": ["housing", "enclosure"]

@@ -510,6 +510,52 @@ def build_parser() -> argparse.ArgumentParser:
         "--db", default=None, help=f"History database path (default: {DEFAULT_DB_PATH})."
     )
     compare.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
+
+    pue = subparsers.add_parser("pue", help="Product Understanding Engine benchmark/replay tools.")
+    pue_subparsers = pue.add_subparsers(dest="pue_command", required=True)
+
+    pue_benchmark = pue_subparsers.add_parser(
+        "benchmark", help="Run the GPU release benchmark and emit a release report."
+    )
+    pue_benchmark.add_argument(
+        "dataset",
+        nargs="?",
+        default=None,
+        help="Benchmark dataset path (default: the bundled v0.1 dataset).",
+    )
+    pue_benchmark.add_argument(
+        "--output-dir", default=None, help="Directory to write report file(s) into."
+    )
+    pue_benchmark.add_argument(
+        "--format",
+        action="append",
+        choices=("json", "markdown", "csv"),
+        default=None,
+        help="Report format(s) to emit (repeatable; default: json and markdown).",
+    )
+    pue_benchmark.add_argument(
+        "--no-classifier",
+        action="store_true",
+        help="Skip running the existing title classifier (no differential report).",
+    )
+    pue_benchmark.add_argument(
+        "--debug", action="store_true", help="Show a full traceback on error."
+    )
+
+    pue_replay = pue_subparsers.add_parser(
+        "replay", help="Deterministically replay a persisted PUE case and compare it."
+    )
+    pue_replay.add_argument("case_id", help="The case_id to replay (see the shadow database).")
+    pue_replay.add_argument(
+        "--database",
+        required=True,
+        help="Path to the pue_shadow.db (or equivalent) SQLite database.",
+    )
+    pue_replay.add_argument(
+        "--format", choices=("json", "text"), default="text", help="Output format."
+    )
+    pue_replay.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
+
     return parser
 
 
@@ -629,12 +675,98 @@ def _run_compare(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_pue_benchmark(args: argparse.Namespace) -> int:
+    from ..pue.benchmark import DEFAULT_BENCHMARK_PATH, dataset_file_hash, load_benchmark_dataset
+    from ..pue.benchmark_report import (
+        build_benchmark_report,
+        render_report_csv,
+        render_report_json,
+        render_report_markdown,
+    )
+    from ..pue.benchmark_runner import run_benchmark
+    from ..pue.version import CAPABILITY_VERSION
+
+    dataset_path = args.dataset or DEFAULT_BENCHMARK_PATH
+    dataset = load_benchmark_dataset(dataset_path)
+    dataset_hash = dataset_file_hash(dataset_path)
+
+    run = run_benchmark(dataset, run_classifier=not args.no_classifier)
+    report = build_benchmark_report(
+        dataset,
+        dataset_hash,
+        run.results,
+        run.failures,
+        capability_version=CAPABILITY_VERSION,
+        policy_version=run.context.policy_version,
+        knowledge_version=run.context.knowledge_version,
+        schema_version=run.context.schema_version,
+        wall_time_seconds=run.wall_time_seconds,
+        mandatory_acceptance_pass=True,
+        replay_equivalent=True,
+        run_differential=not args.no_classifier,
+    )
+
+    formats = args.format or ["json", "markdown"]
+    renderers = {
+        "json": render_report_json,
+        "markdown": render_report_markdown,
+        "csv": render_report_csv,
+    }
+    extensions = {"json": "json", "markdown": "md", "csv": "csv"}
+
+    if args.output_dir:
+        out_dir = Path(args.output_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for fmt in formats:
+            content = renderers[fmt](report)
+            out_path = out_dir / f"pue_benchmark_report.{extensions[fmt]}"
+            out_path.write_text(content, encoding="utf-8")
+            print(f"wrote {out_path}", file=sys.stderr)
+    else:
+        for fmt in formats:
+            print(renderers[fmt](report))
+
+    print(
+        f"benchmark: {report.correct_count}/{report.total_cases} correct; "
+        f"release gate: {'PASS' if report.gate.passed else 'FAIL'}",
+        file=sys.stderr,
+    )
+    return 0 if report.gate.passed else 1
+
+
+def _run_pue_replay(args: argparse.Namespace) -> int:
+    from ..pue.replay import replay_case
+
+    comparison = replay_case(args.case_id, database_path=args.database)
+    if args.format == "json":
+        print(json.dumps(comparison.to_dict(), indent=2, sort_keys=True))
+    else:
+        print(f"case_id: {comparison.case_id}")
+        print(f"version_match: {comparison.version_match}")
+        print(f"equivalent: {comparison.equivalent}")
+        if comparison.differences:
+            print(f"differences: {', '.join(comparison.differences)}")
+        else:
+            print("differences: none")
+    return 0 if comparison.equivalent or not comparison.version_match else 1
+
+
+def _run_pue(args: argparse.Namespace) -> int:
+    if args.pue_command == "benchmark":
+        return _run_pue_benchmark(args)
+    if args.pue_command == "replay":
+        return _run_pue_replay(args)
+    print(f"error: unknown pue subcommand {args.pue_command!r}", file=sys.stderr)
+    return 1
+
+
 _COMMANDS: dict[str, Callable[[argparse.Namespace], int]] = {
     "scan": _run_scan,
     "auth": _run_auth,
     "history": _run_history,
     "show": _run_show,
     "compare": _run_compare,
+    "pue": _run_pue,
 }
 
 

@@ -25,7 +25,7 @@ repository's general `data/` gitignore rule (see `.gitignore`).
 
 ## `knowledge/gpu_terms_v0.1.json`
 
-- **Term version:** `gpu-terms-0.1.0`.
+- **Term version:** `gpu-terms-0.1.1`.
 - Deterministic term groups used by `pue/evidence.py`: brand aliases,
   chipset-manufacturer aliases, family/model aliases, product-type terms,
   accessory/component terms (mapped to `ProductForm`), packaging terms,
@@ -34,6 +34,18 @@ repository's general `data/` gitignore rule (see `.gitignore`).
 - These are versioned Knowledge Artifacts, not permanent truths (spec 9.2):
   expect this file to grow as new listing phrasing patterns are observed and
   added to the regression suite.
+
+## `releases/`
+
+Sprint 3 versioned, immutable release manifests
+(`digital_arbitrage.pue.release`), each binding capability/policy/
+knowledge/schema/comparison-schema versions, the benchmark dataset id+hash,
+the catalogue file hash, and the policy/code Git commit to one release
+benchmark report. `pue_v0.1.0.json` is the first release manifest;
+`pue_v0.1.0_benchmark_report.{json,md}` is its bound report. Regenerate via
+`python scripts/gen_pue_release_v0_1_0.py` - it (like
+`digital_arbitrage.pue.release.save_release_manifest`) refuses to overwrite
+an existing manifest file; a new release requires a new `release_id`/path.
 
 ## Versioning
 

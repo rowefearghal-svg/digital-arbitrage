@@ -1,0 +1,2938 @@
+{
+  "dataset_schema_version": "pue-benchmark-dataset-0.1.0",
+  "dataset_id": "gpu-release-benchmark-v0.1",
+  "benchmark_version": "gpu-release-benchmark-0.1.0",
+  "created_date": "2026-07-31",
+  "curator": "digital-arbitrage PUE Sprint 3",
+  "domain": "gpu",
+  "knowledge_version": "gpu-seed-0.1.0",
+  "policy_version": "gpu-policy-0.1.0",
+  "provenance_note": "Hand-authored, synthetic benchmark for local PUE v0.1 evaluation. Titles are either drawn verbatim from the seed catalogue (data/pue/catalogues/gpu_seed_v0.1.json) for exact-identification coverage, or hand-constructed to exercise a specific reasoning behaviour (accessory/packaging/bundle/ambiguity/domain/contradiction handling). No live marketplace data was scraped or imported. Gold labels were authored independently of the current PUE implementation's output, per Sprint 3 label-integrity rules (see BenchmarkDataset docstring / brief section 4.4).",
+  "corrections": [],
+  "cases": [
+    {
+      "case_id": "exact_01_rtx4090_fe",
+      "title": "NVIDIA GeForce RTX 4090 Founders Edition 24GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "nvidia"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-nvidia-rtx4090-fe"
+      ],
+      "expected_identified_family": "rtx 4090",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_02_asus_tuf_rtx4090",
+      "title": "ASUS TUF Gaming GeForce RTX 4090 OC 24GB TUF-RTX4090-O24G",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-asus-tuf-rtx4090-o24g"
+      ],
+      "expected_identified_family": "rtx 4090",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "expected_identification_levels": [
+        "exact_catalogue_product"
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_03_asus_rog_rtx4090",
+      "title": "ASUS ROG Strix GeForce RTX 4090 OC 24GB ROG-STRIX-RTX4090-O24G-GAMING",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-asus-rog-strix-rtx4090-o24g"
+      ],
+      "expected_identified_family": "rtx 4090",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "expected_identification_levels": [
+        "exact_catalogue_product"
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_04_msi_rtx4090_trio",
+      "title": "MSI GeForce RTX 4090 Gaming X Trio 24GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "msi"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-msi-rtx4090-gamingx-trio"
+      ],
+      "expected_identified_family": "rtx 4090",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_05_gigabyte_rtx4090_master",
+      "title": "GIGABYTE AORUS GeForce RTX 4090 Master 24GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "gigabyte"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-gigabyte-aorus-rtx4090-master"
+      ],
+      "expected_identified_family": "rtx 4090",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_06_zotac_rtx4090_trinity",
+      "title": "ZOTAC Gaming GeForce RTX 4090 Trinity OC 24GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "zotac"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-zotac-rtx4090-trinity-oc"
+      ],
+      "expected_identified_family": "rtx 4090",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_07_rtx4080_fe",
+      "title": "NVIDIA GeForce RTX 4080 Founders Edition 16GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "nvidia"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-nvidia-rtx4080-fe"
+      ],
+      "expected_identified_family": "rtx 4080",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_08_asus_tuf_rtx4080super",
+      "title": "ASUS TUF Gaming GeForce RTX 4080 SUPER OC 16GB TUF-RTX4080S-O16G-GAMING",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-asus-tuf-rtx4080super-oc"
+      ],
+      "expected_identified_family": "rtx 4080 super",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "expected_identification_levels": [
+        "exact_catalogue_product"
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_09_msi_rtx4080super_trio",
+      "title": "MSI GeForce RTX 4080 SUPER Gaming X Trio 16GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "msi"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-msi-rtx4080super-gamingx-trio"
+      ],
+      "expected_identified_family": "rtx 4080 super",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_10_rtx4070_fe",
+      "title": "NVIDIA GeForce RTX 4070 Founders Edition 12GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "nvidia"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-nvidia-rtx4070-fe"
+      ],
+      "expected_identified_family": "rtx 4070",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_11_asus_dual_rtx4070",
+      "title": "ASUS Dual GeForce RTX 4070 OC 12GB DUAL-RTX4070-O12G",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-asus-dual-rtx4070-oc"
+      ],
+      "expected_identified_family": "rtx 4070",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "expected_identification_levels": [
+        "exact_catalogue_product"
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_12_msi_rtx4070tisuper_trio",
+      "title": "MSI GeForce RTX 4070 Ti SUPER Gaming X Trio 16GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "msi"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-msi-rtx4070tisuper-gamingx-trio"
+      ],
+      "expected_identified_family": "rtx 4070 ti super",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_13_asus_dual_rtx3060_8g",
+      "title": "ASUS Dual GeForce RTX 3060 OC 8GB DUAL-RTX3060-O8G-V2",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-asus-dual-rtx3060-oc-8g"
+      ],
+      "expected_identified_family": "rtx 3060",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "expected_identification_levels": [
+        "exact_catalogue_product"
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_14_asus_dual_rtx3060_12g",
+      "title": "ASUS Dual GeForce RTX 3060 OC 12GB DUAL-RTX3060-O12G-V2",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-asus-dual-rtx3060-oc-12g"
+      ],
+      "expected_identified_family": "rtx 3060",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "expected_identification_levels": [
+        "exact_catalogue_product"
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_15_msi_rtx3060_gamingx_8g",
+      "title": "MSI GeForce RTX 3060 Gaming X 8GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "msi"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-msi-gamingx-rtx3060-8g"
+      ],
+      "expected_identified_family": "rtx 3060",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_16_msi_rtx3060_ventus_12g",
+      "title": "MSI GeForce RTX 3060 Ventus 2X 12GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "msi"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-msi-ventus-rtx3060-12g"
+      ],
+      "expected_identified_family": "rtx 3060",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_17_gigabyte_rtx3060_windforce",
+      "title": "GIGABYTE GeForce RTX 3060 WINDFORCE OC 12GB GV-N3060WF2OC-12GD",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "gigabyte"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-gigabyte-windforce-rtx3060-12g"
+      ],
+      "expected_identified_family": "rtx 3060",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "expected_identification_levels": [
+        "exact_catalogue_product"
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_18_amd_rx7900xtx_reference",
+      "title": "AMD Radeon RX 7900 XTX Reference 24GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "amd"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-amd-rx7900xtx-reference"
+      ],
+      "expected_identified_family": "rx 7900 xtx",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_19_sapphire_rx7900xtx_nitro",
+      "title": "SAPPHIRE Nitro+ Radeon RX 7900 XTX 24GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "sapphire"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-sapphire-nitro-rx7900xtx"
+      ],
+      "expected_identified_family": "rx 7900 xtx",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_20_powercolor_rx7900xtx_reddevil",
+      "title": "PowerColor Red Devil Radeon RX 7900 XTX 24GB RX 7900 XTX 24G-E/OC",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "powercolor"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-powercolor-reddevil-rx7900xtx"
+      ],
+      "expected_identified_family": "rx 7900 xtx",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_21_amd_rx7800xt_reference",
+      "title": "AMD Radeon RX 7800 XT Reference 16GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "amd"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-amd-rx7800xt-reference"
+      ],
+      "expected_identified_family": "rx 7800 xt",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_22_sapphire_rx7800xt_nitro",
+      "title": "SAPPHIRE Nitro+ Radeon RX 7800 XT 16GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "sapphire"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-sapphire-nitro-rx7800xt"
+      ],
+      "expected_identified_family": "rx 7800 xt",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_23_intel_arca770_le",
+      "title": "Intel Arc A770 Limited Edition 16GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "intel"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-intel-arca770-le-16g"
+      ],
+      "expected_identified_family": "arc a770",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_24_asrock_arca770_phantom",
+      "title": "ASRock Intel Arc A770 Phantom Gaming 16GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asrock"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-asrock-arca770-phantom-16g"
+      ],
+      "expected_identified_family": "arc a770",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_25_intel_arca750_le",
+      "title": "Intel Arc A750 Limited Edition 8GB",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "intel"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-intel-arca750-le-8g"
+      ],
+      "expected_identified_family": "arc a750",
+      "required_evidence_types": [
+        "product_family_token"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "ambig_01_rtx3060_12gb_no_brand",
+      "title": "RTX 3060 12GB Graphics Card",
+      "case_tags": [
+        "indistinguishable_variants",
+        "board_partner_ambiguity"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "expected_identified_family": "rtx 3060",
+      "acceptable_catalogue_product_ids": [
+        "gpu-asus-dual-rtx3060-oc-12g",
+        "gpu-msi-ventus-rtx3060-12g",
+        "gpu-gigabyte-windforce-rtx3060-12g"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "ambig_02_rtx4090_no_brand",
+      "title": "NVIDIA RTX 4090 24GB Graphics Card",
+      "case_tags": [
+        "indistinguishable_variants",
+        "board_partner_ambiguity",
+        "family_only"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain",
+        "identified"
+      ],
+      "expected_identification_levels": [
+        "model",
+        "family"
+      ],
+      "expected_identified_family": "rtx 4090",
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "family_only_01_rtx4090",
+      "title": "NVIDIA RTX 4090",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain",
+        "abstained",
+        "identified"
+      ],
+      "expected_identification_levels": [
+        "model"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "family_only_02_rx7900xtx",
+      "title": "AMD RX 7900 XTX",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain",
+        "abstained"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "family_only_03_arca770",
+      "title": "Intel Arc A770",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain",
+        "abstained"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "family_only_04_rtx3060",
+      "title": "RTX 3060 Graphics Card",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "partially_identified",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "mobile_01_rtx4090_laptop_gpu",
+      "title": "NVIDIA GeForce RTX 4090 Laptop GPU",
+      "case_tags": [
+        "mobile_vs_desktop"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "acceptable_catalogue_product_ids": [
+        "gpu-nvidia-rtx4090-laptop"
+      ],
+      "forbidden_catalogue_product_ids": [
+        "gpu-nvidia-rtx4090-fe",
+        "gpu-asus-tuf-rtx4090-o24g",
+        "gpu-asus-rog-strix-rtx4090-o24g",
+        "gpu-msi-rtx4090-gamingx-trio",
+        "gpu-gigabyte-aorus-rtx4090-master",
+        "gpu-zotac-rtx4090-trinity-oc"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "mobile_02_dell_laptop_with_rtx4090",
+      "title": "Dell Gaming Laptop with NVIDIA RTX 4090 Mobile Graphics",
+      "case_tags": [
+        "mobile_vs_desktop"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "partially_identified",
+        "classified",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "forbidden_catalogue_product_ids": [
+        "gpu-nvidia-rtx4090-fe",
+        "gpu-asus-tuf-rtx4090-o24g",
+        "gpu-asus-rog-strix-rtx4090-o24g"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "mobile_03_rtx4090_desktop_vs_laptop_conflict",
+      "title": "RTX 4090 Laptop GPU - NOT the desktop Founders Edition card",
+      "case_tags": [
+        "mobile_vs_desktop",
+        "family_conflict"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_catalogue_product_ids": [
+        "gpu-nvidia-rtx4090-fe"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "waterblock_01_ek_quantum_vector2",
+      "title": "EK Quantum Vector2 RTX 4090 Water Block Full Cover",
+      "case_tags": [
+        "water_block",
+        "component"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified",
+        "identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "expected_product_form": "component",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ],
+      "require_hard_rejected_candidate": true,
+      "required_evidence_types": [
+        "product_form_term"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "waterblock_02_generic_rtx4090",
+      "title": "RTX 4090 Waterblock Full Cover GPU Cooling Block",
+      "case_tags": [
+        "water_block",
+        "component"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "expected_product_form": "component",
+      "require_hard_rejected_candidate": true,
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "waterblock_03_bykski",
+      "title": "Bykski RTX 4090 Full Cover GPU Water Block",
+      "case_tags": [
+        "water_block",
+        "component"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified",
+        "identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "expected_product_form": "component",
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "waterblock_04_gpu_not_included",
+      "title": "RTX 4090 GPU not included - water block only",
+      "case_tags": [
+        "water_block",
+        "gpu_not_included"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "required_evidence_types": [
+        "exclusion_term",
+        "product_form_term"
+      ],
+      "require_hard_rejected_candidate": true,
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 3,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "fan_01_asus_tuf_rtx4090_fan_set",
+      "title": "ASUS TUF Gaming RTX 4090 Replacement Fan Set",
+      "case_tags": [
+        "replacement_fan",
+        "replacement_part"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified",
+        "identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "expected_product_form": "replacement_part",
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "fan_02_generic_rtx4090_fan",
+      "title": "RTX 4090 replacement fan set",
+      "case_tags": [
+        "replacement_fan",
+        "replacement_part"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "expected_product_form": "replacement_part",
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "fan_03_cooling_fans_for_rtx4090",
+      "title": "Replacement cooling fans for RTX 4090 graphics card - fits ASUS TUF",
+      "case_tags": [
+        "replacement_fan",
+        "replacement_part"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "expected_product_form": "replacement_part",
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "backplate_01_nvidia_rtx4090_fe",
+      "title": "NVIDIA GeForce RTX 4090 Founders Edition Backplate",
+      "case_tags": [
+        "backplate",
+        "replacement_part"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified",
+        "identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "expected_product_form": "replacement_part",
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "backplate_02_generic_rtx4090",
+      "title": "RTX 4090 Founders Edition backplate replacement part - GPU not included",
+      "case_tags": [
+        "backplate",
+        "replacement_part",
+        "gpu_not_included"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "adapter_01_12vhpwr",
+      "title": "12VHPWR PCIe 5.0 Power Adapter Cable for RTX 40-Series",
+      "case_tags": [
+        "power_cable",
+        "compatible_item"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "adapter_02_generic_power_cable",
+      "title": "12VHPWR power adapter for RTX 4090",
+      "case_tags": [
+        "power_cable",
+        "compatible_item"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "bracket_01_universal_anti_sag",
+      "title": "Universal GPU Anti-Sag Support Bracket",
+      "case_tags": [
+        "bracket",
+        "accessory"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "expected_product_form": "accessory",
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "bracket_02_riser_cable",
+      "title": "Generic PCIe Riser Cable Compatible with RTX 4090",
+      "case_tags": [
+        "compatible_accessory"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "bracket_03_gpu_support_brace",
+      "title": "Graphics card brace / anti sag bracket, fits most GPUs",
+      "case_tags": [
+        "bracket",
+        "accessory"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "packaging_01_empty_box",
+      "title": "Empty RTX 4090 Founders Edition Box Only",
+      "case_tags": [
+        "empty_box",
+        "packaging_only"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "expected_product_form": "packaging_only",
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ],
+      "required_evidence_types": [
+        "packaging_term"
+      ],
+      "forbidden_harmful_outcomes": [
+        "packaging_to_complete_product"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "packaging_02_box_only_no_card",
+      "title": "RTX 4090 FE box only - no graphics card included",
+      "case_tags": [
+        "empty_box",
+        "packaging_only",
+        "gpu_not_included"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "expected_product_form": "packaging_only",
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "packaging_to_complete_product"
+      ],
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "packaging_03_retail_box_asus_tuf",
+      "title": "ASUS TUF RTX 4090 retail packaging box only, empty",
+      "case_tags": [
+        "empty_box",
+        "packaging_only"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "packaging_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "damaged_01_for_parts_rtx4090",
+      "title": "ASUS TUF RTX 4090 - for parts or repair, not working",
+      "case_tags": [
+        "incomplete_damaged",
+        "for_parts"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "damaged_02_cracked_pcb",
+      "title": "NVIDIA RTX 4080 Founders Edition - cracked PCB, for parts only",
+      "case_tags": [
+        "incomplete_damaged",
+        "for_parts"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "damaged_03_missing_fans_incomplete",
+      "title": "MSI RTX 4090 Gaming X Trio - missing fans, incomplete, sold as-is",
+      "case_tags": [
+        "incomplete_damaged"
+      ],
+      "annotation_confidence": "low",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "not_included_01_case_only",
+      "title": "RTX 4090 graphics card box and manual only, GPU not included",
+      "case_tags": [
+        "gpu_not_included"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "required_evidence_types": [
+        "exclusion_term"
+      ],
+      "forbidden_harmful_outcomes": [
+        "packaging_to_complete_product",
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "not_included_02_bracket_only",
+      "title": "RTX 4090 support bracket only, card not included",
+      "case_tags": [
+        "gpu_not_included",
+        "bracket"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "compat_01_case_fits_rtx4090",
+      "title": "PC Case - fits RTX 4090 and other large graphics cards",
+      "case_tags": [
+        "compatibility_only"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "compat_02_cooler_compatible",
+      "title": "Aftermarket GPU cooler, compatible with RTX 4090 reference PCB",
+      "case_tags": [
+        "compatibility_only"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "bundle_01_rtx4090_psu",
+      "title": "ASUS TUF Gaming RTX 4090 OC 24GB + 1000W PSU Bundle",
+      "case_tags": [
+        "bundle"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "bundle_02_rtx4090_with_waterblock",
+      "title": "ASUS RTX 4090 with EK water block",
+      "case_tags": [
+        "bundle",
+        "ambiguous_title"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "classified",
+        "partially_identified"
+      ],
+      "require_multiple_hypotheses": true,
+      "min_evidence_count": 3,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "bundle_03_gpu_and_riser",
+      "title": "MSI RTX 4090 Gaming X Trio bundled with PCIe riser cable",
+      "case_tags": [
+        "bundle"
+      ],
+      "annotation_confidence": "low",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "gap_01_rx6800xt",
+      "title": "AMD Radeon RX 6800 XT 16GB",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified",
+        "classified",
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "catalogue_gap": true,
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "gap_02_rtx4060",
+      "title": "NVIDIA GeForce RTX 4060 8GB",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified",
+        "classified",
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "catalogue_gap": true,
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "gap_03_gtx1660super",
+      "title": "NVIDIA GeForce GTX 1660 SUPER 6GB",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified",
+        "classified",
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "catalogue_gap": true,
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "gap_04_arca580",
+      "title": "Intel Arc A580 8GB",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified",
+        "classified",
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "catalogue_gap": true,
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "zero_candidate_01_unknown_brand",
+      "title": "UnknownBrandXYZ Graphics Card Model Q9000",
+      "case_tags": [
+        "zero_candidate"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified",
+        "abstained",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "zero_candidate_02_gpu_generic_no_specifics",
+      "title": "Graphics card, used, works fine",
+      "case_tags": [
+        "zero_candidate"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified",
+        "abstained"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "ambiguous_01_rtx3060_board_partner",
+      "title": "RTX 3060 12GB",
+      "case_tags": [
+        "genuinely_ambiguous"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "ambiguous_02_gpu_or_waterblock",
+      "title": "RTX 4090 with cooling upgrade installed",
+      "case_tags": [
+        "genuinely_ambiguous"
+      ],
+      "annotation_confidence": "low",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "abstain_01_contradiction",
+      "title": "RTX 4090 (actually RTX 4080, relisted by mistake)",
+      "case_tags": [
+        "justified_abstention",
+        "family_conflict"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "abstained",
+        "ambiguous"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "abstain_02_low_quality_title",
+      "title": "gpu 4090 good condition dm me",
+      "case_tags": [
+        "justified_abstention",
+        "source_quality"
+      ],
+      "annotation_confidence": "low",
+      "allowed_decision_types": [
+        "partially_identified",
+        "classified",
+        "abstained"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "domain_01_phone",
+      "title": "Samsung Galaxy S23 Ultra 256GB",
+      "case_tags": [
+        "unsupported_domain"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "unsupported_domain": true,
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "domain_02_ambiguous_short",
+      "title": "Samsung?",
+      "case_tags": [
+        "unsupported_domain"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "unsupported_domain": true,
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "domain_03_iphone_charger",
+      "title": "Apple iPhone 15 Charger Cable USB-C 1m",
+      "case_tags": [
+        "unsupported_domain"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "unsupported_domain": true,
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "conflict_01_title_structured",
+      "title": "NVIDIA GeForce RTX 4090 Founders Edition 24GB",
+      "structured_attributes": {
+        "model": "RTX 4080"
+      },
+      "case_tags": [
+        "family_conflict"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "abstained"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "acceptable_abstention_reasons": [
+        "unresolved_contradiction"
+      ],
+      "min_evidence_count": 3,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "conflict_02_brand_mismatch",
+      "title": "ASUS TUF Gaming GeForce RTX 4090 OC 24GB",
+      "structured_attributes": {
+        "brand": "MSI"
+      },
+      "case_tags": [
+        "family_conflict"
+      ],
+      "annotation_confidence": "low",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "abstained",
+        "classified"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "misleading_01_mousepad",
+      "title": "RTX 4090 Gaming Mouse Pad XXL - Extended Desk Mat",
+      "case_tags": [
+        "misleading_similarity"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified",
+        "ambiguous",
+        "abstained"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "misleading_02_tshirt",
+      "title": "RTX 4090 Graphics Card Logo T-Shirt, Large",
+      "case_tags": [
+        "misleading_similarity"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified",
+        "ambiguous",
+        "abstained"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "edge_01_empty_title",
+      "title": " ",
+      "case_tags": [
+        "edge_case",
+        "empty_title"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "edge_02_malformed_input",
+      "title": null,
+      "malformed": true,
+      "case_tags": [
+        "edge_case",
+        "technical_failure"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "processing_failed"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "abstained"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_alias_01_asus_tuf_rtx4090_mpn",
+      "title": "ASUS TUF RTX 4090 OC TUF-RTX4090-O24G",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-asus-tuf-rtx4090-o24g"
+      ],
+      "expected_identified_family": "rtx 4090",
+      "min_evidence_count": 2,
+      "expected_identification_levels": [
+        "exact_catalogue_product"
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_alias_02_gigabyte_aorus_mpn",
+      "title": "GIGABYTE AORUS RTX 4090 Master GV-N4090AORUS M-24GD",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-gigabyte-aorus-rtx4090-master"
+      ],
+      "expected_identified_family": "rtx 4090",
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_alias_03_zotac_trinity_mpn",
+      "title": "ZOTAC RTX 4090 Trinity OC ZT-D40900J-10P",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-zotac-rtx4090-trinity-oc"
+      ],
+      "expected_identified_family": "rtx 4090",
+      "min_evidence_count": 2,
+      "expected_identification_levels": [
+        "exact_catalogue_product"
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_alias_04_sapphire_nitro_rx7900xtx_mpn",
+      "title": "SAPPHIRE Nitro+ RX 7900 XTX 11322-01-20G",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-sapphire-nitro-rx7900xtx"
+      ],
+      "expected_identified_family": "rx 7900 xtx",
+      "min_evidence_count": 2,
+      "expected_identification_levels": [
+        "exact_catalogue_product"
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_alias_05_asrock_arc_a770_mpn",
+      "title": "ASRock Arc A770 Phantom Gaming ARC A770 PG 16GO",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-asrock-arca770-phantom-16g"
+      ],
+      "expected_identified_family": "arc a770",
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_alias_06_msi_rtx3060_ventus_mpn",
+      "title": "MSI RTX 3060 Ventus 2X 12G RTX 3060 VENTUS 2X 12G",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-msi-ventus-rtx3060-12g"
+      ],
+      "expected_identified_family": "rtx 3060",
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_alias_07_asus_dual_rtx4070_mpn",
+      "title": "ASUS Dual RTX 4070 DUAL-RTX4070-O12G",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-asus-dual-rtx4070-oc"
+      ],
+      "expected_identified_family": "rtx 4070",
+      "min_evidence_count": 2,
+      "expected_identification_levels": [
+        "exact_catalogue_product"
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "exact_alias_08_powercolor_reddevil_mpn",
+      "title": "PowerColor Red Devil RX 7900 XTX RX 7900 XTX 24G-E/OC",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "difficulty": "easy",
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "ambiguous",
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "expected_product_form": "complete_product",
+      "acceptable_catalogue_product_ids": [
+        "gpu-powercolor-reddevil-rx7900xtx"
+      ],
+      "expected_identified_family": "rx 7900 xtx",
+      "min_evidence_count": 2,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "family_only_05_rtx4080",
+      "title": "NVIDIA RTX 4080",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain",
+        "abstained",
+        "identified"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "family_only_06_rtx4070",
+      "title": "RTX 4070 Graphics Card",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain",
+        "abstained",
+        "identified"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "family_only_07_rx7800xt",
+      "title": "AMD RX 7800 XT",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain",
+        "abstained",
+        "identified"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "family_only_08_arca750",
+      "title": "Intel Arc A750",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain",
+        "abstained",
+        "identified"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "family_only_09_rtx3060_8gb",
+      "title": "RTX 3060 8GB",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain",
+        "abstained",
+        "identified"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "mobile_04_amd_rx7900m",
+      "title": "AMD Radeon RX 7900M Mobile GPU",
+      "case_tags": [
+        "mobile_vs_desktop"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "acceptable_catalogue_product_ids": [
+        "gpu-amd-rx7900m-concept"
+      ],
+      "forbidden_catalogue_product_ids": [
+        "gpu-amd-rx7900xtx-reference",
+        "gpu-sapphire-nitro-rx7900xtx"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "mobile_05_laptop_amd_gpu_generic",
+      "title": "Gaming laptop with AMD RX 7900M graphics, mobile GPU",
+      "case_tags": [
+        "mobile_vs_desktop"
+      ],
+      "annotation_confidence": "low",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "forbidden_catalogue_product_ids": [
+        "gpu-amd-rx7900xtx-reference"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "waterblock_05_full_cover_block_generic",
+      "title": "Full cover water block for graphics card, RTX 4090 compatible",
+      "case_tags": [
+        "water_block",
+        "component"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "fan_04_dual_fan_replacement_kit",
+      "title": "Dual fan replacement kit for RTX 4090 graphics cards",
+      "case_tags": [
+        "replacement_fan",
+        "replacement_part"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "backplate_03_generic_metal",
+      "title": "Metal backplate for RTX 4090 Founders Edition, replacement part",
+      "case_tags": [
+        "backplate",
+        "replacement_part"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "bracket_04_gpu_support_stand",
+      "title": "Adjustable GPU support stand, universal graphics card holder",
+      "case_tags": [
+        "bracket",
+        "accessory"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "expected_product_form": "accessory",
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "adapter_03_riser_cable_variant",
+      "title": "PCIe 4.0 GPU riser cable, compatible with RTX 4090",
+      "case_tags": [
+        "compatible_accessory"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "packaging_04_msi_box_only",
+      "title": "MSI RTX 4090 Gaming X Trio original box only, no card",
+      "case_tags": [
+        "empty_box",
+        "packaging_only",
+        "gpu_not_included"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "packaging_to_complete_product"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "damaged_04_water_damage",
+      "title": "GIGABYTE AORUS RTX 4090 Master - water damaged, untested, for parts",
+      "case_tags": [
+        "incomplete_damaged",
+        "for_parts"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "damaged_05_bent_pins",
+      "title": "AMD RX 7900 XTX Reference - bent PCIe pins, sold for parts",
+      "case_tags": [
+        "incomplete_damaged",
+        "for_parts"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "not_included_03_manual_only",
+      "title": "RTX 4090 instruction manual and accessories only, no GPU",
+      "case_tags": [
+        "gpu_not_included"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "packaging_to_complete_product",
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "compat_03_psu_compatible_wattage",
+      "title": "1000W PSU, recommended for RTX 4090 systems",
+      "case_tags": [
+        "compatibility_only"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified",
+        "ambiguous",
+        "abstained"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "bundle_04_rtx4090_plus_psu_catalogue",
+      "title": "ASUS TUF Gaming RTX 4090 OC 24GB + 1000W PSU Bundle (synthetic concept)",
+      "case_tags": [
+        "bundle"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "acceptable_catalogue_product_ids": [
+        "bundle-asus-tuf-rtx4090-plus-psu"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "bundle_05_two_cards",
+      "title": "Two graphics cards: RTX 4090 and RTX 3060, sold together",
+      "case_tags": [
+        "bundle",
+        "ambiguous_title"
+      ],
+      "annotation_confidence": "low",
+      "allowed_decision_types": [
+        "ambiguous",
+        "partially_identified",
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "gap_05_rtx4090ti",
+      "title": "NVIDIA GeForce RTX 4090 Ti 24GB",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "partially_identified",
+        "classified",
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "catalogue_gap": true,
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "gap_06_rx7600",
+      "title": "AMD Radeon RX 7600 8GB",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "partially_identified",
+        "classified",
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "catalogue_gap": true,
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "gap_07_arcb580",
+      "title": "Intel Arc B580 12GB",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "partially_identified",
+        "classified",
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "catalogue_gap": true,
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "zero_candidate_03_generic_desc",
+      "title": "Great condition, barely used, works perfectly",
+      "case_tags": [
+        "zero_candidate"
+      ],
+      "annotation_confidence": "low",
+      "allowed_decision_types": [
+        "abstained",
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "ambiguous_03_asus_rtx4090_no_variant",
+      "title": "ASUS RTX 4090 24GB",
+      "case_tags": [
+        "genuinely_ambiguous",
+        "board_partner_ambiguity"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "partially_identified",
+        "ambiguous",
+        "identified"
+      ],
+      "forbidden_decision_types": [
+        "outside_supported_domain"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "abstain_03_two_families_conflict",
+      "title": "RTX 4090 / RX 7900 XTX (whichever is in stock)",
+      "case_tags": [
+        "justified_abstention",
+        "family_conflict"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "ambiguous",
+        "abstained"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "domain_04_cpu",
+      "title": "AMD Ryzen 9 7950X3D Desktop CPU Processor",
+      "case_tags": [
+        "unsupported_domain"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "outside_supported_domain"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified",
+        "classified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "unsupported_domain": true,
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "domain_05_motherboard",
+      "title": "ASUS ROG Strix Z790-E Gaming Motherboard",
+      "case_tags": [
+        "unsupported_domain"
+      ],
+      "annotation_confidence": "high",
+      "allowed_decision_types": [
+        "outside_supported_domain",
+        "classified"
+      ],
+      "forbidden_decision_types": [
+        "identified",
+        "partially_identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "unsupported_domain": true,
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "conflict_03_capacity_mismatch",
+      "title": "NVIDIA GeForce RTX 4090 Founders Edition 24GB",
+      "structured_attributes": {
+        "capacity_gb": 16
+      },
+      "case_tags": [
+        "family_conflict"
+      ],
+      "annotation_confidence": "low",
+      "allowed_decision_types": [
+        "identified",
+        "partially_identified",
+        "abstained",
+        "classified"
+      ],
+      "min_evidence_count": 1,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "misleading_03_keychain",
+      "title": "Mini RTX 4090 Graphics Card Keychain Miniature Replica",
+      "case_tags": [
+        "misleading_similarity"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified",
+        "ambiguous",
+        "abstained"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    },
+    {
+      "case_id": "misleading_04_sticker_decal",
+      "title": "RTX 4090 Logo Sticker Decal for PC Case, Vinyl",
+      "case_tags": [
+        "misleading_similarity"
+      ],
+      "annotation_confidence": "medium",
+      "allowed_decision_types": [
+        "classified",
+        "ambiguous",
+        "abstained"
+      ],
+      "forbidden_decision_types": [
+        "identified"
+      ],
+      "forbidden_product_forms": [
+        "complete_product"
+      ],
+      "forbidden_harmful_outcomes": [
+        "accessory_to_complete_product"
+      ],
+      "min_evidence_count": 0,
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+    }
+  ]
+}
