@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from digital_arbitrage.pue.admission import admit_observation
 from digital_arbitrage.pue.enums import EvidenceType
-from digital_arbitrage.pue.evidence import extract_evidence
+from digital_arbitrage.pue.evidence import DEFAULT_TERMS_PATH, extract_evidence, load_terms
 
 from .conftest import make_normalized
 
@@ -12,6 +12,23 @@ from .conftest import make_normalized
 def _extract(title, context):
     obs = admit_observation(make_normalized(title), context)
     return obs, extract_evidence(obs, context)
+
+
+def test_terminology_artifact_has_required_metadata_fields() -> None:
+    """Sprint 2 Task 7: the terminology artifact must record a stable
+    version ID, curator, admission/update date, purpose, and change note -
+    not just the bare term groups."""
+    terms = load_terms(str(DEFAULT_TERMS_PATH))
+    for required_field in (
+        "term_version",
+        "curator",
+        "date_admitted",
+        "date_updated",
+        "purpose",
+        "change_note",
+    ):
+        assert required_field in terms, f"terminology artifact missing {required_field!r}"
+        assert terms[required_field], f"terminology artifact has an empty {required_field!r}"
 
 
 def test_empty_title_yields_no_evidence(deterministic_context) -> None:

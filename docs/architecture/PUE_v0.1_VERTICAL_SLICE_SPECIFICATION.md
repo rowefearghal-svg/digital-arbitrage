@@ -1301,8 +1301,7 @@ class CandidateRepository(Protocol):
         identifier_type: str,
         value: str,
         knowledge_version: str,
-    ) -> Sequence[CatalogueProduct]:
-        ...
+    ) -> Sequence[CatalogueProduct]: ...
 
     def retrieve(
         self,
@@ -1310,8 +1309,7 @@ class CandidateRepository(Protocol):
         query: CandidateQuery,
         limit: int,
         knowledge_version: str,
-    ) -> Sequence[RetrievedCatalogueProduct]:
-        ...
+    ) -> Sequence[RetrievedCatalogueProduct]: ...
 ```
 
 Candidate query:

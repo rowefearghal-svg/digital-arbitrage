@@ -78,7 +78,13 @@ def test_shadow_isolation_does_not_change_classifier_output() -> None:
     with_shadow = classifier.classify(listing, profile)
 
     assert without_shadow == with_shadow
-    assert shadow_result is not None
+    assert len(shadow_result) == 1
+    # The classifier ran exactly the two times above (before and after
+    # shadow execution) - shadow mode itself never re-invokes it - yet a
+    # comparison record is still produced, because it reuses the
+    # already-set ``listing.classification`` from the first call.
+    assert shadow_result[0].comparison is not None
+    assert shadow_result[0].comparison.classifier_label == without_shadow.classification.value
 
 
 def test_shadow_custom_policy_version_is_recorded_end_to_end(tmp_path: Path) -> None:
@@ -94,9 +100,9 @@ def test_shadow_custom_policy_version_is_recorded_end_to_end(tmp_path: Path) -> 
     db_path = tmp_path / "shadow.db"
     config = ShadowConfig(enabled=True, db_path=db_path, policy=custom_policy)
 
-    records = run_pue_shadow([listing], config=config)
-    assert len(records) == 1
-    record = records[0]
+    case_results = run_pue_shadow([listing], config=config)
+    assert len(case_results) == 1
+    record = case_results[0].reasoning_record
     assert record.decision.policy_version == "custom-policy-9.9.9"
 
     with PueCaseStore(db_path) as store:
@@ -138,12 +144,14 @@ def test_repeated_shadow_run_avoids_duplicate_completed_records(tmp_path: Path) 
     second_run = run_pue_shadow([listing], config=config)
     assert len(first_run) == 1
     assert len(second_run) == 1
-    assert first_run[0].case_id != second_run[0].case_id
+    first_record = first_run[0].reasoning_record
+    second_record = second_run[0].reasoning_record
+    assert first_record.case_id != second_record.case_id
 
     with PueCaseStore(db_path) as store:
-        persisted = store.find_by_fingerprint(first_run[0].observation.source_fingerprint)
+        persisted = store.find_by_fingerprint(first_record.observation.source_fingerprint)
     assert len(persisted) == 1
-    assert persisted[0].case_id == first_run[0].case_id
+    assert persisted[0].case_id == first_record.case_id
 
 
 def test_shadow_disabled_by_default_is_a_no_op() -> None:

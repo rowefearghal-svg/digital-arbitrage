@@ -14,6 +14,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from types import TracebackType
 
+from .comparison import ClassifierPueComparison, comparison_from_json, comparison_to_json
 from .enums import (
     AbstentionReason,
     CalibrationStatus,
@@ -50,7 +51,10 @@ from .models import (
 from .validation import PueValidationError, thaw_value
 
 #: Current on-disk schema version for this table (bumped when the DDL changes).
-SCHEMA_VERSION = 1
+#: Bumped to 2 in Sprint 2: added ``pue_classifier_comparisons`` (same
+#: database file, no new database - spec: comparison records persist
+#: alongside Reasoning Records).
+SCHEMA_VERSION = 2
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS pue_cases (
@@ -80,6 +84,27 @@ ON pue_cases(source_fingerprint);
 
 CREATE INDEX IF NOT EXISTS idx_pue_cases_versions
 ON pue_cases(capability_version, policy_version, knowledge_version);
+
+CREATE TABLE IF NOT EXISTS pue_classifier_comparisons (
+    case_id TEXT PRIMARY KEY REFERENCES pue_cases(case_id),
+    provider TEXT NOT NULL,
+    provider_listing_id TEXT NOT NULL,
+    source_fingerprint TEXT NOT NULL,
+    classifier_capability_version TEXT NOT NULL,
+    pue_capability_version TEXT NOT NULL,
+    category TEXT NOT NULL,
+    comparison_json TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_pue_comparisons_listing
+ON pue_classifier_comparisons(provider, provider_listing_id);
+
+CREATE INDEX IF NOT EXISTS idx_pue_comparisons_fingerprint
+ON pue_classifier_comparisons(source_fingerprint);
+
+CREATE INDEX IF NOT EXISTS idx_pue_comparisons_versions
+ON pue_classifier_comparisons(classifier_capability_version, pue_capability_version);
 """
 
 
@@ -641,3 +666,102 @@ class PueCaseStore:
             params = (limit,)
         rows = self._conn.execute(sql, params).fetchall()
         return [row["case_id"] for row in rows]
+
+    # ----------------------------------------------------------------- #
+    # Classifier/PUE comparison records (Sprint 2, Task 1) - same
+    # database file as ``pue_cases``, not a new database.
+    # ----------------------------------------------------------------- #
+    def save_comparison(
+        self,
+        comparison: ClassifierPueComparison,
+        *,
+        created_at: str | None = None,
+        replay: bool = False,
+    ) -> str:
+        """Persist ``comparison``. Raises if ``case_id`` already has a
+        comparison (no overwrite; mirrors :meth:`save_case`).
+
+        Equivalent-record detection mirrors :meth:`save_case`: when
+        ``replay`` is ``False``, a comparison whose ``source_fingerprint``
+        and classifier/PUE version pair already match a previously
+        persisted comparison is rejected, so repeated normal processing of
+        the same listing under the same versions does not accumulate
+        duplicate comparison records.
+        """
+        if self.get_comparison(comparison.case_id) is not None:
+            raise PueValidationError(
+                f"a comparison for case_id {comparison.case_id!r} is already persisted; "
+                "historical records are never overwritten"
+            )
+        if not replay:
+            equivalent = self.find_comparison_equivalent(
+                source_fingerprint=comparison.source_fingerprint,
+                classifier_capability_version=comparison.classifier_capability_version,
+                pue_capability_version=comparison.pue_capability_version,
+            )
+            if equivalent is not None:
+                raise PueValidationError(
+                    "an equivalent comparison already exists for source_fingerprint "
+                    f"{comparison.source_fingerprint!r} under the same classifier/PUE "
+                    f"versions (case_id={equivalent.case_id!r}); pass replay=True to "
+                    "retain another record for explicitly marked replay/evaluation activity"
+                )
+        timestamp = created_at if created_at is not None else _utc_now()
+        with self._conn:
+            self._conn.execute(
+                "INSERT INTO pue_classifier_comparisons ("
+                "case_id, provider, provider_listing_id, source_fingerprint, "
+                "classifier_capability_version, pue_capability_version, category, "
+                "comparison_json, created_at"
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    comparison.case_id,
+                    comparison.provider,
+                    comparison.provider_listing_id,
+                    comparison.source_fingerprint,
+                    comparison.classifier_capability_version,
+                    comparison.pue_capability_version,
+                    comparison.category.value,
+                    comparison_to_json(comparison),
+                    timestamp,
+                ),
+            )
+        return comparison.case_id
+
+    def get_comparison(self, case_id: str) -> ClassifierPueComparison | None:
+        row = self._conn.execute(
+            "SELECT comparison_json FROM pue_classifier_comparisons WHERE case_id = ?",
+            (case_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        return comparison_from_json(row["comparison_json"])
+
+    def find_comparison_equivalent(
+        self,
+        *,
+        source_fingerprint: str,
+        classifier_capability_version: str,
+        pue_capability_version: str,
+    ) -> ClassifierPueComparison | None:
+        """Return the earliest persisted comparison equivalent to this
+        fingerprint and version pair, if any (application-level duplicate
+        detection; see :meth:`save_comparison`)."""
+        row = self._conn.execute(
+            "SELECT comparison_json FROM pue_classifier_comparisons WHERE "
+            "source_fingerprint = ? AND classifier_capability_version = ? "
+            "AND pue_capability_version = ? ORDER BY created_at ASC LIMIT 1",
+            (source_fingerprint, classifier_capability_version, pue_capability_version),
+        ).fetchone()
+        if row is None:
+            return None
+        return comparison_from_json(row["comparison_json"])
+
+    def list_comparisons(self, *, limit: int | None = None) -> list[ClassifierPueComparison]:
+        sql = "SELECT comparison_json FROM pue_classifier_comparisons ORDER BY created_at DESC"
+        params: tuple[int, ...] = ()
+        if limit is not None:
+            sql += " LIMIT ?"
+            params = (limit,)
+        rows = self._conn.execute(sql, params).fetchall()
+        return [comparison_from_json(row["comparison_json"]) for row in rows]

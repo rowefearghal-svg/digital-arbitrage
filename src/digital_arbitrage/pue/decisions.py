@@ -412,10 +412,18 @@ def form_decision(
     codes = _contradiction_codes(all_hyp_evals)
 
     if contradicted_family_claims:
+        # A single hypothesis with a title-vs-structured-attribute family
+        # conflict is not "two or more concrete, materially different
+        # interpretations" (that is AMBIGUOUS, see the ``len(hypotheses) >
+        # 1`` branch above) - it is one interpretation whose own supporting
+        # Claims directly contradict each other, so no interpretation can be
+        # justified at all. Sprint 2 abstention-reason audit: this is
+        # UNRESOLVED_CONTRADICTION, not AMBIGUOUS (pre-merge behaviour
+        # returned AMBIGUOUS here; acceptance case 14 already allowed both).
         uncertainty = _compute_uncertainty(observation, hypothesis, surviving, True, has_soft, True)
         return Decision(
             **_base_decision_kwargs(state, policy, context),
-            decision_type=DecisionType.AMBIGUOUS,
+            decision_type=DecisionType.ABSTAINED,
             identification_level=IdentificationLevel.UNKNOWN,
             selected_hypothesis_id=hypothesis.hypothesis_id,
             selected_candidate_instance_id=None,
@@ -428,7 +436,7 @@ def form_decision(
             alternative_candidate_ids=tuple(c.candidate_instance_id for c, _ in surviving),
             unresolved_fields=("product_family",),
             contradiction_codes=("title_structured_attribute_conflict",) + codes,
-            abstention_reason=None,
+            abstention_reason=AbstentionReason.UNRESOLVED_CONTRADICTION,
             review_recommended=True,
             comparability_status=ComparabilityStatus.INSUFFICIENT_INFORMATION,
             uncertainty=uncertainty,
@@ -467,6 +475,17 @@ def form_decision(
                 ),
                 uncertainty=uncertainty,
             )
+        # NOTE (Sprint 2 abstention-reason audit): this branch is currently
+        # unreachable by construction, not a bug. A COMPLETE_PRODUCT/
+        # INCOMPLETE_PRODUCT/BUNDLE ProductHypothesis is only ever created
+        # by hypotheses.generate_hypotheses when ``family`` or the generic
+        # "graphics_card" product_type is already present (see
+        # ``if not hypotheses and (identity_family is not None or
+        # graphics_card_type):`` there), so the ``if`` above always takes
+        # the broader CLASSIFIED path first. NO_SUITABLE_CANDIDATE is kept
+        # as declared, reachable behaviour for the day a hypothesis type
+        # requiring catalogue identity with neither signal exists (e.g. an
+        # identifier-only listing); see ABSTENTION_REASON_REACHABILITY.
         return _abstained(
             state, policy, context, AbstentionReason.NO_SUITABLE_CANDIDATE, uncertainty
         )
@@ -577,6 +596,79 @@ def form_decision(
             uncertainty=uncertainty,
         )
 
+    # NOTE (Sprint 2 abstention-reason audit): like NO_SUITABLE_CANDIDATE
+    # above, this fallback is currently unreachable by construction rather
+    # than untested by omission. Reaching here requires ``hypothesis.family
+    # is None`` (the partial-identification branch above already handles
+    # ``family is not None``) *and* ``hypothesis.product_type !=
+    # "graphics_card"`` (the CLASSIFIED branch immediately above already
+    # handles that case) - but hypotheses.generate_hypotheses only ever
+    # creates this hypothesis shape when family or "graphics_card" is
+    # present, so at least one of those two branches always fires first.
+    # Multi-variant indistinguishability (e.g. an unresolved RTX 3060
+    # 8GB/12GB choice) is real and covered - it correctly resolves to
+    # PARTIALLY_IDENTIFIED with ``uncertainty.distinguishability == LOW``
+    # and every surviving Candidate preserved as an alternative (see
+    # test_indistinguishable_variants.py), which is the deliberately
+    # preferred, more informative outcome over a bare abstention (spec:
+    # prefer the broadest justified Decision over forced ambiguity).
+    # CANDIDATES_INDISTINGUISHABLE is kept as declared, reachable behaviour
+    # for a future hypothesis type that reaches this ladder with neither
+    # signal; see ABSTENTION_REASON_REACHABILITY.
     return _abstained(
         state, policy, context, AbstentionReason.CANDIDATES_INDISTINGUISHABLE, uncertainty
     )
+
+
+#: Sprint 2 abstention-reason audit (Task 3). Every :class:`AbstentionReason`
+#: member must appear here exactly once (enforced by
+#: tests/pue/test_abstention_audit.py::test_every_abstention_reason_is_
+#: documented) with an honest note on whether :func:`form_decision` can
+#: currently produce it, or why it is reserved for a not-yet-built
+#: capability. No runtime behaviour was invented merely to make a reason
+#: reachable; see the inline NOTEs above for the two "reserved" cases inside
+#: this module.
+ABSTENTION_REASON_REACHABILITY: dict[AbstentionReason, str] = {
+    AbstentionReason.INSUFFICIENT_EVIDENCE: (
+        "reachable: an empty/whitespace-only title produces zero hypotheses "
+        "(see the ``if not hypotheses:`` branch)."
+    ),
+    AbstentionReason.UNRESOLVED_CONTRADICTION: (
+        "reachable: a single hypothesis whose title-derived family Claim is "
+        "CONTRADICTED by a structured-attribute Claim (see "
+        "``contradicted_family_claims``)."
+    ),
+    AbstentionReason.CANDIDATES_INDISTINGUISHABLE: (
+        "reserved: unreachable given the current hypothesis-generation "
+        "invariant that a COMPLETE_PRODUCT/INCOMPLETE_PRODUCT/BUNDLE "
+        "hypothesis always carries a family or the generic 'graphics_card' "
+        "product_type, so PARTIALLY_IDENTIFIED or CLASSIFIED is always "
+        "available first and is preferred (a broader justified Decision "
+        "over a bare abstention)."
+    ),
+    AbstentionReason.NO_SUITABLE_CANDIDATE: (
+        "reserved: unreachable for the same structural reason as "
+        "CANDIDATES_INDISTINGUISHABLE - no hypothesis shape currently "
+        "reaches the zero-surviving-Candidates branch without a family or "
+        "'graphics_card' product_type already known."
+    ),
+    AbstentionReason.SOURCE_QUALITY_TOO_LOW: (
+        "reserved: no source-quality scoring capability exists yet beyond "
+        "title token count (used only for the observation_quality "
+        "uncertainty band, not for routing a Decision); defining a "
+        "dedicated quality signal is out of Sprint 2 scope."
+    ),
+    AbstentionReason.PROCESSING_LIMIT_REACHED: (
+        "reserved: ProcessingContext truncates hypotheses/candidates at "
+        "configured limits (max_active_hypotheses, "
+        "max_candidates_before_rerank, max_candidate_evaluations) but "
+        "form_decision does not yet detect or flag when truncation may "
+        "have hidden a better-supported outcome."
+    ),
+    AbstentionReason.UNKNOWN_PRODUCT_PATTERN: (
+        "reserved: no capability yet distinguishes a coherent-but-"
+        "unrecognized GPU pattern from a generic 'graphics card' mention; "
+        "both currently resolve to the same PRODUCT_TYPE-level CLASSIFIED "
+        "outcome (spec: never force the nearest catalogue match)."
+    ),
+}

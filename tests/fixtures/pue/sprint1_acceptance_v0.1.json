@@ -163,9 +163,10 @@
       "structured_attributes": { "model": "RTX 4070" },
       "difficulty": "hard",
       "annotation_source": "spec_section_21_row_14",
-      "annotation_confidence": "medium",
-      "allowed_decision_types": ["ambiguous", "abstained"],
-      "forbidden_decision_types": ["identified"],
+      "annotation_confidence": "high",
+      "allowed_decision_types": ["abstained"],
+      "forbidden_decision_types": ["identified", "ambiguous", "partially_identified", "classified"],
+      "expected_abstention_reason": "unresolved_contradiction",
       "require_contradicted_claim": true,
       "min_evidence_count": 2
     },

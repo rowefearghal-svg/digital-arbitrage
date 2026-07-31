@@ -106,6 +106,8 @@ class ArbitragePipeline:
         self._scorer = RecommendationScorer(self.config.scoring_config)
         #: PUE shadow-mode output from the most recent ``analyze()`` call, if
         #: shadow mode is enabled (see ``PipelineConfig.pue_shadow_config``).
+        #: Each element is a ``PueShadowCaseResult`` (ReasoningRecord +
+        #: ProductUnderstandingResult + optional classifier/PUE comparison).
         #: Never influences ``PipelineResult``.
         self.last_pue_shadow_records: tuple = ()
 
