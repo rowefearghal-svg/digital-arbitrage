@@ -1,7 +1,24 @@
 {
-  "fixture_version": "sprint1-acceptance-0.1.0",
+  "fixture_version": "sprint1-acceptance-0.1.1",
   "schema_version": "0.1",
   "source": "docs/architecture/PUE_v0.1_VERTICAL_SLICE_SPECIFICATION.md section 21",
+  "adjudications": [
+    {
+      "case_id": "case_14_title_structured_contradiction",
+      "adjudicated_by": "PUE Sprint 2 pre-merge correction (spec review, independent of decisions.py behaviour)",
+      "date": "2026-07-31",
+      "original_label": {
+        "annotation_confidence": "medium",
+        "allowed_decision_types": ["ambiguous", "abstained"]
+      },
+      "revised_label": {
+        "annotation_confidence": "medium",
+        "allowed_decision_types": ["abstained"],
+        "expected_abstention_reason": "unresolved_contradiction"
+      },
+      "rationale": "Per the specification's own definitions (PUE_v0.1_VERTICAL_SLICE_SPECIFICATION.md sections 8.4 Product Hypothesis and 16 Decision Formation), AMBIGUOUS is reserved for two or more concrete, materially different ProductHypothesis interpretations competing for the same listing. This case produces exactly one ProductHypothesis whose own title-derived family Claim is CONTRADICTED by a structured-attribute Claim: a single interpretation that cannot be justified at all, not a choice between multiple interpretations. By the specification's own vocabulary this is definitionally an unresolved internal contradiction (ABSTAINED / UNRESOLVED_CONTRADICTION), not ambiguity between hypotheses. This adjudication is grounded in the specification's terminology, not in matching the implementation's current output; annotation_confidence is deliberately left at medium (not raised to high) because this remains a spec-interpretation call rather than a certainty established by independently reviewed real-world labelled data."
+    }
+  ],
   "cases": [
     {
       "case_id": "case_01_outside_domain",
@@ -164,8 +181,10 @@
       "difficulty": "hard",
       "annotation_source": "spec_section_21_row_14",
       "annotation_confidence": "medium",
-      "allowed_decision_types": ["ambiguous", "abstained"],
-      "forbidden_decision_types": ["identified"],
+      "allowed_decision_types": ["abstained"],
+      "forbidden_decision_types": ["identified", "ambiguous", "partially_identified", "classified"],
+      "expected_abstention_reason": "unresolved_contradiction",
+      "adjudication_ref": "case_14_title_structured_contradiction",
       "require_contradicted_claim": true,
       "min_evidence_count": 2
     },

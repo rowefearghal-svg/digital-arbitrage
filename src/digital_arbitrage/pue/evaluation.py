@@ -294,7 +294,7 @@ def evaluate_candidates(
                     candidate_value=product.product_form.value,
                     result=ComparisonResult.CONTRADICT,
                     severity=ContradictionSeverity.HARD,
-                    evidence_ids=(),
+                    evidence_ids=_evidence_ids_for_claims(hypothesis.claim_ids, state.claims),
                     explanation=(
                         "Listing describes compatibility only, not this Candidate's identity."
                     ),

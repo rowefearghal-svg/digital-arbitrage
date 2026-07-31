@@ -10,10 +10,13 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import uuid
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from types import TracebackType
 
+from .comparison import ClassifierPueComparison, comparison_from_json, comparison_to_json
 from .enums import (
     AbstentionReason,
     CalibrationStatus,
@@ -50,9 +53,22 @@ from .models import (
 from .validation import PueValidationError, thaw_value
 
 #: Current on-disk schema version for this table (bumped when the DDL changes).
-SCHEMA_VERSION = 1
+#: Bumped to 2 in Sprint 2: added ``pue_classifier_comparisons`` (same
+#: database file, no new database - spec: comparison records persist
+#: alongside Reasoning Records). Bumped to 3 in the Sprint 2 pre-merge
+#: correction: ``comparison_id`` (not ``case_id``) is now the comparisons
+#: table's primary key, so one case can hold multiple comparisons (e.g. the
+#: same listing classified under different search profiles), plus the full
+#: comparison-equivalence key (search-profile/policy/knowledge/schema
+#: version columns).
+SCHEMA_VERSION = 3
 
-_SCHEMA = """
+#: Split into named pieces (table vs indexes) rather than one combined
+#: string, specifically so the v2 -> v3 migration below can create the
+#: ``pue_classifier_comparisons`` table *before* dropping the old,
+#: renamed-aside v2 table, but defer (re)creating its indexes until
+#: *after* that drop - see ``_migrate_v2_to_v3`` for why.
+_PUE_CASES_SCHEMA = """
 CREATE TABLE IF NOT EXISTS pue_cases (
     case_id TEXT PRIMARY KEY,
     observation_id TEXT NOT NULL,
@@ -82,9 +98,309 @@ CREATE INDEX IF NOT EXISTS idx_pue_cases_versions
 ON pue_cases(capability_version, policy_version, knowledge_version);
 """
 
+_PUE_COMPARISONS_TABLE_SCHEMA = """
+CREATE TABLE IF NOT EXISTS pue_classifier_comparisons (
+    comparison_id TEXT PRIMARY KEY,
+    case_id TEXT NOT NULL REFERENCES pue_cases(case_id),
+    provider TEXT NOT NULL,
+    provider_listing_id TEXT NOT NULL,
+    source_fingerprint TEXT NOT NULL,
+    classifier_search_profile_fingerprint TEXT NOT NULL,
+    classifier_capability_version TEXT NOT NULL,
+    pue_capability_version TEXT NOT NULL,
+    pue_policy_version TEXT NOT NULL,
+    pue_knowledge_version TEXT NOT NULL,
+    comparison_schema_version TEXT NOT NULL,
+    category TEXT NOT NULL,
+    comparison_json TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+"""
+
+_PUE_COMPARISONS_INDEXES_SCHEMA = """
+CREATE INDEX IF NOT EXISTS idx_pue_comparisons_case
+ON pue_classifier_comparisons(case_id);
+
+CREATE INDEX IF NOT EXISTS idx_pue_comparisons_listing
+ON pue_classifier_comparisons(provider, provider_listing_id);
+
+CREATE INDEX IF NOT EXISTS idx_pue_comparisons_fingerprint
+ON pue_classifier_comparisons(source_fingerprint);
+
+-- Full comparison-equivalence key (Sprint 2 pre-merge correction item 1):
+-- every column here materially determines whether two comparisons are the
+-- same observation. Different policy/knowledge/search-profile versions
+-- must never be treated as equivalent merely because pue_capability_version
+-- is unchanged.
+CREATE INDEX IF NOT EXISTS idx_pue_comparisons_equivalence
+ON pue_classifier_comparisons(
+    source_fingerprint,
+    classifier_search_profile_fingerprint,
+    classifier_capability_version,
+    pue_capability_version,
+    pue_policy_version,
+    pue_knowledge_version,
+    comparison_schema_version
+);
+"""
+
+_SCHEMA = _PUE_CASES_SCHEMA + _PUE_COMPARISONS_TABLE_SCHEMA + _PUE_COMPARISONS_INDEXES_SCHEMA
+
+
+#: Sentinel values recorded for the two comparison-equivalence columns that
+#: simply did not exist in a v2 (first-attempt Sprint 2) database, so a
+#: migrated row is never mistaken for a comparison genuinely computed under
+#: a real, known search profile or comparison-schema version.
+LEGACY_V2_SEARCH_PROFILE_FINGERPRINT = "legacy-v2-search-profile-not-recorded"
+LEGACY_V2_COMPARISON_SCHEMA_VERSION = "pue-comparison-0.1.0-legacy-v2-migrated"
+
 
 def _utc_now() -> str:
     return datetime.now(UTC).replace(microsecond=0).isoformat()
+
+
+def _run_in_transaction(
+    conn: sqlite3.Connection, body: Callable[[sqlite3.Connection], None]
+) -> None:
+    """Run ``body(conn)`` inside one explicit, genuinely rollback-able
+    transaction.
+
+    Python's sqlite3 module's default ("legacy") transaction control only
+    ever *implicitly* opens a transaction before a DML statement
+    (INSERT/UPDATE/DELETE/REPLACE) and commits implicitly before anything
+    else - a bare ``with conn:`` around DDL statements (CREATE/ALTER/DROP
+    TABLE) does **not** actually wrap them in a transaction, since no
+    implicit BEGIN is ever issued for DDL; each one silently autocommits
+    on its own the moment it runs. That defeats the "perform migration
+    transactionally" / rollback requirement entirely. Issuing an explicit
+    ``BEGIN`` first is the documented, correct way to make DDL genuinely
+    transactional under the sqlite3 module's default settings (verified
+    empirically: an explicit BEGIN/ROLLBACK around a table rename, create,
+    data copy, and drop correctly restores the original table).
+
+    Python 3.12's manual ``autocommit=False`` mode was deliberately not
+    used instead: it keeps a transaction open at all times, including at
+    connection start, which prevents ``PRAGMA foreign_keys`` from ever
+    being applied (that pragma is a no-op while any transaction is open).
+    """
+    conn.execute("BEGIN")
+    try:
+        body(conn)
+    except BaseException:
+        conn.execute("ROLLBACK")
+        raise
+    else:
+        conn.execute("COMMIT")
+
+
+def _apply_ddl_statements(conn: sqlite3.Connection, ddl: str) -> None:
+    """Execute every statement in ``ddl`` individually via ``execute()``
+    rather than ``conn.executescript()``.
+
+    ``executescript()`` issues an implicit ``COMMIT`` before it runs and
+    does not honour the caller's transaction - it is unsuitable anywhere
+    an all-or-nothing guarantee is required (schema creation/migration
+    must roll back completely on failure). Splitting on ``;`` is safe here:
+    none of this DDL contains a string literal or identifier with a
+    semicolon in it.
+    """
+    for statement in ddl.split(";"):
+        statement = statement.strip()
+        if statement:
+            conn.execute(statement)
+
+
+def _apply_schema_statements(conn: sqlite3.Connection) -> None:
+    """Apply the complete current schema (``_SCHEMA``) - safe whenever
+    there is no risk of an index name colliding with one still bound to a
+    different, about-to-be-dropped table (see ``_migrate_v2_to_v3``,
+    which applies ``_PUE_COMPARISONS_TABLE_SCHEMA`` and
+    ``_PUE_COMPARISONS_INDEXES_SCHEMA`` separately instead, for exactly
+    that reason)."""
+    _apply_ddl_statements(conn, _SCHEMA)
+
+
+def _table_names(conn: sqlite3.Connection) -> set[str]:
+    return {
+        row[0]
+        for row in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall()
+    }
+
+
+def _column_names(conn: sqlite3.Connection, table: str) -> set[str]:
+    return {row[1] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+
+
+def _detect_schema_version(conn: sqlite3.Connection) -> int:
+    """Determine the on-disk schema version (SQLite-upgrade correction).
+
+    Prefers the persisted ``PRAGMA user_version`` once this store has
+    written it (every version from this correction onward does). A
+    database that predates version tracking entirely reports
+    ``user_version == 0`` indistinguishably from a genuinely brand-new,
+    empty database, so table/column shape is used to tell them apart:
+    no tables at all means genuinely new (version 0); a ``pue_cases``
+    table with no ``pue_classifier_comparisons`` table is Sprint 1 (v1);
+    a ``pue_classifier_comparisons`` table whose primary key is still
+    ``case_id`` (no ``comparison_id`` column) is the first-attempt
+    Sprint 2 shape (v2).
+    """
+    tables = _table_names(conn)
+    if not tables:
+        return 0
+    user_version = conn.execute("PRAGMA user_version").fetchone()[0]
+    if user_version:
+        return int(user_version)
+    if "pue_classifier_comparisons" not in tables:
+        return 1
+    columns = _column_names(conn, "pue_classifier_comparisons")
+    if "comparison_id" in columns:
+        return SCHEMA_VERSION
+    return 2
+
+
+def _migrate_v1_to_v3(conn: sqlite3.Connection) -> None:
+    """v1 (Sprint 1: ``pue_cases`` only) -> v3. Purely additive: v1 never
+    had a comparisons table at all, and ``pue_cases`` itself is unchanged
+    since v1, so this only needs to create the new table/indexes. One
+    transaction; every existing ``pue_cases`` row is untouched."""
+
+    def _body(c: sqlite3.Connection) -> None:
+        _apply_schema_statements(c)
+        c.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
+
+    _run_in_transaction(conn, _body)
+
+
+def _migrate_v2_to_v3(conn: sqlite3.Connection) -> None:
+    """v2 (first-attempt Sprint 2: ``case_id`` primary key, no
+    comparison-equivalence columns) -> v3.
+
+    SQLite cannot alter a PRIMARY KEY in place, so ``pue_classifier_
+    comparisons`` is rebuilt: create the v3-shaped table under a temporary
+    name, copy every existing row across (synthesizing a fresh
+    ``comparison_id`` and the new version columns - backfilling
+    ``pue_policy_version``/``pue_knowledge_version`` from the matching
+    ``pue_cases`` row where possible, since those values *are* recoverable;
+    ``classifier_search_profile_fingerprint`` and
+    ``comparison_schema_version`` were never recorded in v2, so an explicit
+    legacy sentinel is used instead of a guess), drop the old table, and
+    rename the new one into place. ``pue_cases`` itself is untouched.
+    Every existing ``comparison_json`` blob is also rewritten so it
+    deserializes cleanly through the current (v3) ``comparison_from_json``,
+    which now requires these same fields.
+
+    Runs as a single transaction (foreign-key checks briefly suspended for
+    the table-rebuild sequence, per SQLite's documented pattern for
+    altering a table involved in foreign-key relationships, then verified
+    on again afterwards) - the version is stamped only once every row has
+    been copied successfully.
+    """
+    old_rows = conn.execute(
+        "SELECT case_id, provider, provider_listing_id, source_fingerprint, "
+        "classifier_capability_version, pue_capability_version, category, "
+        "comparison_json, created_at FROM pue_classifier_comparisons"
+    ).fetchall()
+
+    # ``PRAGMA foreign_keys`` may only be toggled outside an open
+    # transaction, so it is switched off here (before the transaction
+    # opens) and restored in ``finally`` (after it closes) - never inside.
+    # ``PRAGMA foreign_key_check`` itself works regardless of this setting
+    # and is run *inside* the transaction below, so a violation raises
+    # before commit and the whole migration rolls back with it.
+    conn.execute("PRAGMA foreign_keys = OFF")
+
+    def _body(c: sqlite3.Connection) -> None:
+        c.execute("ALTER TABLE pue_classifier_comparisons RENAME TO _pue_comparisons_v2")
+        _apply_ddl_statements(c, _PUE_CASES_SCHEMA)  # unchanged; idempotent
+        # Table only here, deliberately *not* its indexes yet: ``ALTER
+        # TABLE ... RENAME`` does not rename the indexes that were bound
+        # to the old v2 table - they keep their original names (e.g.
+        # idx_pue_comparisons_listing) and now belong to
+        # ``_pue_comparisons_v2``. If the v3 indexes (identically named)
+        # were created now, ``CREATE INDEX IF NOT EXISTS`` would silently
+        # no-op for every name that still collides with an old index -
+        # index names are unique per schema, not per table - leaving the
+        # final table missing those indexes entirely once the old table
+        # (and its indexes) is dropped below. Creating them only *after*
+        # the drop, once every colliding old name is gone, avoids this.
+        _apply_ddl_statements(c, _PUE_COMPARISONS_TABLE_SCHEMA)
+
+        for row in old_rows:
+            comparison_id = str(uuid.uuid4())
+            case_row = c.execute(
+                "SELECT policy_version, knowledge_version FROM pue_cases WHERE case_id = ?",
+                (row["case_id"],),
+            ).fetchone()
+            pue_policy_version = case_row["policy_version"] if case_row else "unknown"
+            pue_knowledge_version = case_row["knowledge_version"] if case_row else "unknown"
+
+            payload = json.loads(row["comparison_json"])
+            payload.setdefault("comparison_id", comparison_id)
+            payload.setdefault("comparison_schema_version", LEGACY_V2_COMPARISON_SCHEMA_VERSION)
+            payload.setdefault(
+                "classifier_search_profile_fingerprint",
+                LEGACY_V2_SEARCH_PROFILE_FINGERPRINT,
+            )
+            payload.setdefault("pue_policy_version", pue_policy_version)
+            payload.setdefault("pue_knowledge_version", pue_knowledge_version)
+            migrated_json = json.dumps(payload, sort_keys=True)
+
+            c.execute(
+                "INSERT INTO pue_classifier_comparisons ("
+                "comparison_id, case_id, provider, provider_listing_id, "
+                "source_fingerprint, classifier_search_profile_fingerprint, "
+                "classifier_capability_version, pue_capability_version, "
+                "pue_policy_version, pue_knowledge_version, comparison_schema_version, "
+                "category, comparison_json, created_at"
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    comparison_id,
+                    row["case_id"],
+                    row["provider"],
+                    row["provider_listing_id"],
+                    row["source_fingerprint"],
+                    LEGACY_V2_SEARCH_PROFILE_FINGERPRINT,
+                    row["classifier_capability_version"],
+                    row["pue_capability_version"],
+                    pue_policy_version,
+                    pue_knowledge_version,
+                    LEGACY_V2_COMPARISON_SCHEMA_VERSION,
+                    row["category"],
+                    migrated_json,
+                    row["created_at"],
+                ),
+            )
+
+        c.execute("DROP TABLE _pue_comparisons_v2")
+
+        # Only now - after the old table and every index still bound to
+        # its old names are gone - are the v3 indexes safe to create
+        # without a silent no-op (see the note above).
+        _apply_ddl_statements(c, _PUE_COMPARISONS_INDEXES_SCHEMA)
+
+        # ``PRAGMA foreign_key_check`` works regardless of whether FK
+        # enforcement is currently on or off, so it can safely run
+        # *inside* this still-open transaction: a violation raises here,
+        # before ``user_version`` is stamped and before the transaction
+        # commits, so the entire migration - the rename, every
+        # re-inserted row, and the drop - rolls back together with it
+        # (never a partially-migrated database).
+        fk_errors = c.execute("PRAGMA foreign_key_check(pue_classifier_comparisons)").fetchall()
+        if fk_errors:
+            raise PueValidationError(
+                f"v2 -> v3 migration produced {len(fk_errors)} foreign-key "
+                "violation(s) in pue_classifier_comparisons; migration was rolled back"
+            )
+
+        c.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
+
+    try:
+        _run_in_transaction(conn, _body)
+    finally:
+        # foreign_keys may only be toggled with no transaction open; by
+        # this point the transaction has already committed or rolled back.
+        conn.execute("PRAGMA foreign_keys = ON")
 
 
 # --------------------------------------------------------------------------- #
@@ -494,11 +810,45 @@ class PueCaseStore:
                 parent.mkdir(parents=True, exist_ok=True)
         self._conn = sqlite3.connect(self.path)
         self._conn.row_factory = sqlite3.Row
+        # SQLite does not enforce foreign keys by default even when a
+        # column declares REFERENCES; must be turned on per connection
+        # (Sprint 2 pre-merge correction item 2). Must happen before any
+        # transaction is opened - see the note on ``_run_in_transaction``
+        # below for why this store never uses Python 3.12+ manual
+        # autocommit mode.
+        self._conn.execute("PRAGMA foreign_keys = ON")
         self._init_schema()
 
     def _init_schema(self) -> None:
-        with self._conn:
-            self._conn.executescript(_SCHEMA)
+        """Bring the database to ``SCHEMA_VERSION`` (final SQLite-upgrade
+        correction): a brand-new database is created fresh; an existing
+        Sprint 1 (v1) or first-attempt Sprint 2 (v2) database is migrated
+        in place, transactionally, preserving every existing ``pue_cases``
+        row; an unrecognized future version is rejected with no changes at
+        all. Users are never required to manually delete their database."""
+        current = _detect_schema_version(self._conn)
+        if current in (0, SCHEMA_VERSION):
+            # 0: brand-new/empty database. SCHEMA_VERSION: already current
+            # (or a hand-built fixture at the current shape with no
+            # persisted user_version yet). Either way, the idempotent
+            # CREATE-IF-NOT-EXISTS schema is safe to (re)apply; then stamp
+            # the version so future opens skip detection ambiguity.
+            def _body(c: sqlite3.Connection) -> None:
+                _apply_schema_statements(c)
+                c.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
+
+            _run_in_transaction(self._conn, _body)
+        elif current == 1:
+            _migrate_v1_to_v3(self._conn)
+        elif current == 2:
+            _migrate_v2_to_v3(self._conn)
+        else:
+            raise PueValidationError(
+                f"Unrecognized pue_cases database schema version {current!r} at "
+                f"{self.path!r} (this store supports new/empty, v1, v2, and the "
+                f"current v{SCHEMA_VERSION}); refusing to modify a database from a "
+                "newer, unrecognized version of this application."
+            )
 
     def close(self) -> None:
         self._conn.close()
@@ -514,29 +864,16 @@ class PueCaseStore:
     ) -> None:
         self.close()
 
-    def save_case(
-        self, record: ReasoningRecord, *, created_at: str | None = None, replay: bool = False
-    ) -> str:
-        """Persist ``record``. Raises if ``case_id`` already exists (no overwrite).
-
-        Equivalent-record detection (application level, not a DB constraint):
-        when ``replay`` is ``False`` (normal shadow processing), a case whose
-        ``source_fingerprint`` and full version triple (capability/policy/
-        knowledge) already match a previously persisted, completed record is
-        rejected - re-running the identical listing under identical versions
-        must not accumulate duplicate completed records. Pass ``replay=True``
-        for explicitly marked replay/evaluation activity (e.g. benchmarking a
-        new policy against historical listings), which may retain another
-        record for the same fingerprint/version triple.
-        """
+    def _check_case_insertable(self, record: ReasoningRecord, *, replay: bool) -> None:
+        """Raise if ``record`` cannot be newly inserted (see :meth:`save_case`)."""
         existing = self.get_case(record.case_id)
         if existing is not None:
             raise PueValidationError(
                 f"case_id {record.case_id!r} already persisted; historical records "
                 "are never overwritten (create a new case for a rerun)"
             )
-        decision = record.decision
         if not replay:
+            decision = record.decision
             equivalent = self.find_equivalent(
                 source_fingerprint=record.observation.source_fingerprint,
                 capability_version=decision.capability_version,
@@ -551,41 +888,105 @@ class PueCaseStore:
                     f"(case_id={equivalent.case_id!r}); pass replay=True to retain "
                     "another record for explicitly marked replay/evaluation activity"
                 )
+
+    def _insert_case_row(self, record: ReasoningRecord, timestamp: str) -> None:
+        """Execute the case INSERT only - caller controls the transaction
+        (see :meth:`save_case` and :meth:`save_case_with_comparison`)."""
+        decision = record.decision
         selected_catalogue_product_id = None
         if decision.selected_candidate_instance_id is not None:
             for c in record.candidates:
                 if c.candidate_instance_id == decision.selected_candidate_instance_id:
                     selected_catalogue_product_id = c.catalogue_product_id
                     break
+        self._conn.execute(
+            "INSERT INTO pue_cases ("
+            "case_id, observation_id, provider, provider_listing_id, source_fingerprint, "
+            "capability_version, policy_version, knowledge_version, schema_version, "
+            "decision_type, identification_level, product_form, "
+            "selected_catalogue_product_id, comparability_status, "
+            "reasoning_record_json, created_at"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                record.case_id,
+                record.observation.observation_id,
+                record.observation.provider,
+                record.observation.provider_listing_id,
+                record.observation.source_fingerprint,
+                decision.capability_version,
+                decision.policy_version,
+                decision.knowledge_version,
+                record.schema_version,
+                decision.decision_type.value,
+                decision.identification_level.value,
+                decision.product_form.value,
+                selected_catalogue_product_id,
+                decision.comparability_status.value,
+                reasoning_record_to_json(record),
+                timestamp,
+            ),
+        )
+
+    def save_case(
+        self, record: ReasoningRecord, *, created_at: str | None = None, replay: bool = False
+    ) -> str:
+        """Persist ``record``. Raises if ``case_id`` already exists (no overwrite).
+
+        Equivalent-record detection (application level, not a DB constraint):
+        when ``replay`` is ``False`` (normal shadow processing), a case whose
+        ``source_fingerprint`` and full version triple (capability/policy/
+        knowledge) already match a previously persisted, completed record is
+        rejected - re-running the identical listing under identical versions
+        must not accumulate duplicate completed records. Pass ``replay=True``
+        for explicitly marked replay/evaluation activity (e.g. benchmarking a
+        new policy against historical listings), which may retain another
+        record for the same fingerprint/version triple.
+
+        See :meth:`save_case_with_comparison` when a comparison must be
+        inserted transactionally alongside a brand-new case.
+        """
+        self._check_case_insertable(record, replay=replay)
         timestamp = created_at if created_at is not None else _utc_now()
         with self._conn:
-            self._conn.execute(
-                "INSERT INTO pue_cases ("
-                "case_id, observation_id, provider, provider_listing_id, source_fingerprint, "
-                "capability_version, policy_version, knowledge_version, schema_version, "
-                "decision_type, identification_level, product_form, "
-                "selected_catalogue_product_id, comparability_status, "
-                "reasoning_record_json, created_at"
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (
-                    record.case_id,
-                    record.observation.observation_id,
-                    record.observation.provider,
-                    record.observation.provider_listing_id,
-                    record.observation.source_fingerprint,
-                    decision.capability_version,
-                    decision.policy_version,
-                    decision.knowledge_version,
-                    record.schema_version,
-                    decision.decision_type.value,
-                    decision.identification_level.value,
-                    decision.product_form.value,
-                    selected_catalogue_product_id,
-                    decision.comparability_status.value,
-                    reasoning_record_to_json(record),
-                    timestamp,
-                ),
+            self._insert_case_row(record, timestamp)
+        return record.case_id
+
+    def save_case_with_comparison(
+        self,
+        record: ReasoningRecord,
+        comparison: ClassifierPueComparison | None,
+        *,
+        created_at: str | None = None,
+        replay: bool = False,
+    ) -> str:
+        """Persist a brand-new ``record`` and, if given, its ``comparison``
+        as a single transaction.
+
+        Either both writes commit or neither does: a successfully inserted
+        case must never be left without its expected comparison merely
+        because the second write failed (Sprint 2 pre-merge correction
+        item 2). ``comparison.case_id`` must equal ``record.case_id`` - use
+        :meth:`save_comparison` directly to backfill a comparison onto an
+        already-persisted case (e.g. an existing Sprint 1 case that has no
+        comparison yet).
+        """
+        if comparison is not None and comparison.case_id != record.case_id:
+            raise PueValidationError(
+                "comparison.case_id must equal record.case_id for a new case+comparison "
+                f"insert (got {comparison.case_id!r} vs {record.case_id!r}); use "
+                "save_comparison() directly to backfill onto an existing case"
             )
+        self._check_case_insertable(record, replay=replay)
+        if comparison is not None:
+            # Not _check_comparison_insertable: the case row does not exist
+            # yet at this point - it is inserted in the same transaction
+            # below - so only the comparison_id/equivalence checks apply.
+            self._check_comparison_id_and_equivalence(comparison, replay=replay)
+        timestamp = created_at if created_at is not None else _utc_now()
+        with self._conn:
+            self._insert_case_row(record, timestamp)
+            if comparison is not None:
+                self._insert_comparison_row(comparison, timestamp)
         return record.case_id
 
     def get_case(self, case_id: str) -> ReasoningRecord | None:
@@ -641,3 +1042,182 @@ class PueCaseStore:
             params = (limit,)
         rows = self._conn.execute(sql, params).fetchall()
         return [row["case_id"] for row in rows]
+
+    # ----------------------------------------------------------------- #
+    # Classifier/PUE comparison records (Sprint 2, Task 1) - same
+    # database file as ``pue_cases``, not a new database.
+    #
+    # ``comparison_id`` (not ``case_id``) is the primary key: one PUE case
+    # may legitimately hold more than one comparison, e.g. the same
+    # listing classified under two different search profiles (Sprint 2
+    # pre-merge correction item 1/2).
+    # ----------------------------------------------------------------- #
+    def _check_comparison_id_and_equivalence(
+        self, comparison: ClassifierPueComparison, *, replay: bool
+    ) -> None:
+        """Raise on a duplicate ``comparison_id`` or (unless ``replay``) an
+        equivalent comparison. Does **not** check that ``case_id`` already
+        exists - see :meth:`_check_comparison_insertable` for that, which
+        callers must skip when the case is being inserted in the very same
+        transaction (see :meth:`save_case_with_comparison`)."""
+        if self.get_comparison_by_id(comparison.comparison_id) is not None:
+            raise PueValidationError(
+                f"comparison_id {comparison.comparison_id!r} is already persisted; "
+                "historical records are never overwritten"
+            )
+        if not replay:
+            equivalent = self.find_comparison_equivalent(
+                source_fingerprint=comparison.source_fingerprint,
+                classifier_search_profile_fingerprint=(
+                    comparison.classifier_search_profile_fingerprint
+                ),
+                classifier_capability_version=comparison.classifier_capability_version,
+                pue_capability_version=comparison.pue_capability_version,
+                pue_policy_version=comparison.pue_policy_version,
+                pue_knowledge_version=comparison.pue_knowledge_version,
+                comparison_schema_version=comparison.comparison_schema_version,
+            )
+            if equivalent is not None:
+                raise PueValidationError(
+                    "an equivalent comparison already exists for source_fingerprint "
+                    f"{comparison.source_fingerprint!r} under the same search-profile/"
+                    "classifier/PUE versions "
+                    f"(comparison_id={equivalent.comparison_id!r}); pass replay=True "
+                    "to retain another record for explicitly marked replay/evaluation "
+                    "activity"
+                )
+
+    def _check_comparison_insertable(
+        self, comparison: ClassifierPueComparison, *, replay: bool
+    ) -> None:
+        """Full standalone insertability check (see :meth:`save_comparison`):
+        the referenced case must already exist, plus everything
+        :meth:`_check_comparison_id_and_equivalence` checks."""
+        if self.get_case(comparison.case_id) is None:
+            raise PueValidationError(
+                f"comparison.case_id {comparison.case_id!r} does not reference an "
+                "existing pue_cases row; a comparison cannot be persisted for a "
+                "nonexistent case"
+            )
+        self._check_comparison_id_and_equivalence(comparison, replay=replay)
+
+    def _insert_comparison_row(self, comparison: ClassifierPueComparison, timestamp: str) -> None:
+        """Execute the comparison INSERT only - caller controls the
+        transaction (see :meth:`save_comparison` and
+        :meth:`save_case_with_comparison`)."""
+        self._conn.execute(
+            "INSERT INTO pue_classifier_comparisons ("
+            "comparison_id, case_id, provider, provider_listing_id, source_fingerprint, "
+            "classifier_search_profile_fingerprint, classifier_capability_version, "
+            "pue_capability_version, pue_policy_version, pue_knowledge_version, "
+            "comparison_schema_version, category, comparison_json, created_at"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                comparison.comparison_id,
+                comparison.case_id,
+                comparison.provider,
+                comparison.provider_listing_id,
+                comparison.source_fingerprint,
+                comparison.classifier_search_profile_fingerprint,
+                comparison.classifier_capability_version,
+                comparison.pue_capability_version,
+                comparison.pue_policy_version,
+                comparison.pue_knowledge_version,
+                comparison.comparison_schema_version,
+                comparison.category.value,
+                comparison_to_json(comparison),
+                timestamp,
+            ),
+        )
+
+    def save_comparison(
+        self,
+        comparison: ClassifierPueComparison,
+        *,
+        created_at: str | None = None,
+        replay: bool = False,
+    ) -> str:
+        """Persist ``comparison`` against its already-existing ``case_id``.
+
+        Raises if ``comparison.case_id`` does not reference a persisted
+        case (also enforced at the database level by
+        ``PRAGMA foreign_keys = ON``), if ``comparison_id`` already exists,
+        or - unless ``replay=True`` - if an equivalent comparison (full
+        equivalence key: source fingerprint, search-profile fingerprint,
+        classifier capability version, PUE capability/policy/knowledge
+        version, and comparison schema version) already exists.
+
+        Use this directly to backfill a comparison onto an existing case
+        that has none yet; use :meth:`save_case_with_comparison` when both
+        the case and its first comparison are being newly inserted together.
+        """
+        self._check_comparison_insertable(comparison, replay=replay)
+        timestamp = created_at if created_at is not None else _utc_now()
+        with self._conn:
+            self._insert_comparison_row(comparison, timestamp)
+        return comparison.comparison_id
+
+    def get_comparison_by_id(self, comparison_id: str) -> ClassifierPueComparison | None:
+        row = self._conn.execute(
+            "SELECT comparison_json FROM pue_classifier_comparisons WHERE comparison_id = ?",
+            (comparison_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        return comparison_from_json(row["comparison_json"])
+
+    def get_comparisons_for_case(self, case_id: str) -> list[ClassifierPueComparison]:
+        """Every comparison persisted for ``case_id``, oldest first. A case
+        may have zero, one, or several (e.g. distinct search profiles)."""
+        rows = self._conn.execute(
+            "SELECT comparison_json FROM pue_classifier_comparisons WHERE case_id = ? "
+            "ORDER BY created_at ASC",
+            (case_id,),
+        ).fetchall()
+        return [comparison_from_json(row["comparison_json"]) for row in rows]
+
+    def find_comparison_equivalent(
+        self,
+        *,
+        source_fingerprint: str,
+        classifier_search_profile_fingerprint: str,
+        classifier_capability_version: str,
+        pue_capability_version: str,
+        pue_policy_version: str,
+        pue_knowledge_version: str,
+        comparison_schema_version: str,
+    ) -> ClassifierPueComparison | None:
+        """Return the earliest persisted comparison equivalent to this full
+        key, if any (application-level duplicate detection; see
+        :meth:`save_comparison`). Every argument is materially relevant: a
+        different search profile, policy version, or knowledge version is
+        never treated as equivalent merely because the capability versions
+        are unchanged (Sprint 2 pre-merge correction item 1)."""
+        row = self._conn.execute(
+            "SELECT comparison_json FROM pue_classifier_comparisons WHERE "
+            "source_fingerprint = ? AND classifier_search_profile_fingerprint = ? "
+            "AND classifier_capability_version = ? AND pue_capability_version = ? "
+            "AND pue_policy_version = ? AND pue_knowledge_version = ? "
+            "AND comparison_schema_version = ? ORDER BY created_at ASC LIMIT 1",
+            (
+                source_fingerprint,
+                classifier_search_profile_fingerprint,
+                classifier_capability_version,
+                pue_capability_version,
+                pue_policy_version,
+                pue_knowledge_version,
+                comparison_schema_version,
+            ),
+        ).fetchone()
+        if row is None:
+            return None
+        return comparison_from_json(row["comparison_json"])
+
+    def list_comparisons(self, *, limit: int | None = None) -> list[ClassifierPueComparison]:
+        sql = "SELECT comparison_json FROM pue_classifier_comparisons ORDER BY created_at DESC"
+        params: tuple[int, ...] = ()
+        if limit is not None:
+            sql += " LIMIT ?"
+            params = (limit,)
+        rows = self._conn.execute(sql, params).fetchall()
+        return [comparison_from_json(row["comparison_json"]) for row in rows]

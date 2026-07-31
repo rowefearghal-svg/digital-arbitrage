@@ -3,6 +3,9 @@
   "schema_version": "0.1",
   "curator": "digital-arbitrage PUE Sprint 1",
   "date_admitted": "2026-07-29",
+  "date_updated": "2026-07-31",
+  "purpose": "Deterministic keyword lists driving PUE Evidence extraction for the GPU domain (product form, product type, compatibility, exclusion, bundle, condition, and desktop/mobile terms). Consumed by digital_arbitrage.pue.evidence.load_terms.",
+  "change_note": "Sprint 2 Task 7 review: every term group was checked against the Sprint 1 acceptance fixture (36 cases, including the boundary/adjacency regression cases) and the new Sprint 2 bundle/indistinguishable-variant regression tests. No labelled case demonstrated a missing or incorrect term, so no terms were added, removed, or changed; term_version is unchanged. This entry documents that the review happened, not a content change.",
   "license_note": "Hand-authored deterministic term lists. No external dataset imported.",
   "brand_aliases": {
     "nvidia": ["nvidia", "geforce", "nvidia geforce"],

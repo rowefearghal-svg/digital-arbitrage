@@ -74,11 +74,17 @@ def test_shadow_isolation_does_not_change_classifier_output() -> None:
     without_shadow = classifier.classify(listing, profile)
 
     config = ShadowConfig(enabled=True)
-    shadow_result = run_pue_shadow([listing], config=config)
+    shadow_result = run_pue_shadow([listing], config=config, search_profile=profile)
     with_shadow = classifier.classify(listing, profile)
 
     assert without_shadow == with_shadow
-    assert shadow_result is not None
+    assert len(shadow_result) == 1
+    # The classifier ran exactly the two times above (before and after
+    # shadow execution) - shadow mode itself never re-invokes it - yet a
+    # comparison record is still produced, because it reuses the
+    # already-set ``listing.classification`` from the first call.
+    assert shadow_result[0].comparison is not None
+    assert shadow_result[0].comparison.classifier_label == without_shadow.classification.value
 
 
 def test_shadow_custom_policy_version_is_recorded_end_to_end(tmp_path: Path) -> None:
@@ -94,9 +100,9 @@ def test_shadow_custom_policy_version_is_recorded_end_to_end(tmp_path: Path) -> 
     db_path = tmp_path / "shadow.db"
     config = ShadowConfig(enabled=True, db_path=db_path, policy=custom_policy)
 
-    records = run_pue_shadow([listing], config=config)
-    assert len(records) == 1
-    record = records[0]
+    case_results = run_pue_shadow([listing], config=config)
+    assert len(case_results) == 1
+    record = case_results[0].reasoning_record
     assert record.decision.policy_version == "custom-policy-9.9.9"
 
     with PueCaseStore(db_path) as store:
@@ -138,12 +144,75 @@ def test_repeated_shadow_run_avoids_duplicate_completed_records(tmp_path: Path) 
     second_run = run_pue_shadow([listing], config=config)
     assert len(first_run) == 1
     assert len(second_run) == 1
-    assert first_run[0].case_id != second_run[0].case_id
+    first_record = first_run[0].reasoning_record
+    second_record = second_run[0].reasoning_record
+    assert first_record.case_id != second_record.case_id
 
     with PueCaseStore(db_path) as store:
-        persisted = store.find_by_fingerprint(first_run[0].observation.source_fingerprint)
+        persisted = store.find_by_fingerprint(first_record.observation.source_fingerprint)
     assert len(persisted) == 1
-    assert persisted[0].case_id == first_run[0].case_id
+    assert persisted[0].case_id == first_record.case_id
+
+
+def test_two_search_profiles_backfill_distinct_comparisons_onto_one_case(tmp_path: Path) -> None:
+    """Running shadow mode twice for the identical listing under two
+    different search profiles must persist exactly one PUE case (the
+    second run's case-level equivalent-record check correctly prevents a
+    duplicate case row) but two distinct comparison records, one per
+    search profile - and repeating either profile again must remain
+    idempotent (final Sprint 2 correction: backfilling must only skip a
+    genuinely *equivalent* comparison, not merely because the case already
+    holds some other comparison under a different search profile)."""
+    listing = make_normalized("ASUS TUF RTX 4090 OC TUF-RTX4090-O24G")
+    profile_a = build_search_profile("rtx 4090")
+    profile_b = build_search_profile("rtx 4090 oc")
+    classifier = ListingClassifier()
+    db_path = tmp_path / "shadow.db"
+    config = ShadowConfig(enabled=True, db_path=db_path)
+
+    classifier.classify(listing, profile_a)
+    run_a = run_pue_shadow([listing], config=config, search_profile=profile_a)
+    classifier.classify(listing, profile_b)
+    run_b = run_pue_shadow([listing], config=config, search_profile=profile_b)
+
+    assert len(run_a) == 1
+    assert len(run_b) == 1
+    fingerprint = run_a[0].reasoning_record.observation.source_fingerprint
+    assert run_b[0].reasoning_record.observation.source_fingerprint == fingerprint
+    comparison_a = run_a[0].comparison
+    comparison_b = run_b[0].comparison
+    assert comparison_a is not None
+    assert comparison_b is not None
+    assert (
+        comparison_a.classifier_search_profile_fingerprint
+        != comparison_b.classifier_search_profile_fingerprint
+    )
+
+    with PueCaseStore(db_path) as store:
+        cases = store.find_by_fingerprint(fingerprint)
+        assert len(cases) == 1
+        case_id = cases[0].case_id
+        comparisons = store.get_comparisons_for_case(case_id)
+
+    assert len(comparisons) == 2
+    fingerprints = {c.classifier_search_profile_fingerprint for c in comparisons}
+    assert fingerprints == {
+        comparison_a.classifier_search_profile_fingerprint,
+        comparison_b.classifier_search_profile_fingerprint,
+    }
+
+    # Repeating either profile again must remain idempotent: no third
+    # comparison is added, and still only one case exists.
+    classifier.classify(listing, profile_a)
+    run_pue_shadow([listing], config=config, search_profile=profile_a)
+    classifier.classify(listing, profile_b)
+    run_pue_shadow([listing], config=config, search_profile=profile_b)
+
+    with PueCaseStore(db_path) as store:
+        cases_after = store.find_by_fingerprint(fingerprint)
+        assert len(cases_after) == 1
+        assert cases_after[0].case_id == case_id
+        assert len(store.get_comparisons_for_case(case_id)) == 2
 
 
 def test_shadow_disabled_by_default_is_a_no_op() -> None:
@@ -197,3 +266,28 @@ def test_arbitrage_pipeline_analyze_identical_with_shadow_enabled(tmp_path: Path
     # Shadow mode actually ran and produced output for this call, otherwise
     # the comparison above would be vacuous.
     assert enabled_pipeline.last_pue_shadow_records != ()
+
+
+def test_last_pue_shadow_results_and_records_are_both_exposed(tmp_path: Path) -> None:
+    """Sprint 2 pre-merge correction item 6: ``run_pue_shadow`` returns
+    ``PueShadowCaseResult`` envelopes, not bare ``ReasoningRecord``s.
+    ``last_pue_shadow_results`` is the authoritative attribute holding
+    those envelopes; ``last_pue_shadow_records`` is a genuine compatibility
+    projection restoring its original Sprint 1 meaning - a tuple of plain
+    ``ReasoningRecord``s, never the envelope itself."""
+    from digital_arbitrage.pipeline.pue_shadow import PueShadowCaseResult
+    from digital_arbitrage.pue.models import ReasoningRecord
+
+    pipeline = ArbitragePipeline(
+        PipelineConfig(pue_shadow_config=ShadowConfig(enabled=True, db_path=tmp_path / "shadow.db"))
+    )
+    pipeline.analyze("rtx 4090")
+
+    assert pipeline.last_pue_shadow_results != ()
+    assert all(isinstance(r, PueShadowCaseResult) for r in pipeline.last_pue_shadow_results)
+    assert pipeline.last_pue_shadow_records != ()
+    assert all(isinstance(r, ReasoningRecord) for r in pipeline.last_pue_shadow_records)
+    assert len(pipeline.last_pue_shadow_records) == len(pipeline.last_pue_shadow_results)
+    assert pipeline.last_pue_shadow_records == tuple(
+        r.reasoning_record for r in pipeline.last_pue_shadow_results
+    )
