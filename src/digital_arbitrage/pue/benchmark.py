@@ -111,11 +111,22 @@ class BenchmarkCase:
 
     # --- abstention semantics --------------------------------------------- #
     acceptable_abstention_reasons: tuple[str, ...]
-    avoidable_if_abstained: bool
-    """True when the gold annotation holds that the available title
-    evidence *does* support a non-abstaining outcome - an ABSTAINED
-    Decision on this case is an avoidable abstention, not a justified one
-    (brief section 6.4)."""
+    abstention_classification: str | None
+    """Explicit gold classification of an ABSTAINED outcome on this case -
+    one of ``"justified"`` or ``"avoidable"``, or ``None`` when this case's
+    abstention behaviour has not been independently hand-adjudicated at
+    all (Sprint 3 final release-integrity correction item 7).
+
+    Deliberately **not** inferred as ``justified = abstained and not
+    avoidable`` from a single boolean: that inference silently treated
+    every abstention nobody had explicitly marked ``avoidable`` as
+    ``justified`` by default, which meant the
+    ``every_abstention_classified_justified_or_avoidable`` release gate
+    could never actually catch a genuinely unlabelled abstention (every
+    case was, in effect, always pre-classified). A ``None`` here must
+    cause that gate check to fail for any case that actually abstains -
+    an unlabelled abstention is a gap in the gold annotation, not a
+    default "fine"."""
 
     # --- harm / domain classification ------------------------------------ #
     forbidden_harmful_outcomes: tuple[str, ...]
@@ -125,6 +136,32 @@ class BenchmarkCase:
     unsupported_domain: bool
     """True when this listing is gold-labelled as outside the GPU domain
     (must not be scored as an ordinary identification error)."""
+
+    # --- explicit search/comparison context (Sprint 3 final correction
+    # item 2) --------------------------------------------------------------
+    search_query: str | None
+    """The buyer search query this listing is being evaluated *against*
+    for classifier/PUE differential and comparability-reporting purposes
+    only - e.g. ``"RTX 4090"`` for a listing titled "EK Quantum RTX 4090
+    water block". Deliberately never derived from ``title`` (a listing's
+    own title is not a buyer's search intent - matching a listing against
+    a search query built from its own title is tautological and can never
+    reveal a real product-form mismatch between what was searched for and
+    what was found). ``None`` means this case has no comparison context at
+    all: the existing title classifier is not run and no
+    ``ClassifierPueComparison`` is produced for it (excluded from every
+    classifier/differential metric, never silently compared against an
+    implicit or synthesized query)."""
+    searched_product_form: str | None
+    """Gold annotation of what product form the ``search_query`` searcher
+    was realistically looking for (almost always ``"complete_product"`` -
+    a buyer searching a bare GPU family name is looking for a graphics
+    card, not an accessory) - descriptive context only, never fed into PUE
+    factual identity reasoning."""
+    searched_family: str | None
+    """Gold annotation of the GPU family the ``search_query`` denotes
+    (e.g. ``"rtx 4090"``) - descriptive context only, never fed into PUE
+    factual identity reasoning."""
 
     def outcome_options(self) -> int:
         """How many materially different acceptable outcomes this case
@@ -231,16 +268,24 @@ def _case_from_dict(entry: Mapping[str, object]) -> BenchmarkCase:
             "Candidate exists at all)"
         )
 
-    avoidable = _as_bool(
-        entry.get("avoidable_if_abstained"), field_name="avoidable_if_abstained", case_id=case_id
-    )
-    if avoidable and "abstained" not in allowed:
-        # An avoidable-if-abstained flag only means something for a case
-        # that permits ABSTAINED as one of its acceptable outcomes at all;
-        # otherwise the flag can never be evaluated against anything.
+    abstention_classification = _as_optional_str(entry.get("abstention_classification"))
+    _VALID_ABSTENTION_CLASSIFICATIONS = frozenset({"justified", "avoidable"})
+    if (
+        abstention_classification is not None
+        and abstention_classification not in _VALID_ABSTENTION_CLASSIFICATIONS
+    ):
         raise PueValidationError(
-            f"case {case_id!r}: avoidable_if_abstained=true requires 'abstained' to be "
-            "present in allowed_decision_types"
+            f"case {case_id!r}: abstention_classification must be one of "
+            f"{sorted(_VALID_ABSTENTION_CLASSIFICATIONS)} or omitted, got "
+            f"{abstention_classification!r}"
+        )
+    if abstention_classification is not None and "abstained" not in allowed:
+        # An explicit abstention classification only means something for a
+        # case that permits ABSTAINED as one of its acceptable outcomes at
+        # all; otherwise it can never be evaluated against anything.
+        raise PueValidationError(
+            f"case {case_id!r}: abstention_classification={abstention_classification!r} "
+            "requires 'abstained' to be present in allowed_decision_types"
         )
 
     return BenchmarkCase(
@@ -327,11 +372,14 @@ def _case_from_dict(entry: Mapping[str, object]) -> BenchmarkCase:
             field_name="acceptable_abstention_reasons",
             case_id=case_id,
         ),
-        avoidable_if_abstained=avoidable,
+        abstention_classification=abstention_classification,
         forbidden_harmful_outcomes=harmful,
         unsupported_domain=_as_bool(
             entry.get("unsupported_domain"), field_name="unsupported_domain", case_id=case_id
         ),
+        search_query=_as_optional_str(entry.get("search_query")),
+        searched_product_form=_as_optional_str(entry.get("searched_product_form")),
+        searched_family=_as_optional_str(entry.get("searched_family")),
     )
 
 

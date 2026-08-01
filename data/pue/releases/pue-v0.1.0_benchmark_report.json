@@ -793,7 +793,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "replacement_part",
-      "reasoning_record_case_id": "release-00001151"
+      "reasoning_record_case_id": "release-00001150"
     },
     {
       "case_id": "fan_03_cooling_fans_for_rtx4090",
@@ -811,7 +811,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "replacement_part",
-      "reasoning_record_case_id": "release-00001186"
+      "reasoning_record_case_id": "release-00001184"
     },
     {
       "case_id": "backplate_01_nvidia_rtx4090_fe",
@@ -829,7 +829,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "replacement_part",
-      "reasoning_record_case_id": "release-00001229"
+      "reasoning_record_case_id": "release-00001226"
     },
     {
       "case_id": "backplate_02_generic_rtx4090",
@@ -848,7 +848,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "replacement_part",
-      "reasoning_record_case_id": "release-00001268"
+      "reasoning_record_case_id": "release-00001264"
     },
     {
       "case_id": "adapter_01_12vhpwr",
@@ -866,7 +866,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "accessory",
-      "reasoning_record_case_id": "release-00001307"
+      "reasoning_record_case_id": "release-00001302"
     },
     {
       "case_id": "adapter_02_generic_power_cable",
@@ -884,7 +884,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "accessory",
-      "reasoning_record_case_id": "release-00001324"
+      "reasoning_record_case_id": "release-00001318"
     },
     {
       "case_id": "bracket_01_universal_anti_sag",
@@ -902,7 +902,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "accessory",
-      "reasoning_record_case_id": "release-00001364"
+      "reasoning_record_case_id": "release-00001357"
     },
     {
       "case_id": "bracket_02_riser_cable",
@@ -914,14 +914,15 @@
       "correct": false,
       "decision_type": "ambiguous",
       "failed_checks": [
-        "decision_type_allowed"
+        "decision_type_allowed",
+        "expected_comparability"
       ],
       "harmful_errors": [],
       "identification_level": "unknown",
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00001378"
+      "reasoning_record_case_id": "release-00001370"
     },
     {
       "case_id": "bracket_03_gpu_support_brace",
@@ -939,7 +940,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "accessory",
-      "reasoning_record_case_id": "release-00001415"
+      "reasoning_record_case_id": "release-00001406"
     },
     {
       "case_id": "packaging_01_empty_box",
@@ -957,7 +958,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "packaging_only",
-      "reasoning_record_case_id": "release-00001434"
+      "reasoning_record_case_id": "release-00001424"
     },
     {
       "case_id": "packaging_02_box_only_no_card",
@@ -976,7 +977,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "packaging_only",
-      "reasoning_record_case_id": "release-00001470"
+      "reasoning_record_case_id": "release-00001459"
     },
     {
       "case_id": "packaging_03_retail_box_asus_tuf",
@@ -994,7 +995,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "packaging_only",
-      "reasoning_record_case_id": "release-00001506"
+      "reasoning_record_case_id": "release-00001494"
     },
     {
       "case_id": "damaged_01_for_parts_rtx4090",
@@ -1012,7 +1013,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "incomplete_product",
-      "reasoning_record_case_id": "release-00001544"
+      "reasoning_record_case_id": "release-00001531"
     },
     {
       "case_id": "damaged_02_cracked_pcb",
@@ -1030,7 +1031,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "incomplete_product",
-      "reasoning_record_case_id": "release-00001582"
+      "reasoning_record_case_id": "release-00001568"
     },
     {
       "case_id": "damaged_03_missing_fans_incomplete",
@@ -1047,7 +1048,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00001602"
+      "reasoning_record_case_id": "release-00001587"
     },
     {
       "case_id": "not_included_01_case_only",
@@ -1068,7 +1069,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00001636"
+      "reasoning_record_case_id": "release-00001620"
     },
     {
       "case_id": "not_included_02_bracket_only",
@@ -1086,7 +1087,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "accessory",
-      "reasoning_record_case_id": "release-00001670"
+      "reasoning_record_case_id": "release-00001653"
     },
     {
       "case_id": "compat_01_case_fits_rtx4090",
@@ -1103,9 +1104,9 @@
       "harmful_errors": [],
       "identification_level": "unknown",
       "is_avoidable_abstention": false,
-      "is_justified_abstention": true,
+      "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00001707"
+      "reasoning_record_case_id": "release-00001689"
     },
     {
       "case_id": "compat_02_cooler_compatible",
@@ -1124,7 +1125,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00001739"
+      "reasoning_record_case_id": "release-00001720"
     },
     {
       "case_id": "bundle_01_rtx4090_psu",
@@ -1141,7 +1142,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "bundle",
-      "reasoning_record_case_id": "release-00001778"
+      "reasoning_record_case_id": "release-00001758"
     },
     {
       "case_id": "bundle_02_rtx4090_with_waterblock",
@@ -1151,15 +1152,17 @@
         "ambiguous_title"
       ],
       "comparability_status": "insufficient_information",
-      "correct": true,
+      "correct": false,
       "decision_type": "ambiguous",
-      "failed_checks": [],
+      "failed_checks": [
+        "expected_comparability"
+      ],
       "harmful_errors": [],
       "identification_level": "unknown",
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00001816"
+      "reasoning_record_case_id": "release-00001795"
     },
     {
       "case_id": "bundle_03_gpu_and_riser",
@@ -1168,15 +1171,17 @@
         "bundle"
       ],
       "comparability_status": "insufficient_information",
-      "correct": true,
+      "correct": false,
       "decision_type": "ambiguous",
-      "failed_checks": [],
+      "failed_checks": [
+        "expected_comparability"
+      ],
       "harmful_errors": [],
       "identification_level": "unknown",
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00001856"
+      "reasoning_record_case_id": "release-00001834"
     },
     {
       "case_id": "gap_01_rx6800xt",
@@ -1193,7 +1198,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00001896"
+      "reasoning_record_case_id": "release-00001873"
     },
     {
       "case_id": "gap_02_rtx4060",
@@ -1210,7 +1215,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00001905"
+      "reasoning_record_case_id": "release-00001881"
     },
     {
       "case_id": "gap_03_gtx1660super",
@@ -1227,7 +1232,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00001914"
+      "reasoning_record_case_id": "release-00001889"
     },
     {
       "case_id": "gap_04_arca580",
@@ -1244,7 +1249,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00001923"
+      "reasoning_record_case_id": "release-00001897"
     },
     {
       "case_id": "zero_candidate_01_unknown_brand",
@@ -1261,7 +1266,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00001932"
+      "reasoning_record_case_id": "release-00001905"
     },
     {
       "case_id": "zero_candidate_02_gpu_generic_no_specifics",
@@ -1278,7 +1283,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00001960"
+      "reasoning_record_case_id": "release-00001932"
     },
     {
       "case_id": "ambiguous_01_rtx3060_board_partner",
@@ -1295,7 +1300,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00001990"
+      "reasoning_record_case_id": "release-00001961"
     },
     {
       "case_id": "ambiguous_02_gpu_or_waterblock",
@@ -1312,7 +1317,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002012"
+      "reasoning_record_case_id": "release-00001982"
     },
     {
       "case_id": "abstain_01_contradiction",
@@ -1325,15 +1330,14 @@
       "correct": false,
       "decision_type": "partially_identified",
       "failed_checks": [
-        "decision_type_allowed",
-        "expected_comparability"
+        "decision_type_allowed"
       ],
       "harmful_errors": [],
       "identification_level": "model",
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002042"
+      "reasoning_record_case_id": "release-00002011"
     },
     {
       "case_id": "abstain_02_low_quality_title",
@@ -1351,7 +1355,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002076"
+      "reasoning_record_case_id": "release-00002044"
     },
     {
       "case_id": "domain_01_phone",
@@ -1368,7 +1372,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00002110"
+      "reasoning_record_case_id": "release-00002077"
     },
     {
       "case_id": "domain_02_ambiguous_short",
@@ -1385,7 +1389,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00002119"
+      "reasoning_record_case_id": "release-00002086"
     },
     {
       "case_id": "domain_03_iphone_charger",
@@ -1402,7 +1406,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00002126"
+      "reasoning_record_case_id": "release-00002093"
     },
     {
       "case_id": "conflict_01_title_structured",
@@ -1419,7 +1423,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": true,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002135"
+      "reasoning_record_case_id": "release-00002102"
     },
     {
       "case_id": "conflict_02_brand_mismatch",
@@ -1436,7 +1440,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002173"
+      "reasoning_record_case_id": "release-00002139"
     },
     {
       "case_id": "misleading_01_mousepad",
@@ -1457,7 +1461,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002212"
+      "reasoning_record_case_id": "release-00002177"
     },
     {
       "case_id": "misleading_02_tshirt",
@@ -1478,7 +1482,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002242"
+      "reasoning_record_case_id": "release-00002207"
     },
     {
       "case_id": "edge_01_empty_title",
@@ -1496,7 +1500,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": true,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00002274"
+      "reasoning_record_case_id": "release-00002239"
     },
     {
       "case_id": "edge_02_malformed_input",
@@ -1514,7 +1518,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00002279"
+      "reasoning_record_case_id": "release-00002243"
     },
     {
       "case_id": "exact_alias_01_asus_tuf_rtx4090_mpn",
@@ -1533,7 +1537,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002283"
+      "reasoning_record_case_id": "release-00002247"
     },
     {
       "case_id": "exact_alias_02_gigabyte_aorus_mpn",
@@ -1552,7 +1556,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002322"
+      "reasoning_record_case_id": "release-00002286"
     },
     {
       "case_id": "exact_alias_03_zotac_trinity_mpn",
@@ -1571,7 +1575,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002360"
+      "reasoning_record_case_id": "release-00002324"
     },
     {
       "case_id": "exact_alias_04_sapphire_nitro_rx7900xtx_mpn",
@@ -1590,7 +1594,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002397"
+      "reasoning_record_case_id": "release-00002361"
     },
     {
       "case_id": "exact_alias_05_asrock_arc_a770_mpn",
@@ -1609,7 +1613,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002421"
+      "reasoning_record_case_id": "release-00002385"
     },
     {
       "case_id": "exact_alias_06_msi_rtx3060_ventus_mpn",
@@ -1628,7 +1632,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002439"
+      "reasoning_record_case_id": "release-00002403"
     },
     {
       "case_id": "exact_alias_07_asus_dual_rtx4070_mpn",
@@ -1647,7 +1651,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002469"
+      "reasoning_record_case_id": "release-00002433"
     },
     {
       "case_id": "exact_alias_08_powercolor_reddevil_mpn",
@@ -1666,7 +1670,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002495"
+      "reasoning_record_case_id": "release-00002459"
     },
     {
       "case_id": "family_only_05_rtx4080",
@@ -1684,7 +1688,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002521"
+      "reasoning_record_case_id": "release-00002485"
     },
     {
       "case_id": "family_only_06_rtx4070",
@@ -1702,7 +1706,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002537"
+      "reasoning_record_case_id": "release-00002500"
     },
     {
       "case_id": "family_only_07_rx7800xt",
@@ -1720,7 +1724,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002555"
+      "reasoning_record_case_id": "release-00002517"
     },
     {
       "case_id": "family_only_08_arca750",
@@ -1738,7 +1742,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002571"
+      "reasoning_record_case_id": "release-00002532"
     },
     {
       "case_id": "family_only_09_rtx3060_8gb",
@@ -1756,7 +1760,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002585"
+      "reasoning_record_case_id": "release-00002545"
     },
     {
       "case_id": "mobile_04_amd_rx7900m",
@@ -1775,7 +1779,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002607"
+      "reasoning_record_case_id": "release-00002566"
     },
     {
       "case_id": "mobile_05_laptop_amd_gpu_generic",
@@ -1792,7 +1796,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002639"
+      "reasoning_record_case_id": "release-00002597"
     },
     {
       "case_id": "waterblock_05_full_cover_block_generic",
@@ -1810,7 +1814,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "component",
-      "reasoning_record_case_id": "release-00002673"
+      "reasoning_record_case_id": "release-00002630"
     },
     {
       "case_id": "fan_04_dual_fan_replacement_kit",
@@ -1828,7 +1832,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "replacement_part",
-      "reasoning_record_case_id": "release-00002715"
+      "reasoning_record_case_id": "release-00002671"
     },
     {
       "case_id": "backplate_03_generic_metal",
@@ -1846,7 +1850,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "replacement_part",
-      "reasoning_record_case_id": "release-00002753"
+      "reasoning_record_case_id": "release-00002708"
     },
     {
       "case_id": "bracket_04_gpu_support_stand",
@@ -1864,7 +1868,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "accessory",
-      "reasoning_record_case_id": "release-00002791"
+      "reasoning_record_case_id": "release-00002745"
     },
     {
       "case_id": "adapter_03_riser_cable_variant",
@@ -1876,14 +1880,15 @@
       "correct": false,
       "decision_type": "ambiguous",
       "failed_checks": [
-        "decision_type_allowed"
+        "decision_type_allowed",
+        "expected_comparability"
       ],
       "harmful_errors": [],
       "identification_level": "unknown",
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00002809"
+      "reasoning_record_case_id": "release-00002762"
     },
     {
       "case_id": "packaging_04_msi_box_only",
@@ -1902,7 +1907,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "packaging_only",
-      "reasoning_record_case_id": "release-00002848"
+      "reasoning_record_case_id": "release-00002800"
     },
     {
       "case_id": "damaged_04_water_damage",
@@ -1920,7 +1925,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "incomplete_product",
-      "reasoning_record_case_id": "release-00002889"
+      "reasoning_record_case_id": "release-00002840"
     },
     {
       "case_id": "damaged_05_bent_pins",
@@ -1938,7 +1943,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "incomplete_product",
-      "reasoning_record_case_id": "release-00002927"
+      "reasoning_record_case_id": "release-00002877"
     },
     {
       "case_id": "not_included_03_manual_only",
@@ -1959,7 +1964,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00002947"
+      "reasoning_record_case_id": "release-00002896"
     },
     {
       "case_id": "compat_03_psu_compatible_wattage",
@@ -1968,15 +1973,17 @@
         "compatibility_only"
       ],
       "comparability_status": "insufficient_information",
-      "correct": true,
+      "correct": false,
       "decision_type": "abstained",
-      "failed_checks": [],
+      "failed_checks": [
+        "avoidable_abstention_did_not_occur"
+      ],
       "harmful_errors": [],
       "identification_level": "unknown",
-      "is_avoidable_abstention": false,
-      "is_justified_abstention": true,
+      "is_avoidable_abstention": true,
+      "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00002979"
+      "reasoning_record_case_id": "release-00002927"
     },
     {
       "case_id": "bundle_04_rtx4090_plus_psu_catalogue",
@@ -1993,7 +2000,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "bundle",
-      "reasoning_record_case_id": "release-00003011"
+      "reasoning_record_case_id": "release-00002958"
     },
     {
       "case_id": "bundle_05_two_cards",
@@ -2003,15 +2010,17 @@
         "ambiguous_title"
       ],
       "comparability_status": "comparable_at_broader_level",
-      "correct": true,
+      "correct": false,
       "decision_type": "partially_identified",
-      "failed_checks": [],
+      "failed_checks": [
+        "expected_comparability"
+      ],
       "harmful_errors": [],
       "identification_level": "model",
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00003049"
+      "reasoning_record_case_id": "release-00002995"
     },
     {
       "case_id": "gap_05_rtx4090ti",
@@ -2020,15 +2029,17 @@
         "catalogue_gap"
       ],
       "comparability_status": "comparable_at_broader_level",
-      "correct": true,
+      "correct": false,
       "decision_type": "partially_identified",
-      "failed_checks": [],
+      "failed_checks": [
+        "expected_comparability"
+      ],
       "harmful_errors": [],
       "identification_level": "model",
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00003083"
+      "reasoning_record_case_id": "release-00003028"
     },
     {
       "case_id": "gap_06_rx7600",
@@ -2045,7 +2056,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00003117"
+      "reasoning_record_case_id": "release-00003061"
     },
     {
       "case_id": "gap_07_arcb580",
@@ -2062,7 +2073,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00003126"
+      "reasoning_record_case_id": "release-00003069"
     },
     {
       "case_id": "zero_candidate_03_generic_desc",
@@ -2079,7 +2090,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00003135"
+      "reasoning_record_case_id": "release-00003077"
     },
     {
       "case_id": "ambiguous_03_asus_rtx4090_no_variant",
@@ -2097,7 +2108,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00003142"
+      "reasoning_record_case_id": "release-00003083"
     },
     {
       "case_id": "abstain_03_two_families_conflict",
@@ -2110,15 +2121,14 @@
       "correct": false,
       "decision_type": "partially_identified",
       "failed_checks": [
-        "decision_type_allowed",
-        "expected_comparability"
+        "decision_type_allowed"
       ],
       "harmful_errors": [],
       "identification_level": "model",
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00003176"
+      "reasoning_record_case_id": "release-00003116"
     },
     {
       "case_id": "domain_04_cpu",
@@ -2135,7 +2145,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00003196"
+      "reasoning_record_case_id": "release-00003135"
     },
     {
       "case_id": "domain_05_motherboard",
@@ -2152,7 +2162,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "unknown",
-      "reasoning_record_case_id": "release-00003205"
+      "reasoning_record_case_id": "release-00003144"
     },
     {
       "case_id": "conflict_03_capacity_mismatch",
@@ -2169,7 +2179,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00003216"
+      "reasoning_record_case_id": "release-00003155"
     },
     {
       "case_id": "misleading_03_keychain",
@@ -2190,7 +2200,7 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00003253"
+      "reasoning_record_case_id": "release-00003191"
     },
     {
       "case_id": "misleading_04_sticker_decal",
@@ -2211,35 +2221,35 @@
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
       "product_form": "complete_product",
-      "reasoning_record_case_id": "release-00003285"
+      "reasoning_record_case_id": "release-00003223"
     }
   ],
-  "correct_count": 105,
-  "dataset_file_hash": "fdc0845fe7ea694c1266a0801c9ee364ed48627537c852d41139a9f769ac9ddb",
+  "correct_count": 100,
+  "dataset_file_hash": "c30c4e547c3bbd9f0a3c7d5ed6799ffc380e2ea2403bea816873d5127c384aa7",
   "dataset_id": "gpu-release-benchmark-v0.1",
   "differential_metrics": {
-    "both_correct": 42,
+    "both_correct": 41,
     "both_wrong": 0,
     "classifier_correct_pue_worsens": 4,
-    "classifier_declined_pue_classified": 8,
-    "classifier_gradable": 51,
-    "classifier_ungradable": 66,
-    "identity_specificity_differences": 87,
-    "product_form_disagreements": 5,
-    "pue_appropriately_abstains": 4,
+    "classifier_declined_pue_classified": 4,
+    "classifier_gradable": 45,
+    "classifier_ungradable": 10,
+    "identity_specificity_differences": 51,
+    "product_form_disagreements": 0,
+    "pue_appropriately_abstains": 0,
     "pue_avoidably_abstains": 0,
-    "pue_corrects_classifier": 5,
-    "pue_prevents_harmful_comparability": 2,
-    "total_compared": 117
+    "pue_corrects_classifier": 0,
+    "pue_prevents_harmful_comparability": 0,
+    "total_compared": 55
   },
   "failure_counts_by_category": {
     "claim_failure": 0,
-    "decision_policy_failure": 12,
+    "decision_policy_failure": 16,
     "evaluation_failure": 0,
     "evidence_failure": 0,
     "explanation_failure": 0,
     "hypothesis_failure": 0,
-    "knowledge_failure": 0,
+    "knowledge_failure": 1,
     "observation_failure": 0,
     "retrieval_failure": 1,
     "runtime_failure": 0
@@ -2250,7 +2260,7 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00001412"
+        "release-00001404"
       ],
       "secondary_categories": []
     },
@@ -2259,7 +2269,7 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00001667"
+        "release-00001651"
       ],
       "secondary_categories": []
     },
@@ -2268,7 +2278,7 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00001736"
+        "release-00001718"
       ],
       "secondary_categories": []
     },
@@ -2277,7 +2287,25 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00001775"
+        "release-00001756"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "bundle_02_rtx4090_with_waterblock",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00001832"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "bundle_03_gpu_and_riser",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00001871"
       ],
       "secondary_categories": []
     },
@@ -2286,7 +2314,7 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00002073"
+        "release-00002042"
       ],
       "secondary_categories": []
     },
@@ -2295,7 +2323,7 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00002239"
+        "release-00002204"
       ],
       "secondary_categories": []
     },
@@ -2304,7 +2332,7 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00002271"
+        "release-00002236"
       ],
       "secondary_categories": []
     },
@@ -2313,16 +2341,16 @@
       "explanation": "An acceptable Candidate exists in the knowledge base but was never retrieved for this case.",
       "primary_category": "retrieval_failure",
       "related_object_ids": [
-        "release-00002616",
-        "release-00002617",
-        "release-00002618",
-        "release-00002619",
-        "release-00002620",
-        "release-00002621",
-        "release-00002622",
-        "release-00002623",
-        "release-00002624",
-        "release-00002625"
+        "release-00002575",
+        "release-00002576",
+        "release-00002577",
+        "release-00002578",
+        "release-00002579",
+        "release-00002580",
+        "release-00002581",
+        "release-00002582",
+        "release-00002583",
+        "release-00002584"
       ],
       "secondary_categories": []
     },
@@ -2331,7 +2359,7 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00002845"
+        "release-00002798"
       ],
       "secondary_categories": []
     },
@@ -2340,8 +2368,33 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00002976"
+        "release-00002925"
       ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "compat_03_psu_compatible_wattage",
+      "explanation": "Avoidable abstention: gold annotation holds the available evidence supported a non-abstaining outcome.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00002956"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "bundle_05_two_cards",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00003026"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "gap_05_rtx4090ti",
+      "explanation": "Gold-labelled catalogue gap (no acceptable Candidate exists in the tested knowledge version 'gpu-seed-0.1.0'); the wrong/avoidable outcome traces to missing knowledge coverage, not a retrieval or evaluation defect.",
+      "primary_category": "knowledge_failure",
+      "related_object_ids": [],
       "secondary_categories": []
     },
     {
@@ -2349,7 +2402,7 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00003193"
+        "release-00003133"
       ],
       "secondary_categories": []
     },
@@ -2358,7 +2411,7 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00003282"
+        "release-00003220"
       ],
       "secondary_categories": []
     },
@@ -2367,24 +2420,24 @@
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
-        "release-00003313"
+        "release-00003251"
       ],
       "secondary_categories": []
     }
   ],
-  "generated_at": "2026-08-01T15:56:26.309877",
+  "generated_at": "2026-08-01T19:07:37.901603",
   "harmful_results": [],
   "knowledge_version": "gpu-seed-0.1.0",
   "operational_metrics": {
-    "listings_per_second": 2284.701,
-    "mean_decision_explanation_ms": 0.0258,
-    "mean_evaluation_ms": 0.0738,
-    "mean_extraction_ms": 0.0802,
+    "listings_per_second": 1537.267,
+    "mean_decision_explanation_ms": 0.0429,
+    "mean_evaluation_ms": 0.1168,
+    "mean_extraction_ms": 0.126,
     "mean_persistence_ms": null,
-    "mean_reasoning_record_json_bytes": 17898.339,
-    "mean_retrieval_ms": 0.1189,
-    "median_latency_ms": 0.3852,
-    "p95_latency_ms": 0.5623,
+    "mean_reasoning_record_json_bytes": 17898.322,
+    "mean_retrieval_ms": 0.1888,
+    "median_latency_ms": 0.5373,
+    "p95_latency_ms": 0.8991,
     "technical_failure_rate": {
       "denominator": 118,
       "excluded": 0,
@@ -2402,10 +2455,10 @@
       "value": 1.0
     },
     "classifier_pue_disagreement_rate": {
-      "denominator": 117,
+      "denominator": 55,
       "excluded": 0,
-      "numerator": 95,
-      "value": 0.812
+      "numerator": 46,
+      "value": 0.8364
     },
     "correct_hypothesis_inclusion_rate": {
       "denominator": 35,
@@ -2423,16 +2476,22 @@
       "processing_failed": 1
     },
     "evidence_precision": {
-      "denominator": 20,
+      "denominator": 0,
       "excluded": 0,
-      "numerator": 20,
-      "value": 1.0
+      "numerator": 0,
+      "value": null
     },
     "evidence_recall": {
       "denominator": 30,
       "excluded": 0,
       "numerator": 30,
       "value": 1.0
+    },
+    "forbidden_evidence_violation_rate": {
+      "denominator": 9,
+      "excluded": 0,
+      "numerator": 0,
+      "value": 0.0
     },
     "hard_contradiction_detection_rate": {
       "denominator": 3,
@@ -2456,10 +2515,10 @@
       "value": 0.0
     },
     "avoidable_abstention_rate": {
-      "denominator": 1,
+      "denominator": 2,
       "excluded": 0,
-      "numerator": 0,
-      "value": 0.0
+      "numerator": 1,
+      "value": 0.5
     },
     "candidate_recall_at_1": {
       "denominator": 37,
@@ -2480,10 +2539,10 @@
       "value": 0.973
     },
     "comparability_accuracy": {
-      "denominator": 66,
+      "denominator": 75,
       "excluded": 0,
-      "numerator": 60,
-      "value": 0.9091
+      "numerator": 65,
+      "value": 0.8667
     },
     "exact_identification_accuracy": {
       "denominator": 11,
@@ -2518,8 +2577,8 @@
     "partial_identification_correctness": {
       "denominator": 60,
       "excluded": 0,
-      "numerator": 51,
-      "value": 0.85
+      "numerator": 49,
+      "value": 0.8167
     },
     "product_form_accuracy": {
       "denominator": 48,
@@ -2531,57 +2590,67 @@
   "release_gate": {
     "checks": [
       {
+        "blocking": true,
         "detail": "pytest -q tests/pue/test_acceptance.py tests/pue/test_golden.py tests/pue/test_invariants.py -> exit code 0",
         "name": "all_mandatory_acceptance_cases_pass",
         "passed": true
       },
       {
+        "blocking": true,
         "detail": "0 case(s): []",
         "name": "zero_accessory_to_complete_product_errors",
         "passed": true
       },
       {
+        "blocking": true,
         "detail": "0 case(s): []",
         "name": "zero_packaging_to_complete_product_errors",
         "passed": true
       },
       {
-        "detail": "See product_metrics.candidate_recall_at_* vs decision-quality metrics above.",
+        "blocking": true,
+        "detail": "candidate_recall_at_1/5/10=['36/37', '36/37', '36/37']; exact/hierarchical_identification_accuracy=['11/11', '13/13']",
         "name": "retrieval_and_decision_quality_reported_independently",
         "passed": true
       },
       {
+        "blocking": true,
         "detail": "untraced: []",
         "name": "every_wrong_decision_has_a_traceable_failure_stage",
         "passed": true
       },
       {
-        "detail": "unclassified: []",
+        "blocking": true,
+        "detail": "unclassified: ['compat_01_case_fits_rtx4090']",
         "name": "every_abstention_classified_justified_or_avoidable",
-        "passed": true
+        "passed": false
       },
       {
-        "detail": "0 harmful case(s) listed in the report's harmful_errors section.",
+        "blocking": true,
+        "detail": "0 harmful case(s) - zero-count trivially satisfies adjudication.",
         "name": "every_harmful_result_individually_listed",
         "passed": true
       },
       {
+        "blocking": true,
         "detail": "release-replay-verify-00000001: equivalent=True; release-replay-verify-00000043: equivalent=True; release-replay-verify-00000078: equivalent=True",
         "name": "deterministic_replay_equivalent",
         "passed": true
       },
       {
+        "blocking": true,
         "detail": "Structural invariant enforced by tests/pue/test_invariants.py::test_invariant_no_commercial_fields (no price/profit/ROI field ever read by pue/claims.py, pue/evaluation.py, or pue/decisions.py); verified by the same mandatory-acceptance pytest run above.",
         "name": "no_commercial_data_in_product_identity_reasoning",
         "passed": true
       },
       {
+        "blocking": true,
         "detail": "{'capability_version': 'pue-0.1.0', 'policy_version': 'gpu-policy-0.1.0', 'knowledge_version': 'gpu-seed-0.1.0', 'schema_version': '0.1'}",
         "name": "versions_identified_in_manifest",
         "passed": true
       }
     ],
-    "passed": true
+    "passed": false
   },
   "schema_version": "0.1",
   "total_cases": 118

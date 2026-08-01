@@ -113,7 +113,7 @@ def test_multiple_acceptable_candidates_count_as_success_if_any_within_rank() ->
 def test_avoidable_abstention_rate_denominator_is_avoidable_eligible_cases() -> None:
     run = _run(run_classifier=False)
     metrics = compute_product_metrics(run.results)
-    expected = sum(1 for c in DATASET.cases if c.avoidable_if_abstained)
+    expected = sum(1 for c in DATASET.cases if c.abstention_classification == "avoidable")
     assert metrics.avoidable_abstention_rate.denominator == expected
 
 
@@ -181,13 +181,20 @@ def test_release_gate_fails_when_a_mandatory_check_fails() -> None:
         run.failures,
         mandatory_acceptance_pass=False,
         replay_equivalent=True,
+        product_metrics=compute_product_metrics(run.results),
     )
     assert gate.passed is False
     failing = [c for c in gate.checks if not c.passed]
     assert any(c.name == "all_mandatory_acceptance_cases_pass" for c in failing)
 
 
-def test_release_gate_passes_when_every_mandatory_check_passes() -> None:
+def test_release_gate_mandatory_checks_pass_when_given_passing_evidence() -> None:
+    """Every check derived *directly* from the ``mandatory_acceptance_pass``/
+    ``replay_equivalent``/version arguments passes when those arguments are
+    passing - independent of whether the current benchmark dataset's own
+    data-derived checks (e.g. every abstention classified) happen to pass,
+    which is a separate, real property of the dataset/implementation, not
+    of this function's argument-wiring."""
     run = _run(run_classifier=False)
     gate = evaluate_release_gate(
         run.results,
@@ -198,8 +205,16 @@ def test_release_gate_passes_when_every_mandatory_check_passes() -> None:
         policy_version=run.context.policy_version,
         knowledge_version=run.context.knowledge_version,
         schema_version=run.context.schema_version,
+        product_metrics=compute_product_metrics(run.results),
     )
-    assert gate.passed is True
+    checks_by_name = {c.name: c for c in gate.checks}
+    for name in (
+        "all_mandatory_acceptance_cases_pass",
+        "deterministic_replay_equivalent",
+        "no_commercial_data_in_product_identity_reasoning",
+        "versions_identified_in_manifest",
+    ):
+        assert checks_by_name[name].passed is True, name
 
 
 def test_release_gate_fails_on_replay_non_equivalence() -> None:
@@ -209,6 +224,7 @@ def test_release_gate_fails_on_replay_non_equivalence() -> None:
         run.failures,
         mandatory_acceptance_pass=True,
         replay_equivalent=False,
+        product_metrics=compute_product_metrics(run.results),
     )
     assert gate.passed is False
 

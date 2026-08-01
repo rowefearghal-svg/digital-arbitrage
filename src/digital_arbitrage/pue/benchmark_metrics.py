@@ -165,6 +165,11 @@ class CaseResult:
     """Non-empty when this case triggered one of :data:`HARMFUL_OUTCOME_KINDS`."""
     is_avoidable_abstention: bool
     is_justified_abstention: bool
+    is_unlabelled_abstention: bool
+    """True when this case's Decision actually abstained but
+    ``case.abstention_classification`` is ``None`` (never hand-adjudicated
+    as ``"justified"`` or ``"avoidable"``) - see
+    :attr:`~digital_arbitrage.pue.benchmark.BenchmarkCase.abstention_classification`."""
     is_technical_failure: bool
     top_acceptable_rank: int | None
     """1-based retrieval rank of the best-ranked acceptable Candidate among
@@ -313,9 +318,17 @@ def evaluate_case(
             checks.append(_check(field_name, actual == expected, f"got {actual!r}"))
 
     # --- abstention semantics ------------------------------------------- #
+    # Explicit tri-state gold classification (Sprint 3 final
+    # release-integrity correction item 7): "justified"/"avoidable" are
+    # asserted independently; a case whose abstention behaviour was never
+    # hand-adjudicated (``abstention_classification is None``) is neither
+    # - it is an *unlabelled* abstention, which must fail the
+    # ``every_abstention_classified_justified_or_avoidable`` release gate
+    # rather than silently defaulting to "justified".
     is_abstained = decision.decision_type == DecisionType.ABSTAINED
-    is_avoidable_abstention = is_abstained and case.avoidable_if_abstained
-    is_justified_abstention = is_abstained and not case.avoidable_if_abstained
+    is_avoidable_abstention = is_abstained and case.abstention_classification == "avoidable"
+    is_justified_abstention = is_abstained and case.abstention_classification == "justified"
+    is_unlabelled_abstention = is_abstained and case.abstention_classification is None
     if is_abstained and case.acceptable_abstention_reasons:
         checks.append(
             _check(
@@ -451,6 +464,7 @@ def evaluate_case(
         harmful_errors=tuple(harmful_errors),
         is_avoidable_abstention=is_avoidable_abstention,
         is_justified_abstention=is_justified_abstention,
+        is_unlabelled_abstention=is_unlabelled_abstention,
         is_technical_failure=is_technical_failure,
         top_acceptable_rank=_acceptable_candidate_rank(case, record),
         selected_product_id=selected_product_id,

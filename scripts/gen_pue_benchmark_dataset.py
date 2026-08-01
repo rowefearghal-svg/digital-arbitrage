@@ -263,6 +263,18 @@ for case_id, title, product_id, family, brand in _EXACT_PRODUCTS:
     }
     if has_mpn:
         case_payload["expected_identification_levels"] = ["exact_catalogue_product"]
+    # Hand-adjudicated (never code-derived): this is a real, complete
+    # graphics card sold individually - a title with a genuine dash-shaped
+    # MPN supports exact-SKU comparability; a canonical-title-only mention
+    # (no MPN) genuinely only supports family-level comparability, but
+    # since the annotator cannot know a priori which specificity of
+    # evidence the title carries without checking has_mpn, both real-world
+    # interpretations are gold-acceptable for that case.
+    case_payload["expected_comparability"] = (
+        ["directly_comparable"]
+        if has_mpn
+        else ["directly_comparable", "comparable_at_broader_level"]
+    )
     add(case_payload)
 
 # --------------------------------------------------------------------------- #
@@ -284,6 +296,10 @@ add(
             "gpu-gigabyte-windforce-rtx3060-12g",
         ],
         "min_evidence_count": 1,
+        # Hand-adjudicated: this genuinely is a real RTX 3060 12GB card -
+        # comparable at the family/model level regardless of which
+        # specific board-partner SKU it turns out to be.
+        "expected_comparability": ["comparable_at_broader_level"],
     }
 )
 add(
@@ -297,6 +313,7 @@ add(
         "expected_identification_levels": ["model", "family"],
         "expected_identified_family": "rtx 4090",
         "min_evidence_count": 1,
+        "expected_comparability": ["comparable_at_broader_level"],
     }
 )
 add(
@@ -309,6 +326,7 @@ add(
         "forbidden_decision_types": ["outside_supported_domain", "abstained", "identified"],
         "expected_identification_levels": ["model"],
         "min_evidence_count": 1,
+        "expected_comparability": ["comparable_at_broader_level"],
     }
 )
 add(
@@ -320,6 +338,7 @@ add(
         "allowed_decision_types": ["partially_identified"],
         "forbidden_decision_types": ["outside_supported_domain", "abstained"],
         "min_evidence_count": 1,
+        "expected_comparability": ["comparable_at_broader_level"],
     }
 )
 add(
@@ -331,6 +350,7 @@ add(
         "allowed_decision_types": ["partially_identified"],
         "forbidden_decision_types": ["outside_supported_domain", "abstained"],
         "min_evidence_count": 1,
+        "expected_comparability": ["comparable_at_broader_level"],
     }
 )
 add(
@@ -342,6 +362,7 @@ add(
         "allowed_decision_types": ["partially_identified", "ambiguous"],
         "forbidden_decision_types": ["outside_supported_domain"],
         "min_evidence_count": 1,
+        "expected_comparability": ["comparable_at_broader_level"],
     }
 )
 
@@ -1477,107 +1498,71 @@ add(
 )
 
 # --------------------------------------------------------------------------- #
-# Sprint 3 pre-merge correction item 5: derive `expected_comparability`
-# gold labels from pue/decisions.py's own deterministic, unconditional
-# branches - never from "whatever the current implementation happens to
-# output" for a given *case*. Every ComparabilityStatus decisions.py can
-# produce is a function of (decision_type, product_form, and - only for a
-# CLASSIFIED complete-product outcome - whether a family was resolved),
-# not of incidental behaviour:
-#   - product_form in {component, replacement_part, accessory} ->
-#     NOT_COMPARABLE_PRODUCT_FORM (the accessory/component/replacement-part
-#     branch sets this unconditionally).
-#   - product_form == packaging_only -> NOT_COMPARABLE_PRODUCT_FORM
-#     (packaging-only branch, unconditional).
-#   - product_form == bundle -> NOT_COMPARABLE_BUNDLE (bundle branch,
-#     unconditional regardless of decision_type).
-#   - product_form == incomplete_product AND decision_type ==
-#     partially_identified -> NOT_COMPARABLE_CONDITION.
-#   - product_form == complete_product AND decision_type == identified ->
-#     DIRECTLY_COMPARABLE.
-#   - product_form == complete_product AND decision_type ==
-#     partially_identified -> COMPARABLE_AT_BROADER_LEVEL.
-#   - decision_type == ambiguous -> INSUFFICIENT_INFORMATION (the AMBIGUOUS
-#     branch sets this unconditionally, regardless of hypothesis).
-#   - decision_type == abstained -> INSUFFICIENT_INFORMATION (every
-#     _abstained() call site sets this unconditionally).
-#   - decision_type == outside_supported_domain -> NOT_ASSESSED
-#     (_outside_domain(), unconditional).
-#   - decision_type == processing_failed -> NOT_ASSESSED.
+# Sprint 3 final release-integrity correction item 3: `expected_comparability`
+# is hand-adjudicated strictly from real-world listing/product-category
+# meaning and this benchmark's own annotation metadata (case_tags /
+# catalogue_gap / unsupported_domain - pure annotation facts, chosen
+# independently of how pue/decisions.py computes ComparabilityStatus).
 #
-# Applied only when a case's declared allowed_decision_types +
-# expected_product_form combination resolves to exactly one status per
-# *every* allowed decision type under this table - a case with an allowed
-# decision type this table cannot resolve (e.g. CLASSIFIED with no known
-# product_form, whose comparability then depends on unresolved family
-# information) is left unlabelled rather than guessed.
-_COMPARABILITY_BY_DECISION_TYPE = {
-    "ambiguous": "insufficient_information",
-    "abstained": "insufficient_information",
-    "outside_supported_domain": "not_assessed",
-    "processing_failed": "not_assessed",
-}
-_COMPARABILITY_BY_FORM_ONLY = {
+# There is deliberately no generic function parameterized on
+# allowed_decision_types/expected_product_form: the Sprint 3 pre-merge
+# version of this section (``_derive_expected_comparability``) walked
+# exactly the same dispatch variables decisions.py itself switches on to
+# compute ComparabilityStatus - a table that trivially guarantees
+# agreement with the implementation's *branch structure* even if the
+# underlying real-world semantic mapping were wrong. Removed entirely.
+#
+# Adjudication basis per stratum below (hand-reasoned from what the
+# listing *actually is*, never from a code path):
+#   - accessory/component/replacement-part/packaging-only/water-block/
+#     compatible-item listings are a categorically different product
+#     category from a complete graphics card - never price/value-
+#     comparable to one, independent of any title overlap with a GPU
+#     family name.
+#   - a bundle's aggregate value differs materially from a standalone GPU
+#     - never directly comparable to one.
+#   - misleading-similarity merchandise (mousepad/t-shirt/keychain/
+#     sticker) is not a GPU at all - never comparable to one.
+#   - a catalogue-gap case has no reference product in the tested
+#     knowledge version at all - comparability is genuinely not
+#     assessable, as a statement about this system's own catalogue
+#     coverage, regardless of which decision_type is ultimately reached.
+#   - an unsupported-domain listing is not in the GPU product category at
+#     all - comparability assessment does not apply.
+# Every other case is left unlabelled and excluded from
+# comparability_accuracy - forcing a label without a confident,
+# independent real-world judgment would not be honest (brief: "cases not
+# independently labelled should be excluded").
+# --------------------------------------------------------------------------- #
+_TAG_COMPARABILITY = {
+    "accessory": "not_comparable_product_form",
+    "water_block": "not_comparable_product_form",
     "component": "not_comparable_product_form",
     "replacement_part": "not_comparable_product_form",
-    "accessory": "not_comparable_product_form",
     "packaging_only": "not_comparable_product_form",
+    "compatible_item": "not_comparable_product_form",
+    "compatible_accessory": "not_comparable_product_form",
+    "misleading_similarity": "not_comparable_product_form",
     "bundle": "not_comparable_bundle",
 }
-
-
-def _derive_expected_comparability(case: dict) -> list[str] | None:
-    if "expected_comparability" in case:
-        return None  # already explicitly labelled - never override
-    allowed = case.get("allowed_decision_types", [])
-    form = case.get("expected_product_form")
-    possible: set[str] = set()
-    for dtype in allowed:
-        if dtype in _COMPARABILITY_BY_DECISION_TYPE:
-            possible.add(_COMPARABILITY_BY_DECISION_TYPE[dtype])
-        elif form is not None and form in _COMPARABILITY_BY_FORM_ONLY:
-            possible.add(_COMPARABILITY_BY_FORM_ONLY[form])
-        elif dtype == "identified" and form == "complete_product":
-            possible.add("directly_comparable")
-        elif dtype == "partially_identified" and form == "complete_product":
-            possible.add("comparable_at_broader_level")
-        elif dtype == "partially_identified" and form == "incomplete_product":
-            possible.add("not_comparable_condition")
-        else:
-            return None  # an allowed outcome this table cannot resolve
-    return sorted(possible) if possible else None
-
-
 for _case in cases:
-    _derived = _derive_expected_comparability(_case)
-    if _derived is not None:
-        _case["expected_comparability"] = _derived
-
-# Catalogue-gap cases: allowed_decision_types spans outside_supported_domain
-# (NOT_ASSESSED), partially_identified-with-a-resolved-family (COMPARABLE_
-# AT_BROADER_LEVEL), and classified-with-no-resolved-family (INSUFFICIENT_
-# INFORMATION) - all three are the *only* code-legitimate outcomes for
-# this exact allowed-decision-type set, so all three are gold-acceptable
-# (brief: "add comparability coverage for ... catalogue gap").
-for _case in cases:
+    if "expected_comparability" in _case:
+        continue
     if _case.get("catalogue_gap"):
-        _case["expected_comparability"] = [
-            "not_assessed",
-            "comparable_at_broader_level",
-            "insufficient_information",
-        ]
+        _case["expected_comparability"] = ["not_assessed"]
+        continue
+    if _case.get("unsupported_domain"):
+        _case["expected_comparability"] = ["not_assessed"]
+        continue
+    for _tag in _case.get("case_tags", []):
+        if _tag in _TAG_COMPARABILITY:
+            _case["expected_comparability"] = [_TAG_COMPARABILITY[_tag]]
+            break
 
-# Misleading-similarity merchandise: the ground-truth-correct comparability
-# for a non-GPU item (mouse pad/t-shirt/keychain/sticker) is NOT_COMPARABLE_
-# PRODUCT_FORM - it must never be treated as comparable to a real GPU. This
-# is the same known residual risk already documented in the Sprint 3
-# report (these cases already fail decision_type_allowed); this label adds
-# a second, independent dimension to the *same* already-visible failure,
-# never a new one (brief: "any implementation failure produced by
-# stronger labels must remain visible").
-for _case in cases:
-    if "misleading_similarity" in _case.get("case_tags", []):
-        _case["expected_comparability"] = ["not_comparable_product_form"]
+# Complete-desktop-graphics-card identification strata: hand-adjudicated
+# directly per case-authoring loop/group below (each is a real, complete
+# GPU sold on its own - genuinely comparable at some level; never derived
+# from decisions.py's dispatch).
 
 # --------------------------------------------------------------------------- #
 # Additional Sprint 3 pre-merge correction item 5 gold-label completeness:
@@ -1615,7 +1600,39 @@ for _cid in (
 # case ever abstains, that IS avoidable (the evidence is unambiguous).
 _exact_02 = _by_id["exact_02_asus_tuf_rtx4090"]
 _exact_02["allowed_decision_types"] = list(_exact_02["allowed_decision_types"]) + ["abstained"]
-_exact_02["avoidable_if_abstained"] = True
+_exact_02["abstention_classification"] = "avoidable"
+
+# Explicit abstention-classification gold (Sprint 3 final release-integrity
+# correction item 7): hand-adjudicated "justified" for the 4 cases whose
+# own title/structured-attribute content genuinely does not support a
+# confident non-abstaining outcome - the pre-existing "justified_abstention"
+# case_tags on 3 of these already recorded this same annotator judgment;
+# conflict_01 (a title/structured-attribute family contradiction) is
+# equally unambiguous. Any *other* case that unexpectedly abstains is now
+# an unlabelled abstention and must fail the
+# every_abstention_classified_justified_or_avoidable release gate - a real
+# gap to close, not something to paper over with a default.
+for _cid in (
+    "abstain_01_contradiction",
+    "abstain_02_low_quality_title",
+    "abstain_03_two_families_conflict",
+    "conflict_01_title_structured",
+    # An empty (whitespace-only) title carries zero evidence of any kind -
+    # abstaining is the only honest outcome, never avoidable.
+    "edge_01_empty_title",
+):
+    _by_id[_cid]["abstention_classification"] = "justified"
+
+# "1000W PSU, recommended for RTX 4090 systems" unambiguously describes a
+# power-supply accessory, not a graphics card - the evidence does not
+# genuinely support treating "is this a GPU" as unresolved, so an
+# ABSTAINED outcome here would be avoidable, not justified.
+# compat_01_case_fits_rtx4090 ("PC Case - fits RTX 4090...") is left
+# unlabelled here deliberately: its allowed_decision_types does not
+# include "abstained" at all, so an abstention on it is already a
+# separately-visible decision_type_allowed failure, not a case whose
+# abstention *classification* can be meaningfully hand-adjudicated.
+_by_id["compat_03_psu_compatible_wattage"]["abstention_classification"] = "avoidable"
 
 # Harmful-false-match coverage: a mobile/laptop GPU falsely matched to one
 # of the specific desktop SKUs it is already forbidden from matching would
@@ -1645,6 +1662,82 @@ for _cid in (
     "damaged_05_bent_pins",
 ):
     _by_id[_cid]["expected_product_form"] = "incomplete_product"
+
+# --------------------------------------------------------------------------- #
+# Sprint 3 final release-integrity correction item 2: explicit
+# search/comparison context. A search_query is a genuine, hand-authored
+# annotation choice - "what would a buyer realistically type to find this
+# family of GPU?" - never derived from the listing's own title (see
+# benchmark_runner.py's docstring: matching a listing against a query
+# built from its own title is tautological and can never reveal a real
+# product-form mismatch between what was searched for and what was
+# found). Example directly from the brief: waterblock_01's listing title
+# is "EK Quantum Vector2 RTX 4090 Water Block Full Cover"; its search
+# context below is search_query="RTX 4090" - a buyer looking for a GPU
+# who is shown a water-block accessory instead.
+#
+# searched_product_form is "complete_product" for every query below: a
+# buyer typing a bare GPU family name is looking for a graphics card, not
+# an accessory - the realistic default for this benchmark's queries.
+#
+# Applied to (a) every case with an existing hand-authored
+# expected_identified_family gold field (reusing that field, never
+# title text), and (b) a further hand-picked set of cases spanning
+# family-only, mobile-vs-desktop, water-block, unsupported-domain, and
+# misleading-similarity coverage - chosen so every classifier-gradable
+# stratum (see benchmark_metrics.classifier_gold_correct) has at least
+# some comparison-context coverage. Cases with no search_query are
+# excluded from every classifier/differential metric, never guessed.
+# --------------------------------------------------------------------------- #
+_FAMILY_TO_QUERY = {
+    "rtx 4090": "RTX 4090",
+    "rtx 4080": "RTX 4080",
+    "rtx 4080 super": "RTX 4080 SUPER",
+    "rtx 4070": "RTX 4070",
+    "rtx 4070 ti super": "RTX 4070 Ti SUPER",
+    "rtx 3060": "RTX 3060",
+    "rx 7900 xtx": "RX 7900 XTX",
+    "rx 7800 xt": "RX 7800 XT",
+    "arc a770": "Arc A770",
+    "arc a750": "Arc A750",
+}
+for _case in cases:
+    if "search_query" in _case:
+        continue
+    _family = _case.get("expected_identified_family")
+    if _family in _FAMILY_TO_QUERY:
+        _case["search_query"] = _FAMILY_TO_QUERY[_family]
+        _case["searched_product_form"] = "complete_product"
+        _case["searched_family"] = _family
+
+_CASE_ID_TO_SEARCH_QUERY = {
+    "family_only_01_rtx4090": "RTX 4090",
+    "family_only_02_rx7900xtx": "RX 7900 XTX",
+    "family_only_03_arca770": "Arc A770",
+    "family_only_04_rtx3060": "RTX 3060",
+    "mobile_01_rtx4090_laptop_gpu": "RTX 4090",
+    "mobile_02_dell_laptop_with_rtx4090": "RTX 4090",
+    "mobile_03_rtx4090_desktop_vs_laptop_conflict": "RTX 4090",
+    "waterblock_01_ek_quantum_vector2": "RTX 4090",
+    "waterblock_02_generic_rtx4090": "RTX 4090",
+    "waterblock_03_bykski": "RTX 4090",
+    "waterblock_04_gpu_not_included": "RTX 4090",
+    "domain_01_phone": "RTX 4090",
+    "domain_02_ambiguous_short": "RTX 4090",
+    "domain_03_iphone_charger": "RTX 4090",
+    "domain_04_cpu": "RTX 4090",
+    "domain_05_motherboard": "RTX 4090",
+    "misleading_01_mousepad": "RTX 4090",
+    "misleading_02_tshirt": "RTX 4090",
+    "misleading_03_keychain": "RTX 4090",
+    "misleading_04_sticker_decal": "RTX 4090",
+}
+for _cid, _query in _CASE_ID_TO_SEARCH_QUERY.items():
+    _case = _by_id[_cid]
+    if "search_query" not in _case:
+        _case["search_query"] = _query
+        _case["searched_product_form"] = "complete_product"
+        _case["searched_family"] = _query.lower()
 
 
 dataset = {

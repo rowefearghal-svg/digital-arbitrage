@@ -47,8 +47,10 @@ _REQUIRED_FIELDS = (
     "benchmark_dataset_hash",
     "catalogue_file_hash",
     "policy_code_git_commit",
+    "policy_code_content_hash",
     "release_benchmark_report_path",
-    "release_report_hash",
+    "release_report_artifact_hash",
+    "release_report_semantic_hash",
     "release_gate_passed",
     "release_date",
     "known_limitations",
@@ -69,11 +71,38 @@ class ReleaseManifest:
     benchmark_dataset_hash: str
     catalogue_file_hash: str
     policy_code_git_commit: str
+    """Best-effort exact Git commit of the running code (see
+    :func:`current_git_commit`) - informational provenance only. This
+    field is *expected* to change across a squash merge (a feature
+    branch's commits collapse into a single, different commit on the base
+    branch) and must never be the sole or authoritative release-provenance
+    identity - see ``policy_code_content_hash`` (Sprint 3 final
+    release-integrity correction item 4)."""
+    policy_code_content_hash: str
+    """Deterministic SHA-256 over the content of every file in
+    :data:`digital_arbitrage.pue.canonical.DEFAULT_POLICY_CODE_PATHS` (see
+    :func:`digital_arbitrage.pue.canonical.policy_code_content_hash`) - the
+    authoritative release-provenance identity, computed purely from file
+    content so it is unaffected by a squash merge, unlike
+    ``policy_code_git_commit``."""
     release_benchmark_report_path: str
-    release_report_hash: str
-    """Canonical content hash of the bound release benchmark report (see
-    :func:`digital_arbitrage.pue.benchmark_report.canonical_report_hash`) -
-    excludes volatile fields (generation timestamp, measured operational
+    release_report_artifact_hash: str
+    """Canonical content hash of the *complete* committed release report
+    (see
+    :func:`digital_arbitrage.pue.benchmark_report.canonical_report_artifact_hash`),
+    including the normally-volatile ``generated_at``/``operational_metrics``
+    sections - this is an *artifact-integrity* hash: verification re-hashes
+    the exact committed report file on disk and must detect any
+    post-publication edit to any field, including operational metrics
+    (Sprint 3 final release-integrity correction item 5). It is **not**
+    expected to reproduce across a fresh regeneration (real wall-clock
+    timing varies run to run) - see ``release_report_semantic_hash`` for
+    that."""
+    release_report_semantic_hash: str
+    """Canonical content hash of the bound release benchmark report's
+    *semantic* content only (see
+    :func:`digital_arbitrage.pue.benchmark_report.canonical_report_semantic_hash`)
+    - excludes volatile fields (generation timestamp, measured operational
     timing) so a regeneration from the same code/dataset/catalogue
     reproduces the exact same hash (Sprint 3 pre-merge correction item 4)."""
     release_gate_passed: bool
@@ -94,8 +123,10 @@ class ReleaseManifest:
             "benchmark_dataset_hash": self.benchmark_dataset_hash,
             "catalogue_file_hash": self.catalogue_file_hash,
             "policy_code_git_commit": self.policy_code_git_commit,
+            "policy_code_content_hash": self.policy_code_content_hash,
             "release_benchmark_report_path": self.release_benchmark_report_path,
-            "release_report_hash": self.release_report_hash,
+            "release_report_artifact_hash": self.release_report_artifact_hash,
+            "release_report_semantic_hash": self.release_report_semantic_hash,
             "release_gate_passed": self.release_gate_passed,
             "release_date": self.release_date,
             "known_limitations": list(self.known_limitations),
@@ -140,12 +171,16 @@ def build_release_manifest(
     benchmark_dataset_hash: str,
     catalogue_file_hash: str,
     release_benchmark_report_path: str,
-    release_report_hash: str,
+    release_report_artifact_hash: str,
+    release_report_semantic_hash: str,
     release_gate_passed: bool,
     release_date: str,
     known_limitations: tuple[str, ...] = (),
     policy_code_git_commit: str | None = None,
+    policy_code_content_hash: str | None = None,
 ) -> ReleaseManifest:
+    from .canonical import policy_code_content_hash as _compute_policy_code_content_hash
+
     return ReleaseManifest(
         manifest_schema_version=RELEASE_MANIFEST_SCHEMA_VERSION,
         release_id=release_id,
@@ -159,8 +194,10 @@ def build_release_manifest(
         benchmark_dataset_hash=benchmark_dataset_hash,
         catalogue_file_hash=catalogue_file_hash,
         policy_code_git_commit=policy_code_git_commit or current_git_commit(),
+        policy_code_content_hash=policy_code_content_hash or _compute_policy_code_content_hash(),
         release_benchmark_report_path=release_benchmark_report_path,
-        release_report_hash=release_report_hash,
+        release_report_artifact_hash=release_report_artifact_hash,
+        release_report_semantic_hash=release_report_semantic_hash,
         release_gate_passed=release_gate_passed,
         release_date=release_date,
         known_limitations=tuple(known_limitations),
@@ -205,8 +242,10 @@ def _manifest_from_dict(raw: Mapping[str, object], *, source: str) -> ReleaseMan
         benchmark_dataset_hash=str(raw["benchmark_dataset_hash"]),
         catalogue_file_hash=str(raw["catalogue_file_hash"]),
         policy_code_git_commit=str(raw["policy_code_git_commit"]),
+        policy_code_content_hash=str(raw["policy_code_content_hash"]),
         release_benchmark_report_path=str(raw["release_benchmark_report_path"]),
-        release_report_hash=str(raw["release_report_hash"]),
+        release_report_artifact_hash=str(raw["release_report_artifact_hash"]),
+        release_report_semantic_hash=str(raw["release_report_semantic_hash"]),
         release_gate_passed=gate_passed,
         release_date=str(raw["release_date"]),
         known_limitations=tuple(str(x) for x in limitations),

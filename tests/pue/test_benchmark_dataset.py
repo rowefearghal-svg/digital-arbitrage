@@ -174,18 +174,33 @@ def test_catalogue_gap_with_acceptable_ids_rejected(tmp_path: Path) -> None:
         load_benchmark_dataset(path)
 
 
-def test_avoidable_if_abstained_without_abstained_allowed_rejected(tmp_path: Path) -> None:
+def test_abstention_classification_without_abstained_allowed_rejected(tmp_path: Path) -> None:
     payload = dict(MINIMAL_VALID)
     payload["cases"] = [
         {
             "case_id": "c1",
             "title": "RTX 4090",
             "allowed_decision_types": ["classified"],
-            "avoidable_if_abstained": True,
+            "abstention_classification": "avoidable",
         }
     ]
     path = _write(tmp_path, payload)
-    with pytest.raises(PueValidationError, match="avoidable_if_abstained"):
+    with pytest.raises(PueValidationError, match="abstention_classification"):
+        load_benchmark_dataset(path)
+
+
+def test_abstention_classification_rejects_unknown_value(tmp_path: Path) -> None:
+    payload = dict(MINIMAL_VALID)
+    payload["cases"] = [
+        {
+            "case_id": "c1",
+            "title": "RTX 4090",
+            "allowed_decision_types": ["classified", "abstained"],
+            "abstention_classification": "sometimes",
+        }
+    ]
+    path = _write(tmp_path, payload)
+    with pytest.raises(PueValidationError, match="abstention_classification"):
         load_benchmark_dataset(path)
 
 

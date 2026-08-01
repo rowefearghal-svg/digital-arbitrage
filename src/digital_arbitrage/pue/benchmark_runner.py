@@ -99,8 +99,19 @@ def run_benchmark(
             listing = case_to_listing(case)
             record = process_one(listing, ctx, repository=repo, policy=active_policy)
             comparison = None
-            if classifier is not None and case.title:
-                profile = build_search_profile(case.title)
+            # The classifier's verdict is only meaningful in the context of
+            # an explicit, independently-authored buyer search query (see
+            # BenchmarkCase.search_query) - never one built from the
+            # listing's own title, which would make "does this listing
+            # match the search" tautologically true and could never reveal
+            # a real product-form mismatch between what was searched for
+            # and what was found (Sprint 3 final release-integrity
+            # correction item 2). A case with no ``search_query`` has no
+            # comparison context at all and is excluded from every
+            # classifier/differential metric, never silently compared
+            # against an implicit query.
+            if classifier is not None and case.search_query:
+                profile = build_search_profile(case.search_query)
                 classification = classifier.classify(listing, profile)
                 comparison = compare_classifier_and_pue(
                     classification, record, search_profile=profile, id_factory=ctx.id_factory

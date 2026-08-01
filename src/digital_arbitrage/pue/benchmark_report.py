@@ -151,7 +151,7 @@ def compute_product_metrics(results: Sequence[CaseResult]) -> ProductMetrics:
 
     abstainable_total = total
     abstained = sum(1 for r in results if r.record.decision.decision_type == DecisionType.ABSTAINED)
-    avoidable_eligible = [r for r in results if r.case.avoidable_if_abstained]
+    avoidable_eligible = [r for r in results if r.case.abstention_classification == "avoidable"]
     avoidable_hits = sum(1 for r in avoidable_eligible if r.is_avoidable_abstention)
 
     comparability_cases = [r for r in results if r.case.expected_comparability]
@@ -196,6 +196,21 @@ def compute_product_metrics(results: Sequence[CaseResult]) -> ProductMetrics:
 @dataclass(frozen=True, slots=True)
 class PipelineMetrics:
     evidence_precision: Metric
+    """Always reported unavailable (denominator 0) - genuine evidence
+    precision requires a *complete* expected/allowed evidence-type label
+    per case (every evidence type that legitimately may appear), which
+    this benchmark does not have; only sparse negative
+    (``forbidden_evidence_types``) labels exist. Counting "not
+    gold-forbidden" as "true positive" would conflate "we did not bother
+    to forbid it" with "it is correct/desired evidence" - not the same
+    claim (Sprint 3 final release-integrity correction item 6). See
+    ``forbidden_evidence_violation_rate`` for what the sparse negative
+    labels actually support."""
+    forbidden_evidence_violation_rate: Metric
+    """Of cases with an explicit gold ``forbidden_evidence_types`` label,
+    the fraction that actually produced at least one forbidden evidence
+    type - a genuine, correctly-scoped rate (not a precision claim) over
+    exactly the labelled negative signal that exists."""
     evidence_recall: Metric
     claim_support_correctness: Metric
     correct_hypothesis_inclusion_rate: Metric
@@ -208,6 +223,7 @@ class PipelineMetrics:
     def to_dict(self) -> dict:
         return {
             "evidence_precision": self.evidence_precision.to_dict(),
+            "forbidden_evidence_violation_rate": self.forbidden_evidence_violation_rate.to_dict(),
             "evidence_recall": self.evidence_recall.to_dict(),
             "claim_support_correctness": self.claim_support_correctness.to_dict(),
             "correct_hypothesis_inclusion_rate": self.correct_hypothesis_inclusion_rate.to_dict(),
@@ -234,26 +250,26 @@ def compute_pipeline_metrics(results: Sequence[CaseResult]) -> PipelineMetrics:
         ev_fn += len(required - present)
     evidence_recall = _metric(ev_tp, ev_tp + ev_fn)
 
-    # Evidence precision: requires a genuine *negative* label - cases with
-    # an explicit gold forbidden_evidence_types set ("this evidence type
-    # must NOT appear"). Without any such label, there is no labelled
-    # false-positive signal at all, and precision must be reported
-    # unavailable (denominator 0 -> Metric.value is None) rather than
-    # fabricated as 1.0 by conflating "no labelled false positives exist"
-    # with "no false positives occurred" (Sprint 3 pre-merge correction
-    # item 5).
-    precision_cases = [r for r in results if r.case.forbidden_evidence_types]
-    prec_tp = prec_fp = 0
-    for r in precision_cases:
-        forbidden = set(r.case.forbidden_evidence_types)
-        present = {e.evidence_type.value for e in r.record.evidence}
-        prec_fp += len(forbidden & present)
-        # True positives for the precision denominator are every evidence
-        # type actually produced on a precision-labelled case that was not
-        # gold-forbidden - i.e. every produced evidence type not counted as
-        # a false positive above.
-        prec_tp += len(present - forbidden)
-    evidence_precision = _metric(prec_tp, prec_tp + prec_fp)
+    # Evidence precision: a genuine precision claim requires knowing, for
+    # every case, the *complete* set of evidence types that legitimately
+    # may appear (every "not forbidden" type would need to be a confirmed
+    # true positive, not merely "we did not bother to forbid it"). This
+    # benchmark has only sparse negative (forbidden_evidence_types) labels
+    # - never a complete positive/allowed evidence-type enumeration per
+    # case - so evidence_precision is always reported unavailable
+    # (denominator 0) rather than fabricated from an incomplete label set
+    # (Sprint 3 final release-integrity correction item 6). See
+    # ``forbidden_evidence_violation_rate`` below for the rate the sparse
+    # negative labels actually, honestly support.
+    evidence_precision = _metric(0, 0)
+
+    violation_cases = [r for r in results if r.case.forbidden_evidence_types]
+    violations = sum(
+        1
+        for r in violation_cases
+        if set(r.case.forbidden_evidence_types) & {e.evidence_type.value for e in r.record.evidence}
+    )
+    forbidden_evidence_violation_rate = _metric(violations, len(violation_cases))
 
     claim_cases = [r for r in results if r.case.require_contradicted_claim]
     claim_hits = sum(
@@ -311,6 +327,7 @@ def compute_pipeline_metrics(results: Sequence[CaseResult]) -> PipelineMetrics:
 
     return PipelineMetrics(
         evidence_precision=evidence_precision,
+        forbidden_evidence_violation_rate=forbidden_evidence_violation_rate,
         evidence_recall=evidence_recall,
         claim_support_correctness=claim_support,
         correct_hypothesis_inclusion_rate=hyp_inclusion,
@@ -517,9 +534,24 @@ class GateCheck:
     name: str
     passed: bool
     detail: str = ""
+    blocking: bool = True
+    """Whether this check's outcome counts toward the enclosing report's
+    ``passed`` property. A small number of checks are recorded for
+    provenance/information only and must never block a release or
+    verification on their own - see e.g.
+    :mod:`digital_arbitrage.pue.release_pipeline`'s
+    ``policy_code_git_commit_matches_running_code`` (Sprint 3 final
+    release-integrity correction item 4: a Git commit is *expected* to
+    differ after a squash merge; only the content-hash check is
+    authoritative and blocking)."""
 
     def to_dict(self) -> dict:
-        return {"name": self.name, "passed": self.passed, "detail": self.detail}
+        return {
+            "name": self.name,
+            "passed": self.passed,
+            "detail": self.detail,
+            "blocking": self.blocking,
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -528,7 +560,7 @@ class ReleaseGateReport:
 
     @property
     def passed(self) -> bool:
-        return all(c.passed for c in self.checks)
+        return all(c.passed for c in self.checks if c.blocking)
 
     def to_dict(self) -> dict:
         return {"passed": self.passed, "checks": [c.to_dict() for c in self.checks]}
@@ -546,6 +578,7 @@ def evaluate_release_gate(
     policy_version: str = "",
     knowledge_version: str = "",
     schema_version: str = "",
+    product_metrics: ProductMetrics,
 ) -> ReleaseGateReport:
     """Evaluate every hard release-gate requirement (brief section 7).
 
@@ -588,11 +621,36 @@ def evaluate_release_gate(
         )
     )
 
+    def _valid_metric(m: Metric) -> bool:
+        return 0 <= m.numerator <= m.denominator
+
+    retrieval_metrics = (
+        product_metrics.candidate_recall_at_1,
+        product_metrics.candidate_recall_at_5,
+        product_metrics.candidate_recall_at_10,
+    )
+    decision_quality_metrics = (
+        product_metrics.exact_identification_accuracy,
+        product_metrics.hierarchical_identification_accuracy,
+    )
+    retrieval_valid = all(_valid_metric(m) for m in retrieval_metrics)
+    decision_quality_valid = all(_valid_metric(m) for m in decision_quality_metrics)
+    retrieval_measured = any(m.denominator > 0 for m in retrieval_metrics)
+    decision_quality_measured = any(m.denominator > 0 for m in decision_quality_metrics)
+    independently_reported = (
+        retrieval_valid
+        and decision_quality_valid
+        and retrieval_measured
+        and decision_quality_measured
+    )
     checks.append(
         GateCheck(
             "retrieval_and_decision_quality_reported_independently",
-            True,
-            "See product_metrics.candidate_recall_at_* vs decision-quality metrics above.",
+            independently_reported,
+            "candidate_recall_at_1/5/10="
+            f"{[f'{m.numerator}/{m.denominator}' for m in retrieval_metrics]}; "
+            "exact/hierarchical_identification_accuracy="
+            f"{[f'{m.numerator}/{m.denominator}' for m in decision_quality_metrics]}",
         )
     )
 
@@ -625,12 +683,31 @@ def evaluate_release_gate(
         )
     )
 
-    all_harmful = [r for r in results if r.harmful_errors]
+    # A harmful result is, by construction, always also a wrong result
+    # (evaluate_case: ``correct = correct and not harmful_errors``), so
+    # every harmful case must already have produced a CaseFailure via the
+    # independent classify_failure stage-classification process (the same
+    # mechanism ``every_wrong_decision_has_a_traceable_failure_stage``
+    # checks above) - that CaseFailure trail *is* this benchmark's
+    # explicit harmful-result review/adjudication entry. Comparing against
+    # it (rather than re-deriving the same "results with harmful_errors"
+    # list a second time) actually exercises whether the independent
+    # adjudication process covered every harmful case, not merely whether
+    # the harmful-errors list is non-empty.
+    harmful_case_ids = {r.case.case_id for r in results if r.harmful_errors}
+    adjudicated_ids = {f.case_id for f in failures}
+    unadjudicated_harmful = sorted(harmful_case_ids - adjudicated_ids)
+    if not harmful_case_ids:
+        harmful_detail = "0 harmful case(s) - zero-count trivially satisfies adjudication."
+    else:
+        harmful_detail = (
+            f"{len(harmful_case_ids)} harmful case(s); unadjudicated: {unadjudicated_harmful}"
+        )
     checks.append(
         GateCheck(
             "every_harmful_result_individually_listed",
-            True,
-            f"{len(all_harmful)} harmful case(s) listed in the report's harmful_errors section.",
+            not unadjudicated_harmful,
+            harmful_detail,
         )
     )
 
@@ -750,6 +827,7 @@ def build_benchmark_report(
         schema_version=schema_version,
         mandatory_acceptance_pass=mandatory_acceptance_pass,
         replay_equivalent=replay_equivalent,
+        product_metrics=product_metrics,
     )
     return BenchmarkReport(
         dataset=dataset,
@@ -853,13 +931,38 @@ def report_semantic_dict(report: BenchmarkReport) -> dict:
     return {k: v for k, v in d.items() if k not in VOLATILE_REPORT_KEYS}
 
 
-def canonical_report_hash(report: BenchmarkReport) -> str:
+def canonical_report_semantic_hash(report: BenchmarkReport) -> str:
     """Stable SHA-256 hash of :func:`report_semantic_dict` (see
     :mod:`digital_arbitrage.pue.canonical`) - the value recorded as a
-    release manifest's ``release_report_hash``."""
+    release manifest's ``release_report_semantic_hash``. Reproducible
+    across a fresh regeneration from the same code/dataset/catalogue
+    (Sprint 3 pre-merge correction item 4) - never expected to match a
+    tampered or independently-generated report byte-for-byte, only the
+    *meaningful* (non-volatile) conclusions."""
     from .canonical import canonical_json_hash
 
     return canonical_json_hash(report_semantic_dict(report))
+
+
+def canonical_report_artifact_hash(report: BenchmarkReport) -> str:
+    """Stable SHA-256 hash of the *complete* :func:`report_to_dict`,
+    including :data:`VOLATILE_REPORT_KEYS` (``generated_at`` and
+    ``operational_metrics``) - the value recorded as a release manifest's
+    ``release_report_artifact_hash`` (Sprint 3 final release-integrity
+    correction item 5).
+
+    This is an *artifact-integrity* hash, not a reproducibility hash: it
+    is computed once at release-generation time and is expected to match
+    only a re-hash of the exact, unmodified committed report file - never
+    a freshly regenerated report (real wall-clock operational timing
+    varies run to run). Verification must re-read the committed file from
+    disk and recompute this hash to detect any post-publication tampering
+    with *any* field, including operational metrics - never regenerate
+    and compare, which would always mismatch on timing alone and so could
+    never actually detect tampering."""
+    from .canonical import canonical_json_hash
+
+    return canonical_json_hash(report_to_dict(report))
 
 
 def render_report_json(report: BenchmarkReport) -> str:
@@ -904,6 +1007,7 @@ def render_report_markdown(report: BenchmarkReport) -> str:
     pm = d["pipeline_metrics"]
     for name in (
         "evidence_precision",
+        "forbidden_evidence_violation_rate",
         "evidence_recall",
         "claim_support_correctness",
         "correct_hypothesis_inclusion_rate",

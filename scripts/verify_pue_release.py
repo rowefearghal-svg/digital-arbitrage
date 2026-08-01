@@ -1,5 +1,7 @@
 """Regenerate a published PUE release from the current checkout and verify
-it against the committed manifest (Sprint 3 pre-merge correction item 4).
+it against the committed manifest (Sprint 3 pre-merge correction item 4;
+provenance/hash-splitting corrected by the Sprint 3 final release-integrity
+correction items 4/5).
 
 Run from the repository root:
 
@@ -7,12 +9,21 @@ Run from the repository root:
 
 Verifies:
 
+- the manifest's ``policy_code_content_hash`` (a deterministic hash of the
+  reasoning code/knowledge-data files - see
+  ``digital_arbitrage.pue.canonical.DEFAULT_POLICY_CODE_PATHS``) equals the
+  same hash freshly computed from the current checkout - the authoritative,
+  squash-merge-surviving provenance check;
 - the manifest's ``policy_code_git_commit`` equals the exact commit of the
-  code actually running this verification;
+  code actually running this verification (informational only - expected
+  to legitimately differ after a squash merge);
 - the manifest's dataset/catalogue hashes equal freshly (canonically)
   computed hashes of the current checkout's files;
-- the manifest's ``release_report_hash`` equals the canonical hash of a
-  freshly regenerated report;
+- the manifest's ``release_report_semantic_hash`` equals the canonical
+  semantic hash of a freshly regenerated report;
+- the manifest's ``release_report_artifact_hash`` equals a fresh canonical
+  hash of the *exact currently-committed* report file on disk (detects any
+  post-publication tampering, including a hand-edited operational metric);
 - the regenerated report's semantic content is byte-for-byte identical to
   the committed report's (ignoring only documented volatile fields).
 

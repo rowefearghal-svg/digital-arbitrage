@@ -16,9 +16,36 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Sequence
 from pathlib import Path
 
 from .validation import PueValidationError
+
+#: Source and policy/knowledge-data files (repo-root-relative) whose
+#: content materially determines a Decision - the basis of
+#: :func:`policy_code_content_hash`, a release-provenance identity that
+#: survives a squash merge (unlike a Git commit hash, which necessarily
+#: changes when a feature branch's commits are squashed into a single
+#: merge commit on the base branch - Sprint 3 final release-integrity
+#: correction item 4). Deliberately excludes the benchmark/report/release
+#: machinery itself (``benchmark*.py``, ``release*.py``, ``comparison.py``)
+#: - this hash identifies the *reasoning* code and knowledge/policy data a
+#: Decision was produced under, not the harness that measured it.
+DEFAULT_POLICY_CODE_PATHS: tuple[str, ...] = (
+    "src/digital_arbitrage/pue/admission.py",
+    "src/digital_arbitrage/pue/claims.py",
+    "src/digital_arbitrage/pue/decisions.py",
+    "src/digital_arbitrage/pue/enums.py",
+    "src/digital_arbitrage/pue/evaluation.py",
+    "src/digital_arbitrage/pue/evidence.py",
+    "src/digital_arbitrage/pue/hypotheses.py",
+    "src/digital_arbitrage/pue/models.py",
+    "src/digital_arbitrage/pue/orchestration.py",
+    "src/digital_arbitrage/pue/policies.py",
+    "src/digital_arbitrage/pue/retrieval.py",
+    "src/digital_arbitrage/pue/validation.py",
+    "data/pue/knowledge/gpu_terms_v0.1.json",
+)
 
 
 def canonical_json_bytes(obj: object) -> bytes:
@@ -56,3 +83,33 @@ def canonical_file_hash(path: Path | str) -> str:
             f"{resolved} is not valid JSON, cannot canonically hash: {exc}"
         ) from exc
     return canonical_json_hash(parsed)
+
+
+def policy_code_content_hash(
+    paths: Sequence[str] = DEFAULT_POLICY_CODE_PATHS, *, repo_root: Path | None = None
+) -> str:
+    """Deterministic SHA-256 over the content of every file in ``paths``
+    (repo-root-relative, hashed in sorted order regardless of the order
+    given) - a release-provenance identity computed purely from file
+    *content*, so it survives a squash merge (a Git commit hash does not:
+    it necessarily changes when a feature branch's commits are squashed
+    into a single merge commit on the base branch).
+
+    Each file contributes its repo-relative path and raw bytes to a single
+    running digest, so both a content change *and* a path rename/removal
+    change the result. A missing file contributes a fixed sentinel rather
+    than raising or being silently skipped - its absence must still change
+    (and therefore be caught by) the resulting hash.
+    """
+    root = repo_root or Path(__file__).resolve().parents[3]
+    hasher = hashlib.sha256()
+    for rel in sorted(paths):
+        hasher.update(rel.encode("utf-8"))
+        hasher.update(b"\0")
+        try:
+            content = (root / rel).read_bytes()
+        except OSError:
+            content = b"<missing>"
+        hasher.update(content)
+        hasher.update(b"\0")
+    return hasher.hexdigest()

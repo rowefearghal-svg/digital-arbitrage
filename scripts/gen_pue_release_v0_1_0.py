@@ -40,8 +40,17 @@ KNOWN_LIMITATIONS = (
     "residual risk detail.",
     "The classifier/PUE differential and candidate-recall metrics are measured against a "
     "hand-authored benchmark, not live marketplace traffic.",
-    "Evidence precision is measured only over cases with an explicit forbidden_evidence_types "
-    "gold label; expanding that coverage is future work, not evaluated here.",
+    "Evidence precision is always reported unavailable: this benchmark has only sparse "
+    "negative (forbidden_evidence_types) evidence labels, never a complete allowed/expected "
+    "evidence-type enumeration per case, so a genuine precision claim cannot be computed. See "
+    "forbidden_evidence_violation_rate for the rate the existing labels actually support.",
+    "Comparability gold labels are hand-adjudicated per case-group from real-world listing "
+    "meaning (see scripts/gen_pue_benchmark_dataset.py); cases without a confident, "
+    "independent real-world judgment are deliberately left unlabelled and excluded from "
+    "comparability_accuracy rather than guessed.",
+    "Classifier/PUE comparison is only produced for cases with an explicit search_query "
+    "annotation (a buyer search-intent context, never derived from the listing's own title); "
+    "cases without one are excluded from every classifier/differential metric.",
 )
 
 

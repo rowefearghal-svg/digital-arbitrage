@@ -47,12 +47,14 @@ from .benchmark_report import (
     BenchmarkReport,
     GateCheck,
     build_benchmark_report,
-    canonical_report_hash,
+    canonical_report_artifact_hash,
+    canonical_report_semantic_hash,
     render_report_json,
     render_report_markdown,
     report_semantic_dict,
 )
 from .benchmark_runner import run_benchmark
+from .canonical import canonical_json_hash, policy_code_content_hash
 from .catalogue import DEFAULT_CATALOGUE_PATH, JsonCandidateRepository, catalogue_file_hash
 from .comparison import COMPARISON_SCHEMA_VERSION
 from .orchestration import build_default_context, process_one
@@ -322,8 +324,10 @@ def run_release_pipeline(
         benchmark_dataset_version=dataset.benchmark_version,
         benchmark_dataset_hash=dataset_hash,
         catalogue_file_hash=catalogue_hash,
+        policy_code_content_hash=policy_code_content_hash(),
         release_benchmark_report_path=report_relative_path,
-        release_report_hash=canonical_report_hash(report),
+        release_report_artifact_hash=canonical_report_artifact_hash(report),
+        release_report_semantic_hash=canonical_report_semantic_hash(report),
         release_gate_passed=report.gate.passed,
         release_date=release_date or datetime.now(UTC).date().isoformat(),
         known_limitations=known_limitations,
@@ -402,7 +406,7 @@ class VerificationReport:
 
     @property
     def passed(self) -> bool:
-        return all(c.passed for c in self.checks)
+        return all(c.passed for c in self.checks if c.blocking)
 
     def to_dict(self) -> dict:
         return {"passed": self.passed, "checks": [c.to_dict() for c in self.checks]}
@@ -420,16 +424,27 @@ def verify_release_reproducibility(
     """Regenerate a release from ``dataset_path``/``catalogue_path`` (by
     default the current, current-checkout files) and verify it against a
     previously published ``manifest`` (Sprint 3 pre-merge correction item
-    4):
+    4; provenance/hash-splitting corrected by the Sprint 3 final
+    release-integrity correction items 4/5):
 
+    - the manifest's ``policy_code_content_hash`` (computed purely from
+      file content - see
+      :func:`digital_arbitrage.pue.canonical.policy_code_content_hash`)
+      equals the same hash freshly computed from the current checkout -
+      the authoritative, squash-merge-surviving provenance check;
     - the manifest's ``policy_code_git_commit`` equals the exact commit of
-      the code actually running this verification;
+      the code actually running this verification (informational only,
+      non-blocking - expected to legitimately differ once this release's
+      branch is squash-merged);
     - the manifest's dataset/catalogue hashes equal freshly (canonically)
       computed hashes of the current files;
-    - the manifest's ``release_report_hash`` equals the canonical hash of a
-      freshly regenerated report;
-    - if ``committed_report_path`` is given, the freshly regenerated
-      report's *semantic* content (see
+    - the manifest's ``release_report_semantic_hash`` equals the canonical
+      semantic hash of a freshly regenerated report;
+    - if ``committed_report_path`` is given: the manifest's
+      ``release_report_artifact_hash`` equals a fresh canonical hash of the
+      *exact currently-committed* report file (detects any post-publication
+      tampering, including a hand-edited operational metric), and the
+      freshly regenerated report's *semantic* content (see
       :func:`digital_arbitrage.pue.benchmark_report.report_semantic_dict`)
       is byte-for-byte identical to the committed report's, ignoring only
       the documented volatile fields.
@@ -442,12 +457,30 @@ def verify_release_reproducibility(
 
     checks: list[GateCheck] = []
 
+    # Informational only, never blocking (Sprint 3 final release-integrity
+    # correction item 4): a Git commit is *expected* to differ once this
+    # release's feature branch is squash-merged into a single, different
+    # commit on the base branch. The authoritative, blocking provenance
+    # check is ``policy_code_content_hash_matches`` below, computed purely
+    # from file content and therefore unaffected by a squash merge.
     current_commit = current_git_commit()
     checks.append(
         GateCheck(
             "policy_code_git_commit_matches_running_code",
             current_commit == manifest.policy_code_git_commit,
-            f"manifest={manifest.policy_code_git_commit!r} running={current_commit!r}",
+            f"manifest={manifest.policy_code_git_commit!r} running={current_commit!r} "
+            "(informational only - expected to differ after a squash merge; see "
+            "policy_code_content_hash_matches for the authoritative check)",
+            blocking=False,
+        )
+    )
+
+    current_content_hash = policy_code_content_hash()
+    checks.append(
+        GateCheck(
+            "policy_code_content_hash_matches",
+            current_content_hash == manifest.policy_code_content_hash,
+            f"manifest={manifest.policy_code_content_hash!r} current={current_content_hash!r}",
         )
     )
 
@@ -478,12 +511,13 @@ def verify_release_reproducibility(
         report_relative_path=manifest.release_benchmark_report_path,
         pytest_runner=pytest_runner,
     )
-    regenerated_hash = canonical_report_hash(regenerated.report)
+    regenerated_semantic_hash = canonical_report_semantic_hash(regenerated.report)
     checks.append(
         GateCheck(
-            "release_report_hash_matches",
-            regenerated_hash == manifest.release_report_hash,
-            f"manifest={manifest.release_report_hash!r} regenerated={regenerated_hash!r}",
+            "release_report_semantic_hash_matches",
+            regenerated_semantic_hash == manifest.release_report_semantic_hash,
+            f"manifest={manifest.release_report_semantic_hash!r} "
+            f"regenerated={regenerated_semantic_hash!r}",
         )
     )
     checks.append(
@@ -495,7 +529,29 @@ def verify_release_reproducibility(
     )
 
     if committed_report_path is not None:
-        committed_dict = _json.loads(Path(committed_report_path).read_text(encoding="utf-8"))
+        committed_text = Path(committed_report_path).read_text(encoding="utf-8")
+        committed_dict = _json.loads(committed_text)
+
+        # Artifact-integrity check (Sprint 3 final release-integrity
+        # correction item 5): re-hash the *exact currently-committed*
+        # report file - including its (volatile-by-nature but now
+        # tamper-checked) generated_at/operational_metrics fields - and
+        # compare against the manifest's release_report_artifact_hash.
+        # This must NEVER be compared against a freshly regenerated
+        # report (real wall-clock timing varies run to run and would
+        # always mismatch); it detects any post-publication edit to the
+        # committed file itself, including a hand-edited operational
+        # metric.
+        committed_artifact_hash = canonical_json_hash(committed_dict)
+        checks.append(
+            GateCheck(
+                "release_report_artifact_hash_matches_committed_file",
+                committed_artifact_hash == manifest.release_report_artifact_hash,
+                f"manifest={manifest.release_report_artifact_hash!r} "
+                f"committed_file={committed_artifact_hash!r}",
+            )
+        )
+
         committed_semantic = {
             k: v for k, v in committed_dict.items() if k not in VOLATILE_REPORT_KEYS
         }

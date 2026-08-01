@@ -29,11 +29,13 @@ def _manifest(**overrides):
         benchmark_dataset_hash="a" * 64,
         catalogue_file_hash="b" * 64,
         release_benchmark_report_path="reports/pue_benchmark_report.json",
-        release_report_hash="c" * 64,
+        release_report_artifact_hash="c" * 64,
+        release_report_semantic_hash="d" * 64,
         release_gate_passed=True,
         release_date="2026-08-01",
         known_limitations=("seed catalogue is small",),
         policy_code_git_commit="deadbeef",
+        policy_code_content_hash="e" * 64,
     )
     defaults.update(overrides)
     return build_release_manifest(**defaults)

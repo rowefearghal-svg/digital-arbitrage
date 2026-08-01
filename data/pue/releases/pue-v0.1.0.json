@@ -1,5 +1,5 @@
 {
-  "benchmark_dataset_hash": "fdc0845fe7ea694c1266a0801c9ee364ed48627537c852d41139a9f769ac9ddb",
+  "benchmark_dataset_hash": "c30c4e547c3bbd9f0a3c7d5ed6799ffc380e2ea2403bea816873d5127c384aa7",
   "benchmark_dataset_id": "gpu-release-benchmark-v0.1",
   "benchmark_dataset_version": "gpu-release-benchmark-0.1.0",
   "capability_version": "pue-0.1.0",
@@ -11,15 +11,19 @@
     "Exact-catalogue-product identification requires a clean, dash-shaped MPN token in the title matching the catalogue's stored identifier exactly; canonical-title-only mentions correctly top out at MODEL/VARIANT identification level.",
     "Misleading-similarity non-GPU merchandise (mouse pads, t-shirts, keychains, stickers referencing a GPU model name) is not yet reliably distinguished from an actual GPU listing at the product-type level - see the downstream comparability recommendation for residual risk detail.",
     "The classifier/PUE differential and candidate-recall metrics are measured against a hand-authored benchmark, not live marketplace traffic.",
-    "Evidence precision is measured only over cases with an explicit forbidden_evidence_types gold label; expanding that coverage is future work, not evaluated here."
+    "Evidence precision is always reported unavailable: this benchmark has only sparse negative (forbidden_evidence_types) evidence labels, never a complete allowed/expected evidence-type enumeration per case, so a genuine precision claim cannot be computed. See forbidden_evidence_violation_rate for the rate the existing labels actually support.",
+    "Comparability gold labels are hand-adjudicated per case-group from real-world listing meaning (see scripts/gen_pue_benchmark_dataset.py); cases without a confident, independent real-world judgment are deliberately left unlabelled and excluded from comparability_accuracy rather than guessed.",
+    "Classifier/PUE comparison is only produced for cases with an explicit search_query annotation (a buyer search-intent context, never derived from the listing's own title); cases without one are excluded from every classifier/differential metric."
   ],
   "manifest_schema_version": "pue-release-manifest-0.1.0",
-  "policy_code_git_commit": "409734d51a8893884b3f7f3c88f4a1369f8a678b",
+  "policy_code_content_hash": "974ec4a649e52a9b57bc92e0795ae092835fa45bef58b69d02aa389c7816bfa2",
+  "policy_code_git_commit": "ca3d1a67e39def48630df7f87321ec2029c90697",
   "policy_version": "gpu-policy-0.1.0",
   "release_benchmark_report_path": "data/pue/releases/pue-v0.1.0_benchmark_report.json",
   "release_date": "2026-08-01",
-  "release_gate_passed": true,
+  "release_gate_passed": false,
   "release_id": "pue-v0.1.0",
-  "release_report_hash": "eddd6f6e334463c53a3206bf4b5a39fd29ddd00a90bade9a9eeec7754df7f16d",
+  "release_report_artifact_hash": "494da8e6259a4c9d567b1da4d16f120f440934043bffa3955d575612d2aaed08",
+  "release_report_semantic_hash": "ff4dda4be95f323ad438073e05dd57e4e758dbd08abe26327b40c02870242be2",
   "schema_version": "0.1"
 }

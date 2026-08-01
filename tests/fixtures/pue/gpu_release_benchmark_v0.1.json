@@ -38,12 +38,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "exact_02_asus_tuf_rtx4090",
@@ -76,12 +79,15 @@
       "expected_identification_levels": [
         "exact_catalogue_product"
       ],
-      "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
         "directly_comparable"
       ],
-      "avoidable_if_abstained": true
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "abstention_classification": "avoidable",
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "exact_03_asus_rog_rtx4090",
@@ -113,11 +119,14 @@
       "expected_identification_levels": [
         "exact_catalogue_product"
       ],
-      "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
         "directly_comparable"
-      ]
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "exact_04_msi_rtx4090_trio",
@@ -147,12 +156,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "exact_05_gigabyte_rtx4090_master",
@@ -182,12 +194,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "exact_06_zotac_rtx4090_trinity",
@@ -217,12 +232,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "exact_07_rtx4080_fe",
@@ -252,12 +270,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4080",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4080"
     },
     {
       "case_id": "exact_08_asus_tuf_rtx4080super",
@@ -289,11 +310,14 @@
       "expected_identification_levels": [
         "exact_catalogue_product"
       ],
-      "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
         "directly_comparable"
-      ]
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 4080 SUPER",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4080 super"
     },
     {
       "case_id": "exact_09_msi_rtx4080super_trio",
@@ -323,12 +347,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4080 SUPER",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4080 super"
     },
     {
       "case_id": "exact_10_rtx4070_fe",
@@ -358,12 +385,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4070",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4070"
     },
     {
       "case_id": "exact_11_asus_dual_rtx4070",
@@ -395,11 +425,14 @@
       "expected_identification_levels": [
         "exact_catalogue_product"
       ],
-      "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
         "directly_comparable"
-      ]
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 4070",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4070"
     },
     {
       "case_id": "exact_12_msi_rtx4070tisuper_trio",
@@ -429,12 +462,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4070 Ti SUPER",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4070 ti super"
     },
     {
       "case_id": "exact_13_asus_dual_rtx3060_8g",
@@ -466,11 +502,14 @@
       "expected_identification_levels": [
         "exact_catalogue_product"
       ],
-      "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
         "directly_comparable"
-      ]
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 3060",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 3060"
     },
     {
       "case_id": "exact_14_asus_dual_rtx3060_12g",
@@ -502,11 +541,14 @@
       "expected_identification_levels": [
         "exact_catalogue_product"
       ],
-      "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
         "directly_comparable"
-      ]
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 3060",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 3060"
     },
     {
       "case_id": "exact_15_msi_rtx3060_gamingx_8g",
@@ -536,12 +578,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 3060",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 3060"
     },
     {
       "case_id": "exact_16_msi_rtx3060_ventus_12g",
@@ -571,12 +616,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 3060",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 3060"
     },
     {
       "case_id": "exact_17_gigabyte_rtx3060_windforce",
@@ -608,11 +656,14 @@
       "expected_identification_levels": [
         "exact_catalogue_product"
       ],
-      "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
         "directly_comparable"
-      ]
+      ],
+      "annotation_source": "sprint3_hand_authored",
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 3060",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 3060"
     },
     {
       "case_id": "exact_18_amd_rx7900xtx_reference",
@@ -642,12 +693,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RX 7900 XTX",
+      "searched_product_form": "complete_product",
+      "searched_family": "rx 7900 xtx"
     },
     {
       "case_id": "exact_19_sapphire_rx7900xtx_nitro",
@@ -677,12 +731,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RX 7900 XTX",
+      "searched_product_form": "complete_product",
+      "searched_family": "rx 7900 xtx"
     },
     {
       "case_id": "exact_20_powercolor_rx7900xtx_reddevil",
@@ -712,12 +769,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RX 7900 XTX",
+      "searched_product_form": "complete_product",
+      "searched_family": "rx 7900 xtx"
     },
     {
       "case_id": "exact_21_amd_rx7800xt_reference",
@@ -747,12 +807,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RX 7800 XT",
+      "searched_product_form": "complete_product",
+      "searched_family": "rx 7800 xt"
     },
     {
       "case_id": "exact_22_sapphire_rx7800xt_nitro",
@@ -782,12 +845,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RX 7800 XT",
+      "searched_product_form": "complete_product",
+      "searched_family": "rx 7800 xt"
     },
     {
       "case_id": "exact_23_intel_arca770_le",
@@ -817,12 +883,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "Arc A770",
+      "searched_product_form": "complete_product",
+      "searched_family": "arc a770"
     },
     {
       "case_id": "exact_24_asrock_arca770_phantom",
@@ -852,12 +921,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "Arc A770",
+      "searched_product_form": "complete_product",
+      "searched_family": "arc a770"
     },
     {
       "case_id": "exact_25_intel_arca750_le",
@@ -887,12 +959,15 @@
         "product_family_token"
       ],
       "min_evidence_count": 2,
+      "expected_comparability": [
+        "directly_comparable",
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "Arc A750",
+      "searched_product_form": "complete_product",
+      "searched_family": "arc a750"
     },
     {
       "case_id": "ambig_01_rtx3060_12gb_no_brand",
@@ -916,8 +991,14 @@
         "gpu-gigabyte-windforce-rtx3060-12g"
       ],
       "min_evidence_count": 1,
+      "expected_comparability": [
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 3060",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 3060"
     },
     {
       "case_id": "ambig_02_rtx4090_no_brand",
@@ -941,8 +1022,14 @@
       ],
       "expected_identified_family": "rtx 4090",
       "min_evidence_count": 1,
+      "expected_comparability": [
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "family_only_01_rtx4090",
@@ -964,8 +1051,14 @@
         "model"
       ],
       "min_evidence_count": 1,
+      "expected_comparability": [
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "family_only_02_rx7900xtx",
@@ -983,8 +1076,14 @@
         "abstained"
       ],
       "min_evidence_count": 1,
+      "expected_comparability": [
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RX 7900 XTX",
+      "searched_product_form": "complete_product",
+      "searched_family": "rx 7900 xtx"
     },
     {
       "case_id": "family_only_03_arca770",
@@ -1002,8 +1101,14 @@
         "abstained"
       ],
       "min_evidence_count": 1,
+      "expected_comparability": [
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "Arc A770",
+      "searched_product_form": "complete_product",
+      "searched_family": "arc a770"
     },
     {
       "case_id": "family_only_04_rtx3060",
@@ -1021,8 +1126,14 @@
         "outside_supported_domain"
       ],
       "min_evidence_count": 1,
+      "expected_comparability": [
+        "comparable_at_broader_level"
+      ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 3060",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 3060"
     },
     {
       "case_id": "mobile_01_rtx4090_laptop_gpu",
@@ -1054,7 +1165,10 @@
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "forbidden_harmful_outcomes": [
         "harmful_false_match"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "mobile_02_dell_laptop_with_rtx4090",
@@ -1078,7 +1192,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "mobile_03_rtx4090_desktop_vs_laptop_conflict",
@@ -1098,7 +1215,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "waterblock_01_ek_quantum_vector2",
@@ -1128,7 +1248,10 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "waterblock_02_generic_rtx4090",
@@ -1158,7 +1281,10 @@
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
         "not_comparable_product_form"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "waterblock_03_bykski",
@@ -1184,7 +1310,10 @@
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
         "not_comparable_product_form"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "waterblock_04_gpu_not_included",
@@ -1214,7 +1343,13 @@
       ],
       "min_evidence_count": 3,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "fan_01_asus_tuf_rtx4090_fan_set",
@@ -1343,7 +1478,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "adapter_01_12vhpwr",
@@ -1369,7 +1507,10 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "adapter_02_generic_power_cable",
@@ -1395,7 +1536,10 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "bracket_01_universal_anti_sag",
@@ -1448,7 +1592,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "bracket_03_gpu_support_brace",
@@ -1469,7 +1616,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "packaging_01_empty_box",
@@ -1556,7 +1706,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "damaged_01_for_parts_rtx4090",
@@ -1739,7 +1892,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_bundle"
+      ]
     },
     {
       "case_id": "bundle_02_rtx4090_with_waterblock",
@@ -1762,7 +1918,7 @@
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
-        "insufficient_information"
+        "not_comparable_bundle"
       ]
     },
     {
@@ -1783,7 +1939,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_bundle"
+      ]
     },
     {
       "case_id": "gap_01_rx6800xt",
@@ -1805,9 +1964,7 @@
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
-        "not_assessed",
-        "comparable_at_broader_level",
-        "insufficient_information"
+        "not_assessed"
       ]
     },
     {
@@ -1830,9 +1987,7 @@
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
-        "not_assessed",
-        "comparable_at_broader_level",
-        "insufficient_information"
+        "not_assessed"
       ]
     },
     {
@@ -1855,9 +2010,7 @@
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
-        "not_assessed",
-        "comparable_at_broader_level",
-        "insufficient_information"
+        "not_assessed"
       ]
     },
     {
@@ -1880,9 +2033,7 @@
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
-        "not_assessed",
-        "comparable_at_broader_level",
-        "insufficient_information"
+        "not_assessed"
       ]
     },
     {
@@ -1981,9 +2132,7 @@
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "insufficient_information"
-      ]
+      "abstention_classification": "justified"
     },
     {
       "case_id": "abstain_02_low_quality_title",
@@ -2003,7 +2152,8 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "abstention_classification": "justified"
     },
     {
       "case_id": "domain_01_phone",
@@ -2032,7 +2182,10 @@
       ],
       "forbidden_evidence_types": [
         "product_family_token"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "domain_02_ambiguous_short",
@@ -2061,7 +2214,10 @@
       ],
       "forbidden_evidence_types": [
         "product_family_token"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "domain_03_iphone_charger",
@@ -2090,7 +2246,10 @@
       ],
       "forbidden_evidence_types": [
         "product_family_token"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "conflict_01_title_structured",
@@ -2114,9 +2273,7 @@
       "min_evidence_count": 3,
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "insufficient_information"
-      ],
+      "abstention_classification": "justified",
       "require_contradicted_claim": true
     },
     {
@@ -2168,7 +2325,10 @@
       ],
       "forbidden_evidence_types": [
         "mpn_token"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "misleading_02_tshirt",
@@ -2199,7 +2359,10 @@
       ],
       "forbidden_evidence_types": [
         "mpn_token"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "edge_01_empty_title",
@@ -2220,10 +2383,7 @@
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "insufficient_information",
-        "not_assessed"
-      ]
+      "abstention_classification": "justified"
     },
     {
       "case_id": "edge_02_malformed_input",
@@ -2243,10 +2403,7 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "not_assessed"
-      ]
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
     },
     {
       "case_id": "exact_alias_01_asus_tuf_rtx4090_mpn",
@@ -2277,9 +2434,9 @@
       ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "exact_alias_02_gigabyte_aorus_mpn",
@@ -2308,10 +2465,9 @@
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "exact_alias_03_zotac_trinity_mpn",
@@ -2342,9 +2498,9 @@
       ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "exact_alias_04_sapphire_nitro_rx7900xtx_mpn",
@@ -2375,9 +2531,9 @@
       ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "directly_comparable"
-      ]
+      "search_query": "RX 7900 XTX",
+      "searched_product_form": "complete_product",
+      "searched_family": "rx 7900 xtx"
     },
     {
       "case_id": "exact_alias_05_asrock_arc_a770_mpn",
@@ -2406,10 +2562,9 @@
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "Arc A770",
+      "searched_product_form": "complete_product",
+      "searched_family": "arc a770"
     },
     {
       "case_id": "exact_alias_06_msi_rtx3060_ventus_mpn",
@@ -2438,10 +2593,9 @@
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RTX 3060",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 3060"
     },
     {
       "case_id": "exact_alias_07_asus_dual_rtx4070_mpn",
@@ -2472,9 +2626,9 @@
       ],
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "directly_comparable"
-      ]
+      "search_query": "RTX 4070",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4070"
     },
     {
       "case_id": "exact_alias_08_powercolor_reddevil_mpn",
@@ -2503,10 +2657,9 @@
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "comparable_at_broader_level",
-        "directly_comparable"
-      ]
+      "search_query": "RX 7900 XTX",
+      "searched_product_form": "complete_product",
+      "searched_family": "rx 7900 xtx"
     },
     {
       "case_id": "family_only_05_rtx4080",
@@ -2677,7 +2830,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "fan_04_dual_fan_replacement_kit",
@@ -2698,7 +2854,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "backplate_03_generic_metal",
@@ -2719,7 +2878,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "bracket_04_gpu_support_stand",
@@ -2764,7 +2926,10 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "packaging_04_msi_box_only",
@@ -2790,7 +2955,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "damaged_04_water_damage",
@@ -2883,7 +3051,8 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "abstention_classification": "avoidable"
     },
     {
       "case_id": "bundle_04_rtx4090_plus_psu_catalogue",
@@ -2905,7 +3074,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_bundle"
+      ]
     },
     {
       "case_id": "bundle_05_two_cards",
@@ -2925,7 +3097,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_bundle"
+      ]
     },
     {
       "case_id": "gap_05_rtx4090ti",
@@ -2947,9 +3122,7 @@
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
-        "not_assessed",
-        "comparable_at_broader_level",
-        "insufficient_information"
+        "not_assessed"
       ]
     },
     {
@@ -2972,9 +3145,7 @@
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
-        "not_assessed",
-        "comparable_at_broader_level",
-        "insufficient_information"
+        "not_assessed"
       ]
     },
     {
@@ -2997,9 +3168,7 @@
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
       "expected_comparability": [
-        "not_assessed",
-        "comparable_at_broader_level",
-        "insufficient_information"
+        "not_assessed"
       ]
     },
     {
@@ -3019,11 +3188,7 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "insufficient_information",
-        "not_assessed"
-      ]
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
     },
     {
       "case_id": "ambiguous_03_asus_rtx4090_no_variant",
@@ -3063,9 +3228,7 @@
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
-      "expected_comparability": [
-        "insufficient_information"
-      ]
+      "abstention_classification": "justified"
     },
     {
       "case_id": "domain_04_cpu",
@@ -3094,7 +3257,10 @@
       ],
       "forbidden_evidence_types": [
         "product_family_token"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "domain_05_motherboard",
@@ -3118,9 +3284,15 @@
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
       "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed"
+      ],
       "forbidden_evidence_types": [
         "product_family_token"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "conflict_03_capacity_mismatch",
@@ -3171,7 +3343,10 @@
       ],
       "forbidden_evidence_types": [
         "mpn_token"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     },
     {
       "case_id": "misleading_04_sticker_decal",
@@ -3202,7 +3377,10 @@
       ],
       "forbidden_evidence_types": [
         "mpn_token"
-      ]
+      ],
+      "search_query": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_family": "rtx 4090"
     }
   ]
 }
