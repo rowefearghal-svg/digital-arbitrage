@@ -26,6 +26,22 @@ Every case asserts more than the final Decision label, per spec section 21's
 closing requirement ("tests must assert not only the final Decision but also
 key Evidence, Claims and Candidate contradictions").
 
+## `gpu_release_benchmark_v0.1.json`
+
+The Sprint 3 GPU release benchmark: 118 hand-authored, labelled cases driven
+by `digital_arbitrage.pue.benchmark`/`benchmark_metrics`/`benchmark_report`/
+`benchmark_runner` and `tests/pue/test_benchmark_*.py`. Run it with
+`arb pue benchmark` (see `src/digital_arbitrage/pipeline/cli.py`) or
+`python scripts/gen_pue_release_v0_1_0.py` to reproduce the bound release
+report at `data/pue/releases/`. See
+`docs/architecture/PUE_v0.1_SPRINT3_BENCHMARK_REPORT.md` for the full
+results, error-taxonomy breakdown, and downstream comparability
+recommendation. Regenerate the dataset only via
+`python scripts/gen_pue_benchmark_dataset.py` after a deliberate, reviewed
+change - review the diff carefully, and add a `corrections` entry (per the
+dataset's own label-integrity rules) rather than silently editing an
+existing case's gold label.
+
 ## `golden/*.json`
 
 Five complete, serialized `ReasoningRecord`s with deterministic ids/times

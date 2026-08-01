@@ -2023,7 +2023,7 @@ The first implementation must include at least the following tests.
 | 19 | `RTX 4090 retail box included` with clear complete-product terms | Complete-product hypothesis may survive; `box included` must not become `box only` |
 | 20 | Unknown coherent GPU model absent from catalogue | Classified or partial; no forced nearest Candidate |
 | 21 | Exact MPN matching Candidate but title says `box only` | Complete-product Candidate hard rejected |
-| 22 | `Compatible with RTX 4090` and no sold-item noun | Ambiguous or abstained; compatibility must not become identity |
+| 22 | `Compatible with RTX 4090` and no sold-item noun | Classified as a non-complete `compatible_item` (or ambiguous if genuinely more than one interpretation remains plausible); never abstained - a single compatibility-only hypothesis is one coherent interpretation, not insufficient evidence. Compatibility must not become identity (Sprint 3 final narrow correction) |
 | 23 | `RTX 4090 + PSU bundle` | Bundle, not directly comparable to single GPU |
 | 24 | Empty title | `ABSTAINED` or input-quality handling, not technical crash |
 | 25 | Malformed object | `PROCESSING_FAILED` with explicit failure category |

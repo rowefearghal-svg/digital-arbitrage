@@ -20,4 +20,4 @@ POLICY_VERSION = "gpu-policy-0.1.0"
 KNOWLEDGE_VERSION = "gpu-seed-0.1.0"
 
 #: Version of the term-group knowledge artifact (product-form/exclusion terms).
-TERM_VERSION = "gpu-terms-0.1.0"
+TERM_VERSION = "gpu-terms-0.1.1"

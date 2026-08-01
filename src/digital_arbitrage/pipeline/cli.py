@@ -510,6 +510,103 @@ def build_parser() -> argparse.ArgumentParser:
         "--db", default=None, help=f"History database path (default: {DEFAULT_DB_PATH})."
     )
     compare.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
+
+    pue = subparsers.add_parser("pue", help="Product Understanding Engine benchmark/replay tools.")
+    pue_subparsers = pue.add_subparsers(dest="pue_command", required=True)
+
+    pue_benchmark = pue_subparsers.add_parser(
+        "benchmark", help="Run the GPU release benchmark and emit a release report."
+    )
+    pue_benchmark.add_argument(
+        "dataset",
+        nargs="?",
+        default=None,
+        help="Benchmark dataset path (default: the bundled v0.1 dataset).",
+    )
+    pue_benchmark.add_argument(
+        "--output-dir", default=None, help="Directory to write report file(s) into."
+    )
+    pue_benchmark.add_argument(
+        "--format",
+        action="append",
+        choices=("json", "markdown", "csv"),
+        default=None,
+        help="Report format(s) to emit (repeatable; default: json and markdown).",
+    )
+    pue_benchmark.add_argument(
+        "--no-classifier",
+        action="store_true",
+        help="Skip running the existing title classifier (no differential report).",
+    )
+    pue_benchmark.add_argument(
+        "--skip-mandatory-checks",
+        action="store_true",
+        help=(
+            "Skip actually executing the mandatory acceptance/regression test suite and "
+            "the replay-equivalence check (faster iteration only - the release gate's "
+            "corresponding checks are then honestly reported as NOT VERIFIED/failed, "
+            "never fabricated as passing)."
+        ),
+    )
+    pue_benchmark.add_argument(
+        "--debug", action="store_true", help="Show a full traceback on error."
+    )
+
+    pue_replay = pue_subparsers.add_parser(
+        "replay", help="Deterministically replay a persisted PUE case and compare it."
+    )
+    pue_replay.add_argument("case_id", help="The case_id to replay (see the shadow database).")
+    pue_replay.add_argument(
+        "--database",
+        required=True,
+        help="Path to the pue_shadow.db (or equivalent) SQLite database.",
+    )
+    pue_replay.add_argument(
+        "--format", choices=("json", "text"), default="text", help="Output format."
+    )
+    pue_replay.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
+
+    pue_release_generate = pue_subparsers.add_parser(
+        "release-generate",
+        help="Generate an immutable, reproducible PUE release manifest + benchmark report.",
+    )
+    pue_release_generate.add_argument("release_id", help="e.g. pue-v0.1.1")
+    pue_release_generate.add_argument(
+        "--releases-dir",
+        default=None,
+        help="Directory to write the manifest + report into (default: data/pue/releases).",
+    )
+    pue_release_generate.add_argument(
+        "--known-limitation",
+        action="append",
+        default=None,
+        dest="known_limitations",
+        help="A known limitation to record in the manifest (repeatable).",
+    )
+    pue_release_generate.add_argument(
+        "--debug", action="store_true", help="Show a full traceback on error."
+    )
+
+    pue_release_verify = pue_subparsers.add_parser(
+        "release-verify",
+        help="Regenerate a release from the current checkout and verify it against a "
+        "previously published manifest.",
+    )
+    pue_release_verify.add_argument("manifest_path", help="Path to the published manifest JSON.")
+    pue_release_verify.add_argument(
+        "--committed-report",
+        default=None,
+        help="Path to the manifest's own committed report JSON, for a semantic-content diff.",
+    )
+    pue_release_verify.add_argument(
+        "--output-dir",
+        default=None,
+        help="Directory (e.g. a fresh temp dir) to write the regenerated report into.",
+    )
+    pue_release_verify.add_argument(
+        "--debug", action="store_true", help="Show a full traceback on error."
+    )
+
     return parser
 
 
@@ -629,12 +726,158 @@ def _run_compare(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_pue_benchmark(args: argparse.Namespace) -> int:
+    from ..pue.benchmark import DEFAULT_BENCHMARK_PATH, dataset_file_hash, load_benchmark_dataset
+    from ..pue.benchmark_report import (
+        build_benchmark_report,
+        render_report_csv,
+        render_report_json,
+        render_report_markdown,
+    )
+    from ..pue.benchmark_runner import run_benchmark
+    from ..pue.release_pipeline import verify_mandatory_acceptance, verify_replay_equivalence
+    from ..pue.version import CAPABILITY_VERSION
+
+    dataset_path = args.dataset or DEFAULT_BENCHMARK_PATH
+    dataset = load_benchmark_dataset(dataset_path)
+    dataset_hash = dataset_file_hash(dataset_path)
+
+    if args.skip_mandatory_checks:
+        skipped_detail = "skipped via --skip-mandatory-checks (not verified)"
+        acceptance_passed, acceptance_detail = False, skipped_detail
+        replay_equivalent, replay_detail = False, skipped_detail
+    else:
+        acceptance_passed, acceptance_detail = verify_mandatory_acceptance()
+        replay_equivalent, replay_detail = verify_replay_equivalence()
+
+    run = run_benchmark(dataset, run_classifier=not args.no_classifier)
+    report = build_benchmark_report(
+        dataset,
+        dataset_hash,
+        run.results,
+        run.failures,
+        capability_version=CAPABILITY_VERSION,
+        policy_version=run.context.policy_version,
+        knowledge_version=run.context.knowledge_version,
+        schema_version=run.context.schema_version,
+        wall_time_seconds=run.wall_time_seconds,
+        mandatory_acceptance_pass=acceptance_passed,
+        mandatory_acceptance_detail=acceptance_detail,
+        replay_equivalent=replay_equivalent,
+        replay_equivalent_detail=replay_detail,
+        run_differential=not args.no_classifier,
+    )
+
+    formats = args.format or ["json", "markdown"]
+    renderers = {
+        "json": render_report_json,
+        "markdown": render_report_markdown,
+        "csv": render_report_csv,
+    }
+    extensions = {"json": "json", "markdown": "md", "csv": "csv"}
+
+    if args.output_dir:
+        out_dir = Path(args.output_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for fmt in formats:
+            content = renderers[fmt](report)
+            out_path = out_dir / f"pue_benchmark_report.{extensions[fmt]}"
+            out_path.write_text(content, encoding="utf-8")
+            print(f"wrote {out_path}", file=sys.stderr)
+    else:
+        for fmt in formats:
+            print(renderers[fmt](report))
+
+    print(
+        f"benchmark: {report.correct_count}/{report.total_cases} correct; "
+        f"release gate: {'PASS' if report.gate.passed else 'FAIL'}",
+        file=sys.stderr,
+    )
+    return 0 if report.gate.passed else 1
+
+
+def _run_pue_replay(args: argparse.Namespace) -> int:
+    from ..pue.replay import replay_case
+
+    comparison = replay_case(args.case_id, database_path=args.database)
+    if args.format == "json":
+        print(json.dumps(comparison.to_dict(), indent=2, sort_keys=True))
+    else:
+        print(f"case_id: {comparison.case_id}")
+        print(f"version_match: {comparison.version_match}")
+        print(f"equivalent: {comparison.equivalent}")
+        if comparison.differences:
+            print(f"differences: {', '.join(comparison.differences)}")
+        else:
+            print("differences: none")
+    return 0 if comparison.equivalent or not comparison.version_match else 1
+
+
+def _run_pue_release_generate(args: argparse.Namespace) -> int:
+    from ..pue.release import DEFAULT_RELEASES_DIR
+    from ..pue.release_pipeline import generate_release_artifacts
+    from ..pue.validation import PueValidationError
+
+    releases_dir = Path(args.releases_dir) if args.releases_dir else DEFAULT_RELEASES_DIR
+    manifest_path = releases_dir / f"{args.release_id}.json"
+    report_json_path = releases_dir / f"{args.release_id}_benchmark_report.json"
+    report_md_path = releases_dir / f"{args.release_id}_benchmark_report.md"
+
+    try:
+        artifacts = generate_release_artifacts(
+            release_id=args.release_id,
+            manifest_path=manifest_path,
+            report_json_path=report_json_path,
+            report_md_path=report_md_path,
+            known_limitations=tuple(args.known_limitations or ()),
+        )
+    except PueValidationError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    print(f"release gate: {'PASS' if artifacts.report.gate.passed else 'FAIL'}", file=sys.stderr)
+    print(f"wrote {manifest_path}", file=sys.stderr)
+    print(f"wrote {report_json_path}", file=sys.stderr)
+    print(f"wrote {report_md_path}", file=sys.stderr)
+    return 0 if artifacts.report.gate.passed else 1
+
+
+def _run_pue_release_verify(args: argparse.Namespace) -> int:
+    from ..pue.release import load_release_manifest
+    from ..pue.release_pipeline import verify_release_reproducibility
+
+    manifest = load_release_manifest(args.manifest_path)
+    result = verify_release_reproducibility(
+        manifest,
+        committed_report_path=args.committed_report,
+        output_dir=args.output_dir,
+    )
+    for check in result.checks:
+        print(f"[{'PASS' if check.passed else 'FAIL'}] {check.name}: {check.detail}")
+    print(f"verification: {'PASS' if result.passed else 'FAIL'}", file=sys.stderr)
+    return 0 if result.passed else 1
+
+
+def _run_pue(args: argparse.Namespace) -> int:
+    if args.pue_command == "benchmark":
+        return _run_pue_benchmark(args)
+    if args.pue_command == "replay":
+        return _run_pue_replay(args)
+    if args.pue_command == "release-generate":
+        return _run_pue_release_generate(args)
+    if args.pue_command == "release-verify":
+        return _run_pue_release_verify(args)
+    print(f"error: unknown pue subcommand {args.pue_command!r}", file=sys.stderr)
+    return 1
+
+
 _COMMANDS: dict[str, Callable[[argparse.Namespace], int]] = {
     "scan": _run_scan,
     "auth": _run_auth,
     "history": _run_history,
     "show": _run_show,
     "compare": _run_compare,
+    "pue": _run_pue,
 }
 
 

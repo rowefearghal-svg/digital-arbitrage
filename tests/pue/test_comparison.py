@@ -147,7 +147,12 @@ def test_category_classifier_declined_pue_classified() -> None:
 
 
 def test_category_pue_abstained() -> None:
-    comparison = _compare("Compatible with RTX 4090")
+    # "Compatible with RTX 4090" no longer abstains (Sprint 3 final narrow
+    # correction to the COMPATIBLE_ITEM decision branch: a compatibility-
+    # only listing is now CLASSIFIED, not ABSTAINED) - an empty/whitespace-
+    # only title (genuinely zero evidence of any kind) is a still-valid,
+    # still-genuinely-abstaining case.
+    comparison = _compare("   ")
     assert comparison.category == ComparisonCategory.PUE_ABSTAINED
     assert comparison.pue_abstained is True
     assert comparison.pue_abstention_reason is not None
@@ -239,7 +244,7 @@ def _sample_comparisons() -> tuple[ClassifierPueComparison, ...]:
         "RTX 4090 Waterblock Full Cover GPU Cooling Block",  # AGREEMENT
         "RTX 4090 with GPU stand included",  # PRODUCT_FORM_DISAGREEMENT
         "Empty RTX 4090 Founders Edition Box Only",  # CLASSIFIER_DECLINED_PUE_CLASSIFIED
-        "Compatible with RTX 4090",  # PUE_ABSTAINED
+        "   ",  # PUE_ABSTAINED
         "ASUS RTX 4090 with EK water block",  # PUE_BROADER_IDENTITY
         "ASUS TUF RTX 4090 OC TUF-RTX4090-O24G",  # PUE_MORE_SPECIFIC_IDENTITY
         "RTX 4090 + PSU bundle",  # PUE_BLOCKED_DIRECT_COMPARABILITY

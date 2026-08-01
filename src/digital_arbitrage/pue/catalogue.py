@@ -13,6 +13,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Protocol
 
+from .canonical import canonical_file_hash
 from .enums import ProductForm
 from .models import CandidateQuery, CatalogueProduct
 from .validation import PueValidationError
@@ -21,6 +22,17 @@ from .validation import PueValidationError
 DEFAULT_CATALOGUE_PATH = (
     Path(__file__).resolve().parents[3] / "data" / "pue" / "catalogues" / "gpu_seed_v0.1.json"
 )
+
+
+def catalogue_file_hash(path: Path | str = DEFAULT_CATALOGUE_PATH) -> str:
+    """Stable, cross-platform SHA-256 hash of the catalogue's *canonical
+    JSON content* (see :mod:`digital_arbitrage.pue.canonical`) - not the
+    raw file bytes, which would vary with CRLF/LF line-ending conversion or
+    incidental whitespace/key ordering (Sprint 3 pre-merge correction item
+    4). Recorded in release manifests so a release is bound to the exact
+    catalogue content that produced it."""
+    return canonical_file_hash(path)
+
 
 #: Suffixes that mark a family name as a mobile/laptop variant of a base
 #: desktop family (e.g. "rtx 4090 laptop gpu" -> "rtx 4090"). Stripping them

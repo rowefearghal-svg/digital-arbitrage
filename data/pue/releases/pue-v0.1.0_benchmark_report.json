@@ -1,0 +1,2635 @@
+{
+  "benchmark_version": "gpu-release-benchmark-0.1.0",
+  "capability_version": "pue-0.1.0",
+  "case_coverage_by_tag": {
+    "accessory": 3,
+    "ambiguous_title": 2,
+    "amd": 2,
+    "asrock": 1,
+    "asus": 6,
+    "backplate": 3,
+    "board_partner_ambiguity": 3,
+    "bracket": 4,
+    "bundle": 5,
+    "catalogue_gap": 7,
+    "compatibility_only": 3,
+    "compatible_accessory": 2,
+    "compatible_item": 2,
+    "complete_desktop_graphics_card": 33,
+    "component": 4,
+    "edge_case": 2,
+    "empty_box": 4,
+    "empty_title": 1,
+    "exact_identification": 33,
+    "family_conflict": 6,
+    "family_only": 10,
+    "for_parts": 4,
+    "genuinely_ambiguous": 3,
+    "gigabyte": 2,
+    "gpu_not_included": 7,
+    "incomplete_damaged": 5,
+    "indistinguishable_variants": 2,
+    "intel": 2,
+    "justified_abstention": 3,
+    "misleading_similarity": 4,
+    "mobile_vs_desktop": 5,
+    "model_only": 9,
+    "mpn_alias_phrasing": 8,
+    "msi": 5,
+    "nvidia": 3,
+    "packaging_only": 4,
+    "power_cable": 2,
+    "powercolor": 1,
+    "replacement_fan": 4,
+    "replacement_part": 7,
+    "sapphire": 2,
+    "source_quality": 1,
+    "technical_failure": 1,
+    "unsupported_domain": 5,
+    "water_block": 5,
+    "zero_candidate": 3,
+    "zotac": 1
+  },
+  "cases": [
+    {
+      "case_id": "exact_01_rtx4090_fe",
+      "case_id_ref": "exact_01_rtx4090_fe",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "nvidia"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000001"
+    },
+    {
+      "case_id": "exact_02_asus_tuf_rtx4090",
+      "case_id_ref": "exact_02_asus_tuf_rtx4090",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "comparability_status": "directly_comparable",
+      "correct": true,
+      "decision_type": "identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "exact_catalogue_product",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000037"
+    },
+    {
+      "case_id": "exact_03_asus_rog_rtx4090",
+      "case_id_ref": "exact_03_asus_rog_rtx4090",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "comparability_status": "directly_comparable",
+      "correct": true,
+      "decision_type": "identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "exact_catalogue_product",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000080"
+    },
+    {
+      "case_id": "exact_04_msi_rtx4090_trio",
+      "case_id_ref": "exact_04_msi_rtx4090_trio",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "msi"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000125"
+    },
+    {
+      "case_id": "exact_05_gigabyte_rtx4090_master",
+      "case_id_ref": "exact_05_gigabyte_rtx4090_master",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "gigabyte"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000163"
+    },
+    {
+      "case_id": "exact_06_zotac_rtx4090_trinity",
+      "case_id_ref": "exact_06_zotac_rtx4090_trinity",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "zotac"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000201"
+    },
+    {
+      "case_id": "exact_07_rtx4080_fe",
+      "case_id_ref": "exact_07_rtx4080_fe",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "nvidia"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000239"
+    },
+    {
+      "case_id": "exact_08_asus_tuf_rtx4080super",
+      "case_id_ref": "exact_08_asus_tuf_rtx4080super",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "comparability_status": "directly_comparable",
+      "correct": true,
+      "decision_type": "identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "exact_catalogue_product",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000259"
+    },
+    {
+      "case_id": "exact_09_msi_rtx4080super_trio",
+      "case_id_ref": "exact_09_msi_rtx4080super_trio",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "msi"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000289"
+    },
+    {
+      "case_id": "exact_10_rtx4070_fe",
+      "case_id_ref": "exact_10_rtx4070_fe",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "nvidia"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000313"
+    },
+    {
+      "case_id": "exact_11_asus_dual_rtx4070",
+      "case_id_ref": "exact_11_asus_dual_rtx4070",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "comparability_status": "directly_comparable",
+      "correct": true,
+      "decision_type": "identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "exact_catalogue_product",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000335"
+    },
+    {
+      "case_id": "exact_12_msi_rtx4070tisuper_trio",
+      "case_id_ref": "exact_12_msi_rtx4070tisuper_trio",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "msi"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000365"
+    },
+    {
+      "case_id": "exact_13_asus_dual_rtx3060_8g",
+      "case_id_ref": "exact_13_asus_dual_rtx3060_8g",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "comparability_status": "directly_comparable",
+      "correct": true,
+      "decision_type": "identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "exact_catalogue_product",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000385"
+    },
+    {
+      "case_id": "exact_14_asus_dual_rtx3060_12g",
+      "case_id_ref": "exact_14_asus_dual_rtx3060_12g",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asus"
+      ],
+      "comparability_status": "directly_comparable",
+      "correct": true,
+      "decision_type": "identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "exact_catalogue_product",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000419"
+    },
+    {
+      "case_id": "exact_15_msi_rtx3060_gamingx_8g",
+      "case_id_ref": "exact_15_msi_rtx3060_gamingx_8g",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "msi"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000453"
+    },
+    {
+      "case_id": "exact_16_msi_rtx3060_ventus_12g",
+      "case_id_ref": "exact_16_msi_rtx3060_ventus_12g",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "msi"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000481"
+    },
+    {
+      "case_id": "exact_17_gigabyte_rtx3060_windforce",
+      "case_id_ref": "exact_17_gigabyte_rtx3060_windforce",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "gigabyte"
+      ],
+      "comparability_status": "directly_comparable",
+      "correct": true,
+      "decision_type": "identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "exact_catalogue_product",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000509"
+    },
+    {
+      "case_id": "exact_18_amd_rx7900xtx_reference",
+      "case_id_ref": "exact_18_amd_rx7900xtx_reference",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "amd"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000541"
+    },
+    {
+      "case_id": "exact_19_sapphire_rx7900xtx_nitro",
+      "case_id_ref": "exact_19_sapphire_rx7900xtx_nitro",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "sapphire"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000561"
+    },
+    {
+      "case_id": "exact_20_powercolor_rx7900xtx_reddevil",
+      "case_id_ref": "exact_20_powercolor_rx7900xtx_reddevil",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "powercolor"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000585"
+    },
+    {
+      "case_id": "exact_21_amd_rx7800xt_reference",
+      "case_id_ref": "exact_21_amd_rx7800xt_reference",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "amd"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000615"
+    },
+    {
+      "case_id": "exact_22_sapphire_rx7800xt_nitro",
+      "case_id_ref": "exact_22_sapphire_rx7800xt_nitro",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "sapphire"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000633"
+    },
+    {
+      "case_id": "exact_23_intel_arca770_le",
+      "case_id_ref": "exact_23_intel_arca770_le",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "intel"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000655"
+    },
+    {
+      "case_id": "exact_24_asrock_arca770_phantom",
+      "case_id_ref": "exact_24_asrock_arca770_phantom",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "asrock"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000673"
+    },
+    {
+      "case_id": "exact_25_intel_arca750_le",
+      "case_id_ref": "exact_25_intel_arca750_le",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "intel"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000691"
+    },
+    {
+      "case_id": "ambig_01_rtx3060_12gb_no_brand",
+      "case_id_ref": "ambig_01_rtx3060_12gb_no_brand",
+      "case_tags": [
+        "indistinguishable_variants",
+        "board_partner_ambiguity"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000707"
+    },
+    {
+      "case_id": "ambig_02_rtx4090_no_brand",
+      "case_id_ref": "ambig_02_rtx4090_no_brand",
+      "case_tags": [
+        "indistinguishable_variants",
+        "board_partner_ambiguity",
+        "family_only"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000731"
+    },
+    {
+      "case_id": "family_only_01_rtx4090",
+      "case_id_ref": "family_only_01_rtx4090",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000767"
+    },
+    {
+      "case_id": "family_only_02_rx7900xtx",
+      "case_id_ref": "family_only_02_rx7900xtx",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000799"
+    },
+    {
+      "case_id": "family_only_03_arca770",
+      "case_id_ref": "family_only_03_arca770",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000817"
+    },
+    {
+      "case_id": "family_only_04_rtx3060",
+      "case_id_ref": "family_only_04_rtx3060",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000833"
+    },
+    {
+      "case_id": "mobile_01_rtx4090_laptop_gpu",
+      "case_id_ref": "mobile_01_rtx4090_laptop_gpu",
+      "case_tags": [
+        "mobile_vs_desktop"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000855"
+    },
+    {
+      "case_id": "mobile_02_dell_laptop_with_rtx4090",
+      "case_id_ref": "mobile_02_dell_laptop_with_rtx4090",
+      "case_tags": [
+        "mobile_vs_desktop"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000884"
+    },
+    {
+      "case_id": "mobile_03_rtx4090_desktop_vs_laptop_conflict",
+      "case_id_ref": "mobile_03_rtx4090_desktop_vs_laptop_conflict",
+      "case_tags": [
+        "mobile_vs_desktop",
+        "family_conflict"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00000915"
+    },
+    {
+      "case_id": "waterblock_01_ek_quantum_vector2",
+      "case_id_ref": "waterblock_01_ek_quantum_vector2",
+      "case_tags": [
+        "water_block",
+        "component"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "component",
+      "reasoning_record_case_id": "release-00000946"
+    },
+    {
+      "case_id": "waterblock_02_generic_rtx4090",
+      "case_id_ref": "waterblock_02_generic_rtx4090",
+      "case_tags": [
+        "water_block",
+        "component"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "component",
+      "reasoning_record_case_id": "release-00000987"
+    },
+    {
+      "case_id": "waterblock_03_bykski",
+      "case_id_ref": "waterblock_03_bykski",
+      "case_tags": [
+        "water_block",
+        "component"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "component",
+      "reasoning_record_case_id": "release-00001032"
+    },
+    {
+      "case_id": "waterblock_04_gpu_not_included",
+      "case_id_ref": "waterblock_04_gpu_not_included",
+      "case_tags": [
+        "water_block",
+        "gpu_not_included"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "component",
+      "reasoning_record_case_id": "release-00001075"
+    },
+    {
+      "case_id": "fan_01_asus_tuf_rtx4090_fan_set",
+      "case_id_ref": "fan_01_asus_tuf_rtx4090_fan_set",
+      "case_tags": [
+        "replacement_fan",
+        "replacement_part"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "replacement_part",
+      "reasoning_record_case_id": "release-00001112"
+    },
+    {
+      "case_id": "fan_02_generic_rtx4090_fan",
+      "case_id_ref": "fan_02_generic_rtx4090_fan",
+      "case_tags": [
+        "replacement_fan",
+        "replacement_part"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "replacement_part",
+      "reasoning_record_case_id": "release-00001150"
+    },
+    {
+      "case_id": "fan_03_cooling_fans_for_rtx4090",
+      "case_id_ref": "fan_03_cooling_fans_for_rtx4090",
+      "case_tags": [
+        "replacement_fan",
+        "replacement_part"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "replacement_part",
+      "reasoning_record_case_id": "release-00001184"
+    },
+    {
+      "case_id": "backplate_01_nvidia_rtx4090_fe",
+      "case_id_ref": "backplate_01_nvidia_rtx4090_fe",
+      "case_tags": [
+        "backplate",
+        "replacement_part"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "replacement_part",
+      "reasoning_record_case_id": "release-00001226"
+    },
+    {
+      "case_id": "backplate_02_generic_rtx4090",
+      "case_id_ref": "backplate_02_generic_rtx4090",
+      "case_tags": [
+        "backplate",
+        "replacement_part",
+        "gpu_not_included"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "replacement_part",
+      "reasoning_record_case_id": "release-00001264"
+    },
+    {
+      "case_id": "adapter_01_12vhpwr",
+      "case_id_ref": "adapter_01_12vhpwr",
+      "case_tags": [
+        "power_cable",
+        "compatible_item"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "accessory",
+      "reasoning_record_case_id": "release-00001302"
+    },
+    {
+      "case_id": "adapter_02_generic_power_cable",
+      "case_id_ref": "adapter_02_generic_power_cable",
+      "case_tags": [
+        "power_cable",
+        "compatible_item"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "accessory",
+      "reasoning_record_case_id": "release-00001318"
+    },
+    {
+      "case_id": "bracket_01_universal_anti_sag",
+      "case_id_ref": "bracket_01_universal_anti_sag",
+      "case_tags": [
+        "bracket",
+        "accessory"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "accessory",
+      "reasoning_record_case_id": "release-00001357"
+    },
+    {
+      "case_id": "bracket_02_riser_cable",
+      "case_id_ref": "bracket_02_riser_cable",
+      "case_tags": [
+        "compatible_accessory"
+      ],
+      "comparability_status": "insufficient_information",
+      "correct": false,
+      "decision_type": "ambiguous",
+      "failed_checks": [
+        "decision_type_allowed",
+        "expected_comparability"
+      ],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00001370"
+    },
+    {
+      "case_id": "bracket_03_gpu_support_brace",
+      "case_id_ref": "bracket_03_gpu_support_brace",
+      "case_tags": [
+        "bracket",
+        "accessory"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "accessory",
+      "reasoning_record_case_id": "release-00001406"
+    },
+    {
+      "case_id": "packaging_01_empty_box",
+      "case_id_ref": "packaging_01_empty_box",
+      "case_tags": [
+        "empty_box",
+        "packaging_only"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "packaging_only",
+      "reasoning_record_case_id": "release-00001424"
+    },
+    {
+      "case_id": "packaging_02_box_only_no_card",
+      "case_id_ref": "packaging_02_box_only_no_card",
+      "case_tags": [
+        "empty_box",
+        "packaging_only",
+        "gpu_not_included"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "packaging_only",
+      "reasoning_record_case_id": "release-00001459"
+    },
+    {
+      "case_id": "packaging_03_retail_box_asus_tuf",
+      "case_id_ref": "packaging_03_retail_box_asus_tuf",
+      "case_tags": [
+        "empty_box",
+        "packaging_only"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "packaging_only",
+      "reasoning_record_case_id": "release-00001494"
+    },
+    {
+      "case_id": "damaged_01_for_parts_rtx4090",
+      "case_id_ref": "damaged_01_for_parts_rtx4090",
+      "case_tags": [
+        "incomplete_damaged",
+        "for_parts"
+      ],
+      "comparability_status": "not_comparable_condition",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "incomplete_product",
+      "reasoning_record_case_id": "release-00001531"
+    },
+    {
+      "case_id": "damaged_02_cracked_pcb",
+      "case_id_ref": "damaged_02_cracked_pcb",
+      "case_tags": [
+        "incomplete_damaged",
+        "for_parts"
+      ],
+      "comparability_status": "not_comparable_condition",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "incomplete_product",
+      "reasoning_record_case_id": "release-00001568"
+    },
+    {
+      "case_id": "damaged_03_missing_fans_incomplete",
+      "case_id_ref": "damaged_03_missing_fans_incomplete",
+      "case_tags": [
+        "incomplete_damaged"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00001587"
+    },
+    {
+      "case_id": "not_included_01_case_only",
+      "case_id_ref": "not_included_01_case_only",
+      "case_tags": [
+        "gpu_not_included"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": false,
+      "decision_type": "partially_identified",
+      "failed_checks": [
+        "decision_type_allowed",
+        "decision_type_not_forbidden",
+        "product_form_not_forbidden"
+      ],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00001620"
+    },
+    {
+      "case_id": "not_included_02_bracket_only",
+      "case_id_ref": "not_included_02_bracket_only",
+      "case_tags": [
+        "gpu_not_included",
+        "bracket"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "accessory",
+      "reasoning_record_case_id": "release-00001653"
+    },
+    {
+      "case_id": "compat_01_case_fits_rtx4090",
+      "case_id_ref": "compat_01_case_fits_rtx4090",
+      "case_tags": [
+        "compatibility_only"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "compatible_item",
+      "reasoning_record_case_id": "release-00001689"
+    },
+    {
+      "case_id": "compat_02_cooler_compatible",
+      "case_id_ref": "compat_02_cooler_compatible",
+      "case_tags": [
+        "compatibility_only"
+      ],
+      "comparability_status": "insufficient_information",
+      "correct": false,
+      "decision_type": "ambiguous",
+      "failed_checks": [
+        "decision_type_allowed"
+      ],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00001720"
+    },
+    {
+      "case_id": "bundle_01_rtx4090_psu",
+      "case_id_ref": "bundle_01_rtx4090_psu",
+      "case_tags": [
+        "bundle"
+      ],
+      "comparability_status": "not_comparable_bundle",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "bundle",
+      "reasoning_record_case_id": "release-00001758"
+    },
+    {
+      "case_id": "bundle_02_rtx4090_with_waterblock",
+      "case_id_ref": "bundle_02_rtx4090_with_waterblock",
+      "case_tags": [
+        "bundle",
+        "ambiguous_title"
+      ],
+      "comparability_status": "insufficient_information",
+      "correct": false,
+      "decision_type": "ambiguous",
+      "failed_checks": [
+        "expected_comparability"
+      ],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00001795"
+    },
+    {
+      "case_id": "bundle_03_gpu_and_riser",
+      "case_id_ref": "bundle_03_gpu_and_riser",
+      "case_tags": [
+        "bundle"
+      ],
+      "comparability_status": "insufficient_information",
+      "correct": false,
+      "decision_type": "ambiguous",
+      "failed_checks": [
+        "expected_comparability"
+      ],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00001834"
+    },
+    {
+      "case_id": "gap_01_rx6800xt",
+      "case_id_ref": "gap_01_rx6800xt",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00001873"
+    },
+    {
+      "case_id": "gap_02_rtx4060",
+      "case_id_ref": "gap_02_rtx4060",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00001881"
+    },
+    {
+      "case_id": "gap_03_gtx1660super",
+      "case_id_ref": "gap_03_gtx1660super",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00001889"
+    },
+    {
+      "case_id": "gap_04_arca580",
+      "case_id_ref": "gap_04_arca580",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00001897"
+    },
+    {
+      "case_id": "zero_candidate_01_unknown_brand",
+      "case_id_ref": "zero_candidate_01_unknown_brand",
+      "case_tags": [
+        "zero_candidate"
+      ],
+      "comparability_status": "insufficient_information",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00001905"
+    },
+    {
+      "case_id": "zero_candidate_02_gpu_generic_no_specifics",
+      "case_id_ref": "zero_candidate_02_gpu_generic_no_specifics",
+      "case_tags": [
+        "zero_candidate"
+      ],
+      "comparability_status": "insufficient_information",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00001932"
+    },
+    {
+      "case_id": "ambiguous_01_rtx3060_board_partner",
+      "case_id_ref": "ambiguous_01_rtx3060_board_partner",
+      "case_tags": [
+        "genuinely_ambiguous"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00001961"
+    },
+    {
+      "case_id": "ambiguous_02_gpu_or_waterblock",
+      "case_id_ref": "ambiguous_02_gpu_or_waterblock",
+      "case_tags": [
+        "genuinely_ambiguous"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00001982"
+    },
+    {
+      "case_id": "abstain_01_contradiction",
+      "case_id_ref": "abstain_01_contradiction",
+      "case_tags": [
+        "justified_abstention",
+        "family_conflict"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": false,
+      "decision_type": "partially_identified",
+      "failed_checks": [
+        "decision_type_allowed"
+      ],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002011"
+    },
+    {
+      "case_id": "abstain_02_low_quality_title",
+      "case_id_ref": "abstain_02_low_quality_title",
+      "case_tags": [
+        "justified_abstention",
+        "source_quality"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002044"
+    },
+    {
+      "case_id": "domain_01_phone",
+      "case_id_ref": "domain_01_phone",
+      "case_tags": [
+        "unsupported_domain"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00002077"
+    },
+    {
+      "case_id": "domain_02_ambiguous_short",
+      "case_id_ref": "domain_02_ambiguous_short",
+      "case_tags": [
+        "unsupported_domain"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00002086"
+    },
+    {
+      "case_id": "domain_03_iphone_charger",
+      "case_id_ref": "domain_03_iphone_charger",
+      "case_tags": [
+        "unsupported_domain"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00002093"
+    },
+    {
+      "case_id": "conflict_01_title_structured",
+      "case_id_ref": "conflict_01_title_structured",
+      "case_tags": [
+        "family_conflict"
+      ],
+      "comparability_status": "insufficient_information",
+      "correct": true,
+      "decision_type": "abstained",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": true,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002102"
+    },
+    {
+      "case_id": "conflict_02_brand_mismatch",
+      "case_id_ref": "conflict_02_brand_mismatch",
+      "case_tags": [
+        "family_conflict"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002139"
+    },
+    {
+      "case_id": "misleading_01_mousepad",
+      "case_id_ref": "misleading_01_mousepad",
+      "case_tags": [
+        "misleading_similarity"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": false,
+      "decision_type": "partially_identified",
+      "failed_checks": [
+        "decision_type_allowed",
+        "product_form_not_forbidden",
+        "expected_comparability"
+      ],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002177"
+    },
+    {
+      "case_id": "misleading_02_tshirt",
+      "case_id_ref": "misleading_02_tshirt",
+      "case_tags": [
+        "misleading_similarity"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": false,
+      "decision_type": "partially_identified",
+      "failed_checks": [
+        "decision_type_allowed",
+        "product_form_not_forbidden",
+        "expected_comparability"
+      ],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002207"
+    },
+    {
+      "case_id": "edge_01_empty_title",
+      "case_id_ref": "edge_01_empty_title",
+      "case_tags": [
+        "edge_case",
+        "empty_title"
+      ],
+      "comparability_status": "insufficient_information",
+      "correct": true,
+      "decision_type": "abstained",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": true,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00002239"
+    },
+    {
+      "case_id": "edge_02_malformed_input",
+      "case_id_ref": "edge_02_malformed_input",
+      "case_tags": [
+        "edge_case",
+        "technical_failure"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "processing_failed",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00002243"
+    },
+    {
+      "case_id": "exact_alias_01_asus_tuf_rtx4090_mpn",
+      "case_id_ref": "exact_alias_01_asus_tuf_rtx4090_mpn",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "comparability_status": "directly_comparable",
+      "correct": true,
+      "decision_type": "identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "exact_catalogue_product",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002247"
+    },
+    {
+      "case_id": "exact_alias_02_gigabyte_aorus_mpn",
+      "case_id_ref": "exact_alias_02_gigabyte_aorus_mpn",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002286"
+    },
+    {
+      "case_id": "exact_alias_03_zotac_trinity_mpn",
+      "case_id_ref": "exact_alias_03_zotac_trinity_mpn",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "comparability_status": "directly_comparable",
+      "correct": true,
+      "decision_type": "identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "exact_catalogue_product",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002324"
+    },
+    {
+      "case_id": "exact_alias_04_sapphire_nitro_rx7900xtx_mpn",
+      "case_id_ref": "exact_alias_04_sapphire_nitro_rx7900xtx_mpn",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "comparability_status": "directly_comparable",
+      "correct": true,
+      "decision_type": "identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "exact_catalogue_product",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002361"
+    },
+    {
+      "case_id": "exact_alias_05_asrock_arc_a770_mpn",
+      "case_id_ref": "exact_alias_05_asrock_arc_a770_mpn",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002385"
+    },
+    {
+      "case_id": "exact_alias_06_msi_rtx3060_ventus_mpn",
+      "case_id_ref": "exact_alias_06_msi_rtx3060_ventus_mpn",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002403"
+    },
+    {
+      "case_id": "exact_alias_07_asus_dual_rtx4070_mpn",
+      "case_id_ref": "exact_alias_07_asus_dual_rtx4070_mpn",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "comparability_status": "directly_comparable",
+      "correct": true,
+      "decision_type": "identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "exact_catalogue_product",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002433"
+    },
+    {
+      "case_id": "exact_alias_08_powercolor_reddevil_mpn",
+      "case_id_ref": "exact_alias_08_powercolor_reddevil_mpn",
+      "case_tags": [
+        "exact_identification",
+        "complete_desktop_graphics_card",
+        "mpn_alias_phrasing"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002459"
+    },
+    {
+      "case_id": "family_only_05_rtx4080",
+      "case_id_ref": "family_only_05_rtx4080",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002485"
+    },
+    {
+      "case_id": "family_only_06_rtx4070",
+      "case_id_ref": "family_only_06_rtx4070",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002500"
+    },
+    {
+      "case_id": "family_only_07_rx7800xt",
+      "case_id_ref": "family_only_07_rx7800xt",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002517"
+    },
+    {
+      "case_id": "family_only_08_arca750",
+      "case_id_ref": "family_only_08_arca750",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002532"
+    },
+    {
+      "case_id": "family_only_09_rtx3060_8gb",
+      "case_id_ref": "family_only_09_rtx3060_8gb",
+      "case_tags": [
+        "model_only",
+        "family_only"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002545"
+    },
+    {
+      "case_id": "mobile_04_amd_rx7900m",
+      "case_id_ref": "mobile_04_amd_rx7900m",
+      "case_tags": [
+        "mobile_vs_desktop"
+      ],
+      "comparability_status": "insufficient_information",
+      "correct": false,
+      "decision_type": "classified",
+      "failed_checks": [
+        "decision_type_allowed"
+      ],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002566"
+    },
+    {
+      "case_id": "mobile_05_laptop_amd_gpu_generic",
+      "case_id_ref": "mobile_05_laptop_amd_gpu_generic",
+      "case_tags": [
+        "mobile_vs_desktop"
+      ],
+      "comparability_status": "insufficient_information",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002597"
+    },
+    {
+      "case_id": "waterblock_05_full_cover_block_generic",
+      "case_id_ref": "waterblock_05_full_cover_block_generic",
+      "case_tags": [
+        "water_block",
+        "component"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "component",
+      "reasoning_record_case_id": "release-00002630"
+    },
+    {
+      "case_id": "fan_04_dual_fan_replacement_kit",
+      "case_id_ref": "fan_04_dual_fan_replacement_kit",
+      "case_tags": [
+        "replacement_fan",
+        "replacement_part"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "replacement_part",
+      "reasoning_record_case_id": "release-00002671"
+    },
+    {
+      "case_id": "backplate_03_generic_metal",
+      "case_id_ref": "backplate_03_generic_metal",
+      "case_tags": [
+        "backplate",
+        "replacement_part"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "replacement_part",
+      "reasoning_record_case_id": "release-00002708"
+    },
+    {
+      "case_id": "bracket_04_gpu_support_stand",
+      "case_id_ref": "bracket_04_gpu_support_stand",
+      "case_tags": [
+        "bracket",
+        "accessory"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "accessory",
+      "reasoning_record_case_id": "release-00002745"
+    },
+    {
+      "case_id": "adapter_03_riser_cable_variant",
+      "case_id_ref": "adapter_03_riser_cable_variant",
+      "case_tags": [
+        "compatible_accessory"
+      ],
+      "comparability_status": "insufficient_information",
+      "correct": false,
+      "decision_type": "ambiguous",
+      "failed_checks": [
+        "decision_type_allowed",
+        "expected_comparability"
+      ],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00002762"
+    },
+    {
+      "case_id": "packaging_04_msi_box_only",
+      "case_id_ref": "packaging_04_msi_box_only",
+      "case_tags": [
+        "empty_box",
+        "packaging_only",
+        "gpu_not_included"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "packaging_only",
+      "reasoning_record_case_id": "release-00002800"
+    },
+    {
+      "case_id": "damaged_04_water_damage",
+      "case_id_ref": "damaged_04_water_damage",
+      "case_tags": [
+        "incomplete_damaged",
+        "for_parts"
+      ],
+      "comparability_status": "not_comparable_condition",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "incomplete_product",
+      "reasoning_record_case_id": "release-00002840"
+    },
+    {
+      "case_id": "damaged_05_bent_pins",
+      "case_id_ref": "damaged_05_bent_pins",
+      "case_tags": [
+        "incomplete_damaged",
+        "for_parts"
+      ],
+      "comparability_status": "not_comparable_condition",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "incomplete_product",
+      "reasoning_record_case_id": "release-00002877"
+    },
+    {
+      "case_id": "not_included_03_manual_only",
+      "case_id_ref": "not_included_03_manual_only",
+      "case_tags": [
+        "gpu_not_included"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": false,
+      "decision_type": "partially_identified",
+      "failed_checks": [
+        "decision_type_allowed",
+        "decision_type_not_forbidden",
+        "product_form_not_forbidden"
+      ],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002896"
+    },
+    {
+      "case_id": "compat_03_psu_compatible_wattage",
+      "case_id_ref": "compat_03_psu_compatible_wattage",
+      "case_tags": [
+        "compatibility_only"
+      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "compatible_item",
+      "reasoning_record_case_id": "release-00002927"
+    },
+    {
+      "case_id": "bundle_04_rtx4090_plus_psu_catalogue",
+      "case_id_ref": "bundle_04_rtx4090_plus_psu_catalogue",
+      "case_tags": [
+        "bundle"
+      ],
+      "comparability_status": "not_comparable_bundle",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "bundle",
+      "reasoning_record_case_id": "release-00002958"
+    },
+    {
+      "case_id": "bundle_05_two_cards",
+      "case_id_ref": "bundle_05_two_cards",
+      "case_tags": [
+        "bundle",
+        "ambiguous_title"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": false,
+      "decision_type": "partially_identified",
+      "failed_checks": [
+        "expected_comparability"
+      ],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00002995"
+    },
+    {
+      "case_id": "gap_05_rtx4090ti",
+      "case_id_ref": "gap_05_rtx4090ti",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": false,
+      "decision_type": "partially_identified",
+      "failed_checks": [
+        "expected_comparability"
+      ],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00003028"
+    },
+    {
+      "case_id": "gap_06_rx7600",
+      "case_id_ref": "gap_06_rx7600",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00003061"
+    },
+    {
+      "case_id": "gap_07_arcb580",
+      "case_id_ref": "gap_07_arcb580",
+      "case_tags": [
+        "catalogue_gap"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00003069"
+    },
+    {
+      "case_id": "zero_candidate_03_generic_desc",
+      "case_id_ref": "zero_candidate_03_generic_desc",
+      "case_tags": [
+        "zero_candidate"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00003077"
+    },
+    {
+      "case_id": "ambiguous_03_asus_rtx4090_no_variant",
+      "case_id_ref": "ambiguous_03_asus_rtx4090_no_variant",
+      "case_tags": [
+        "genuinely_ambiguous",
+        "board_partner_ambiguity"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00003083"
+    },
+    {
+      "case_id": "abstain_03_two_families_conflict",
+      "case_id_ref": "abstain_03_two_families_conflict",
+      "case_tags": [
+        "justified_abstention",
+        "family_conflict"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": false,
+      "decision_type": "partially_identified",
+      "failed_checks": [
+        "decision_type_allowed"
+      ],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00003116"
+    },
+    {
+      "case_id": "domain_04_cpu",
+      "case_id_ref": "domain_04_cpu",
+      "case_tags": [
+        "unsupported_domain"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00003135"
+    },
+    {
+      "case_id": "domain_05_motherboard",
+      "case_id_ref": "domain_05_motherboard",
+      "case_tags": [
+        "unsupported_domain"
+      ],
+      "comparability_status": "not_assessed",
+      "correct": true,
+      "decision_type": "outside_supported_domain",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "unknown",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "unknown",
+      "reasoning_record_case_id": "release-00003144"
+    },
+    {
+      "case_id": "conflict_03_capacity_mismatch",
+      "case_id_ref": "conflict_03_capacity_mismatch",
+      "case_tags": [
+        "family_conflict"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": true,
+      "decision_type": "partially_identified",
+      "failed_checks": [],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00003155"
+    },
+    {
+      "case_id": "misleading_03_keychain",
+      "case_id_ref": "misleading_03_keychain",
+      "case_tags": [
+        "misleading_similarity"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": false,
+      "decision_type": "partially_identified",
+      "failed_checks": [
+        "decision_type_allowed",
+        "product_form_not_forbidden",
+        "expected_comparability"
+      ],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00003191"
+    },
+    {
+      "case_id": "misleading_04_sticker_decal",
+      "case_id_ref": "misleading_04_sticker_decal",
+      "case_tags": [
+        "misleading_similarity"
+      ],
+      "comparability_status": "comparable_at_broader_level",
+      "correct": false,
+      "decision_type": "partially_identified",
+      "failed_checks": [
+        "decision_type_allowed",
+        "product_form_not_forbidden",
+        "expected_comparability"
+      ],
+      "harmful_errors": [],
+      "identification_level": "model",
+      "is_avoidable_abstention": false,
+      "is_justified_abstention": false,
+      "product_form": "complete_product",
+      "reasoning_record_case_id": "release-00003223"
+    }
+  ],
+  "correct_count": 102,
+  "dataset_file_hash": "c30c4e547c3bbd9f0a3c7d5ed6799ffc380e2ea2403bea816873d5127c384aa7",
+  "dataset_id": "gpu-release-benchmark-v0.1",
+  "differential_metrics": {
+    "both_correct": 41,
+    "both_wrong": 0,
+    "classifier_correct_pue_worsens": 4,
+    "classifier_declined_pue_classified": 4,
+    "classifier_gradable": 45,
+    "classifier_ungradable": 10,
+    "identity_specificity_differences": 51,
+    "product_form_disagreements": 0,
+    "pue_appropriately_abstains": 0,
+    "pue_avoidably_abstains": 0,
+    "pue_corrects_classifier": 0,
+    "pue_prevents_harmful_comparability": 0,
+    "total_compared": 55
+  },
+  "failure_counts_by_category": {
+    "claim_failure": 0,
+    "decision_policy_failure": 14,
+    "evaluation_failure": 0,
+    "evidence_failure": 0,
+    "explanation_failure": 0,
+    "hypothesis_failure": 0,
+    "knowledge_failure": 1,
+    "observation_failure": 0,
+    "retrieval_failure": 1,
+    "runtime_failure": 0
+  },
+  "failures": [
+    {
+      "case_id": "bracket_02_riser_cable",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00001404"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "not_included_01_case_only",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00001651"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "compat_02_cooler_compatible",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00001756"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "bundle_02_rtx4090_with_waterblock",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00001832"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "bundle_03_gpu_and_riser",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00001871"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "abstain_01_contradiction",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00002042"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "misleading_01_mousepad",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00002204"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "misleading_02_tshirt",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00002236"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "mobile_04_amd_rx7900m",
+      "explanation": "An acceptable Candidate exists in the knowledge base but was never retrieved for this case.",
+      "primary_category": "retrieval_failure",
+      "related_object_ids": [
+        "release-00002575",
+        "release-00002576",
+        "release-00002577",
+        "release-00002578",
+        "release-00002579",
+        "release-00002580",
+        "release-00002581",
+        "release-00002582",
+        "release-00002583",
+        "release-00002584"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "adapter_03_riser_cable_variant",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00002798"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "not_included_03_manual_only",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00002925"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "bundle_05_two_cards",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00003026"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "gap_05_rtx4090ti",
+      "explanation": "Gold-labelled catalogue gap (no acceptable Candidate exists in the tested knowledge version 'gpu-seed-0.1.0'); the wrong/avoidable outcome traces to missing knowledge coverage, not a retrieval or evaluation defect.",
+      "primary_category": "knowledge_failure",
+      "related_object_ids": [],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "abstain_03_two_families_conflict",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00003133"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "misleading_03_keychain",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00003220"
+      ],
+      "secondary_categories": []
+    },
+    {
+      "case_id": "misleading_04_sticker_decal",
+      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
+      "primary_category": "decision_policy_failure",
+      "related_object_ids": [
+        "release-00003251"
+      ],
+      "secondary_categories": []
+    }
+  ],
+  "generated_at": "2026-08-01T19:39:25.053550",
+  "harmful_results": [],
+  "knowledge_version": "gpu-seed-0.1.0",
+  "operational_metrics": {
+    "listings_per_second": 1320.092,
+    "mean_decision_explanation_ms": 0.0492,
+    "mean_evaluation_ms": 0.1382,
+    "mean_extraction_ms": 0.1458,
+    "mean_persistence_ms": null,
+    "mean_reasoning_record_json_bytes": 17899.8136,
+    "mean_retrieval_ms": 0.2274,
+    "median_latency_ms": 0.6644,
+    "p95_latency_ms": 1.2064,
+    "technical_failure_rate": {
+      "denominator": 118,
+      "excluded": 0,
+      "numerator": 1,
+      "value": 0.0085
+    }
+  },
+  "pipeline_metrics": {
+    "candidate_count_mean": 6.39,
+    "candidate_count_median": 10.0,
+    "claim_support_correctness": {
+      "denominator": 1,
+      "excluded": 0,
+      "numerator": 1,
+      "value": 1.0
+    },
+    "classifier_pue_disagreement_rate": {
+      "denominator": 55,
+      "excluded": 0,
+      "numerator": 46,
+      "value": 0.8364
+    },
+    "correct_hypothesis_inclusion_rate": {
+      "denominator": 35,
+      "excluded": 0,
+      "numerator": 35,
+      "value": 1.0
+    },
+    "decision_distribution": {
+      "abstained": 2,
+      "ambiguous": 5,
+      "classified": 28,
+      "identified": 11,
+      "outside_supported_domain": 12,
+      "partially_identified": 59,
+      "processing_failed": 1
+    },
+    "evidence_precision": {
+      "denominator": 0,
+      "excluded": 0,
+      "numerator": 0,
+      "value": null
+    },
+    "evidence_recall": {
+      "denominator": 30,
+      "excluded": 0,
+      "numerator": 30,
+      "value": 1.0
+    },
+    "forbidden_evidence_violation_rate": {
+      "denominator": 9,
+      "excluded": 0,
+      "numerator": 0,
+      "value": 0.0
+    },
+    "hard_contradiction_detection_rate": {
+      "denominator": 3,
+      "excluded": 0,
+      "numerator": 3,
+      "value": 1.0
+    }
+  },
+  "policy_version": "gpu-policy-0.1.0",
+  "product_metrics": {
+    "abstention_rate": {
+      "denominator": 118,
+      "excluded": 0,
+      "numerator": 2,
+      "value": 0.0169
+    },
+    "accessory_to_complete_product_error_rate": {
+      "denominator": 29,
+      "excluded": 0,
+      "numerator": 0,
+      "value": 0.0
+    },
+    "avoidable_abstention_rate": {
+      "denominator": 2,
+      "excluded": 0,
+      "numerator": 0,
+      "value": 0.0
+    },
+    "candidate_recall_at_1": {
+      "denominator": 37,
+      "excluded": 7,
+      "numerator": 36,
+      "value": 0.973
+    },
+    "candidate_recall_at_10": {
+      "denominator": 37,
+      "excluded": 7,
+      "numerator": 36,
+      "value": 0.973
+    },
+    "candidate_recall_at_5": {
+      "denominator": 37,
+      "excluded": 7,
+      "numerator": 36,
+      "value": 0.973
+    },
+    "comparability_accuracy": {
+      "denominator": 75,
+      "excluded": 0,
+      "numerator": 65,
+      "value": 0.8667
+    },
+    "exact_identification_accuracy": {
+      "denominator": 11,
+      "excluded": 0,
+      "numerator": 11,
+      "value": 1.0
+    },
+    "explanation_faithfulness": {
+      "denominator": 118,
+      "excluded": 0,
+      "numerator": 118,
+      "value": 1.0
+    },
+    "harmful_false_match_rate": {
+      "denominator": 2,
+      "excluded": 0,
+      "numerator": 0,
+      "value": 0.0
+    },
+    "hierarchical_identification_accuracy": {
+      "denominator": 13,
+      "excluded": 0,
+      "numerator": 13,
+      "value": 1.0
+    },
+    "packaging_to_complete_product_error_rate": {
+      "denominator": 6,
+      "excluded": 0,
+      "numerator": 0,
+      "value": 0.0
+    },
+    "partial_identification_correctness": {
+      "denominator": 60,
+      "excluded": 0,
+      "numerator": 49,
+      "value": 0.8167
+    },
+    "product_form_accuracy": {
+      "denominator": 48,
+      "excluded": 0,
+      "numerator": 48,
+      "value": 1.0
+    }
+  },
+  "release_gate": {
+    "checks": [
+      {
+        "blocking": true,
+        "detail": "pytest -q tests/pue/test_acceptance.py tests/pue/test_golden.py tests/pue/test_invariants.py -> exit code 0",
+        "name": "all_mandatory_acceptance_cases_pass",
+        "passed": true
+      },
+      {
+        "blocking": true,
+        "detail": "0 case(s): []",
+        "name": "zero_accessory_to_complete_product_errors",
+        "passed": true
+      },
+      {
+        "blocking": true,
+        "detail": "0 case(s): []",
+        "name": "zero_packaging_to_complete_product_errors",
+        "passed": true
+      },
+      {
+        "blocking": true,
+        "detail": "candidate_recall_at_1/5/10=['36/37', '36/37', '36/37']; exact/hierarchical_identification_accuracy=['11/11', '13/13']",
+        "name": "retrieval_and_decision_quality_reported_independently",
+        "passed": true
+      },
+      {
+        "blocking": true,
+        "detail": "untraced: []",
+        "name": "every_wrong_decision_has_a_traceable_failure_stage",
+        "passed": true
+      },
+      {
+        "blocking": true,
+        "detail": "unclassified: []",
+        "name": "every_abstention_classified_justified_or_avoidable",
+        "passed": true
+      },
+      {
+        "blocking": true,
+        "detail": "0 harmful case(s) - zero-count trivially satisfies adjudication.",
+        "name": "every_harmful_result_individually_listed",
+        "passed": true
+      },
+      {
+        "blocking": true,
+        "detail": "release-replay-verify-00000001: equivalent=True; release-replay-verify-00000043: equivalent=True; release-replay-verify-00000078: equivalent=True",
+        "name": "deterministic_replay_equivalent",
+        "passed": true
+      },
+      {
+        "blocking": true,
+        "detail": "Structural invariant enforced by tests/pue/test_invariants.py::test_invariant_no_commercial_fields (no price/profit/ROI field ever read by pue/claims.py, pue/evaluation.py, or pue/decisions.py); verified by the same mandatory-acceptance pytest run above.",
+        "name": "no_commercial_data_in_product_identity_reasoning",
+        "passed": true
+      },
+      {
+        "blocking": true,
+        "detail": "{'capability_version': 'pue-0.1.0', 'policy_version': 'gpu-policy-0.1.0', 'knowledge_version': 'gpu-seed-0.1.0', 'schema_version': '0.1'}",
+        "name": "versions_identified_in_manifest",
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "schema_version": "0.1",
+  "total_cases": 118
+}
