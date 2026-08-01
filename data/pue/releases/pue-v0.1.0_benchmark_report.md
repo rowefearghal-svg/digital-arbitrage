@@ -2,7 +2,7 @@
 
 - **Dataset:** gpu-release-benchmark-v0.1 (benchmark version gpu-release-benchmark-0.1.0)
 - **Dataset file hash (sha256):** `fdc0845fe7ea694c1266a0801c9ee364ed48627537c852d41139a9f769ac9ddb`
-- **Generated:** 2026-08-01T15:55:21.689259
+- **Generated:** 2026-08-01T15:56:26.309877
 - **Capability version:** pue-0.1.0
 - **Policy version:** gpu-policy-0.1.0
 - **Knowledge version:** gpu-seed-0.1.0
@@ -56,16 +56,16 @@
 
 ## Operational metrics
 
-- **listings_per_second:** 2279.18
-- **median_latency_ms:** 0.3854
-- **p95_latency_ms:** 0.559
-- **mean_extraction_ms:** 0.0812
-- **mean_retrieval_ms:** 0.1185
-- **mean_evaluation_ms:** 0.0751
-- **mean_decision_explanation_ms:** 0.0255
+- **listings_per_second:** 2284.701
+- **median_latency_ms:** 0.3852
+- **p95_latency_ms:** 0.5623
+- **mean_extraction_ms:** 0.0802
+- **mean_retrieval_ms:** 0.1189
+- **mean_evaluation_ms:** 0.0738
+- **mean_decision_explanation_ms:** 0.0258
 - **mean_persistence_ms:** None
 - **technical_failure_rate:** 0.0085 (1/118)
-- **mean_reasoning_record_json_bytes:** 17898.3136
+- **mean_reasoning_record_json_bytes:** 17898.339
 
 ## Classifier vs PUE differential
 

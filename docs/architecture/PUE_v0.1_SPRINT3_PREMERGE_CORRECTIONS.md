@@ -73,6 +73,8 @@ verification: PASS
 
 Cross-process reproducibility was also confirmed directly: two independent Python processes running `run_release_pipeline` produced byte-identical `release_report_hash` values.
 
+**Inherent self-reference note:** a release manifest's `policy_code_git_commit` necessarily references the commit that contains the code/dataset/catalogue it measured, not the (later) commit that adds the manifest file itself - a file cannot embed the hash of the commit it is part of. This repository therefore commits the manifest as a small follow-up commit referencing its parent (documented in that commit's message). Verifying against literal `HEAD` after that follow-up commit correctly reports a `policy_code_git_commit` mismatch (by exactly one commit) while every content/hash/semantic-content check still passes; verifying at the manifest's own referenced parent commit passes all 6 checks. This is a structural property of self-referential provenance stamping, not a defect in the verification logic - the tool's job (catching a manifest that claims a *different, wrong* commit's code produced it) is unaffected.
+
 ## 5. Metric truthfulness and benchmark coverage
 
 - **Evidence precision** (`compute_pipeline_metrics`) no longer reports `1.0` from an unlabelled-false-positive denominator. `BenchmarkCase` gained `forbidden_evidence_types` (a genuine *negative* evidence label — "this evidence type must NOT appear"). Applied to 9 cases where it is structurally guaranteed to be safe (domain cases must never extract `product_family_token`; misleading-similarity titles never contain a real dash-shaped MPN, so `mpn_token` is forbidden). Evidence precision is now genuinely computed: **`20/20 = 1.0`** (previously `null`/unavailable).

@@ -14,7 +14,7 @@
     "Evidence precision is measured only over cases with an explicit forbidden_evidence_types gold label; expanding that coverage is future work, not evaluated here."
   ],
   "manifest_schema_version": "pue-release-manifest-0.1.0",
-  "policy_code_git_commit": "a5a374fb4483a44f1763c645ab336443f05941ee",
+  "policy_code_git_commit": "409734d51a8893884b3f7f3c88f4a1369f8a678b",
   "policy_version": "gpu-policy-0.1.0",
   "release_benchmark_report_path": "data/pue/releases/pue-v0.1.0_benchmark_report.json",
   "release_date": "2026-08-01",
