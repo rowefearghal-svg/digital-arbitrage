@@ -607,6 +607,40 @@ def build_parser() -> argparse.ArgumentParser:
         "--debug", action="store_true", help="Show a full traceback on error."
     )
 
+    pue_live_shadow = pue_subparsers.add_parser(
+        "live-shadow",
+        help="Run a bounded live shadow trial using the released PUE v0.1.",
+    )
+    pue_live_shadow.add_argument(
+        "--queries",
+        default="data/pue/trials/gpu_live_shadow_queries_v0.1.json",
+        help=(
+            "Path to the query manifest "
+            "(default: data/pue/trials/gpu_live_shadow_queries_v0.1.json)."
+        ),
+    )
+    pue_live_shadow.add_argument(
+        "--provider",
+        action="append",
+        dest="providers",
+        default=None,
+        help="Filter to one or more providers (repeatable; default: manifest providers).",
+    )
+    pue_live_shadow.add_argument(
+        "--max-results-per-query",
+        type=int,
+        default=None,
+        help="Override the manifest's per-provider result limit.",
+    )
+    pue_live_shadow.add_argument(
+        "--output-dir",
+        default=None,
+        help="Directory to write trial reports and the PUE shadow database.",
+    )
+    pue_live_shadow.add_argument(
+        "--debug", action="store_true", help="Show a full traceback on error."
+    )
+
     return parser
 
 
@@ -858,6 +892,23 @@ def _run_pue_release_verify(args: argparse.Namespace) -> int:
     return 0 if result.passed else 1
 
 
+def _run_pue_live_shadow(args: argparse.Namespace) -> int:
+    from ..pue.live_shadow import run_live_shadow_trial
+
+    result = run_live_shadow_trial(
+        args.queries,
+        output_dir=args.output_dir,
+        max_results_per_query=args.max_results_per_query,
+        provider_filter=args.providers,
+    )
+    print(f"live-shadow trial: {result.status}", file=sys.stderr)
+    print(f"run_id: {result.run_id}", file=sys.stderr)
+    print(f"providers contacted: {', '.join(result.providers_contacted)}", file=sys.stderr)
+    for key, path in result.output_paths.items():
+        print(f"wrote {key}: {path}", file=sys.stderr)
+    return 0 if result.status in ("SUCCESS", "PARTIAL_SUCCESS") else 1
+
+
 def _run_pue(args: argparse.Namespace) -> int:
     if args.pue_command == "benchmark":
         return _run_pue_benchmark(args)
@@ -867,6 +918,8 @@ def _run_pue(args: argparse.Namespace) -> int:
         return _run_pue_release_generate(args)
     if args.pue_command == "release-verify":
         return _run_pue_release_verify(args)
+    if args.pue_command == "live-shadow":
+        return _run_pue_live_shadow(args)
     print(f"error: unknown pue subcommand {args.pue_command!r}", file=sys.stderr)
     return 1
 

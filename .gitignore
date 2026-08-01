@@ -31,6 +31,10 @@ configs/*.local.*
 data/*
 datasets/
 models/
+
+# Live shadow-trial local outputs (credentials and marketplace data must not be
+# committed; see docs/operations/PUE_LIVE_SHADOW_TRIAL.md).
+var/pue/live-shadow/
 checkpoints/
 *.ckpt
 *.pt

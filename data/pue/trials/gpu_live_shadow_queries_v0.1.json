@@ -1,0 +1,51 @@
+{
+  "manifest_id": "gpu-live-shadow-v0.1.0",
+  "version": "0.1.0",
+  "description": "Post-release live shadow trial query contexts for complete GPUs.",
+  "queries": [
+    {
+      "query_id": "q-rtx-4090",
+      "search_text": "RTX 4090",
+      "searched_product_form": "complete_product",
+      "searched_product_type": "graphics card",
+      "searched_brand": "NVIDIA",
+      "searched_family": "GeForce RTX",
+      "searched_model": "4090",
+      "max_results_per_provider": 25,
+      "providers": ["ebay_browse", "stockx"]
+    },
+    {
+      "query_id": "q-rtx-4080",
+      "search_text": "RTX 4080",
+      "searched_product_form": "complete_product",
+      "searched_product_type": "graphics card",
+      "searched_brand": "NVIDIA",
+      "searched_family": "GeForce RTX",
+      "searched_model": "4080",
+      "max_results_per_provider": 25,
+      "providers": ["ebay_browse", "stockx"]
+    },
+    {
+      "query_id": "q-rx-7900-xtx",
+      "search_text": "RX 7900 XTX",
+      "searched_product_form": "complete_product",
+      "searched_product_type": "graphics card",
+      "searched_brand": "AMD",
+      "searched_family": "Radeon RX",
+      "searched_model": "7900 XTX",
+      "max_results_per_provider": 25,
+      "providers": ["ebay_browse", "stockx"]
+    },
+    {
+      "query_id": "q-arc-a770",
+      "search_text": "Intel Arc A770",
+      "searched_product_form": "complete_product",
+      "searched_product_type": "graphics card",
+      "searched_brand": "Intel",
+      "searched_family": "Arc",
+      "searched_model": "A770",
+      "max_results_per_provider": 25,
+      "providers": ["ebay_browse", "stockx"]
+    }
+  ]
+}
