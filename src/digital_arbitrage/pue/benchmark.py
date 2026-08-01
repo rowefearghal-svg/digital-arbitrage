@@ -19,12 +19,12 @@ specific reason - never a bare ``KeyError``/``TypeError``.
 
 from __future__ import annotations
 
-import hashlib
 import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .canonical import canonical_file_hash
 from .validation import PueValidationError
 
 #: Schema version of the benchmark *dataset format* itself (this module's
@@ -97,6 +97,12 @@ class BenchmarkCase:
 
     # --- reasoning-trace assertions (beyond the final label) ------------- #
     required_evidence_types: tuple[str, ...]
+    forbidden_evidence_types: tuple[str, ...]
+    """Evidence types that must NOT appear in the produced Evidence set for
+    this case - the only genuine *negative* evidence label in this schema
+    (brief section 5 pre-merge correction: without a negative label,
+    evidence-precision has no labelled false-positive signal and must be
+    reported unavailable rather than fabricated as 1.0)."""
     expected_contradiction_fields: tuple[str, ...]
     require_hard_rejected_candidate: bool
     require_contradicted_claim: bool
@@ -290,6 +296,11 @@ def _case_from_dict(entry: Mapping[str, object]) -> BenchmarkCase:
             field_name="required_evidence_types",
             case_id=case_id,
         ),
+        forbidden_evidence_types=_as_str_tuple(
+            entry.get("forbidden_evidence_types"),
+            field_name="forbidden_evidence_types",
+            case_id=case_id,
+        ),
         expected_contradiction_fields=_as_str_tuple(
             entry.get("expected_contradiction_fields"),
             field_name="expected_contradiction_fields",
@@ -364,19 +375,19 @@ _REQUIRED_DATASET_FIELDS = (
 
 
 def dataset_file_hash(path: Path | str = DEFAULT_BENCHMARK_PATH) -> str:
-    """Stable SHA-256 hash of the raw dataset file bytes.
+    """Stable, cross-platform SHA-256 hash of the dataset's *canonical JSON
+    content* (see :mod:`digital_arbitrage.pue.canonical`) - not the raw file
+    bytes, which would vary with CRLF/LF line-ending conversion, incidental
+    whitespace, or key ordering even for byte-different files that encode
+    the exact same dataset.
 
     Recorded in release reports/manifests (brief section 4.1 "stable file
     hash in the resulting release report") so a release is bound to the
-    exact bytes of the dataset that produced it - not merely its declared
-    version string.
+    exact *content* of the dataset that produced it - not merely its
+    declared version string, and not an artefact of the checkout's line
+    endings.
     """
-    resolved = Path(path)
-    try:
-        raw = resolved.read_bytes()
-    except OSError as exc:
-        raise PueValidationError(f"could not read benchmark dataset {resolved}: {exc}") from exc
-    return hashlib.sha256(raw).hexdigest()
+    return canonical_file_hash(path)
 
 
 def load_benchmark_dataset(path: Path | str = DEFAULT_BENCHMARK_PATH) -> BenchmarkDataset:

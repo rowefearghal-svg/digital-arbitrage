@@ -1476,6 +1476,177 @@ add(
     }
 )
 
+# --------------------------------------------------------------------------- #
+# Sprint 3 pre-merge correction item 5: derive `expected_comparability`
+# gold labels from pue/decisions.py's own deterministic, unconditional
+# branches - never from "whatever the current implementation happens to
+# output" for a given *case*. Every ComparabilityStatus decisions.py can
+# produce is a function of (decision_type, product_form, and - only for a
+# CLASSIFIED complete-product outcome - whether a family was resolved),
+# not of incidental behaviour:
+#   - product_form in {component, replacement_part, accessory} ->
+#     NOT_COMPARABLE_PRODUCT_FORM (the accessory/component/replacement-part
+#     branch sets this unconditionally).
+#   - product_form == packaging_only -> NOT_COMPARABLE_PRODUCT_FORM
+#     (packaging-only branch, unconditional).
+#   - product_form == bundle -> NOT_COMPARABLE_BUNDLE (bundle branch,
+#     unconditional regardless of decision_type).
+#   - product_form == incomplete_product AND decision_type ==
+#     partially_identified -> NOT_COMPARABLE_CONDITION.
+#   - product_form == complete_product AND decision_type == identified ->
+#     DIRECTLY_COMPARABLE.
+#   - product_form == complete_product AND decision_type ==
+#     partially_identified -> COMPARABLE_AT_BROADER_LEVEL.
+#   - decision_type == ambiguous -> INSUFFICIENT_INFORMATION (the AMBIGUOUS
+#     branch sets this unconditionally, regardless of hypothesis).
+#   - decision_type == abstained -> INSUFFICIENT_INFORMATION (every
+#     _abstained() call site sets this unconditionally).
+#   - decision_type == outside_supported_domain -> NOT_ASSESSED
+#     (_outside_domain(), unconditional).
+#   - decision_type == processing_failed -> NOT_ASSESSED.
+#
+# Applied only when a case's declared allowed_decision_types +
+# expected_product_form combination resolves to exactly one status per
+# *every* allowed decision type under this table - a case with an allowed
+# decision type this table cannot resolve (e.g. CLASSIFIED with no known
+# product_form, whose comparability then depends on unresolved family
+# information) is left unlabelled rather than guessed.
+_COMPARABILITY_BY_DECISION_TYPE = {
+    "ambiguous": "insufficient_information",
+    "abstained": "insufficient_information",
+    "outside_supported_domain": "not_assessed",
+    "processing_failed": "not_assessed",
+}
+_COMPARABILITY_BY_FORM_ONLY = {
+    "component": "not_comparable_product_form",
+    "replacement_part": "not_comparable_product_form",
+    "accessory": "not_comparable_product_form",
+    "packaging_only": "not_comparable_product_form",
+    "bundle": "not_comparable_bundle",
+}
+
+
+def _derive_expected_comparability(case: dict) -> list[str] | None:
+    if "expected_comparability" in case:
+        return None  # already explicitly labelled - never override
+    allowed = case.get("allowed_decision_types", [])
+    form = case.get("expected_product_form")
+    possible: set[str] = set()
+    for dtype in allowed:
+        if dtype in _COMPARABILITY_BY_DECISION_TYPE:
+            possible.add(_COMPARABILITY_BY_DECISION_TYPE[dtype])
+        elif form is not None and form in _COMPARABILITY_BY_FORM_ONLY:
+            possible.add(_COMPARABILITY_BY_FORM_ONLY[form])
+        elif dtype == "identified" and form == "complete_product":
+            possible.add("directly_comparable")
+        elif dtype == "partially_identified" and form == "complete_product":
+            possible.add("comparable_at_broader_level")
+        elif dtype == "partially_identified" and form == "incomplete_product":
+            possible.add("not_comparable_condition")
+        else:
+            return None  # an allowed outcome this table cannot resolve
+    return sorted(possible) if possible else None
+
+
+for _case in cases:
+    _derived = _derive_expected_comparability(_case)
+    if _derived is not None:
+        _case["expected_comparability"] = _derived
+
+# Catalogue-gap cases: allowed_decision_types spans outside_supported_domain
+# (NOT_ASSESSED), partially_identified-with-a-resolved-family (COMPARABLE_
+# AT_BROADER_LEVEL), and classified-with-no-resolved-family (INSUFFICIENT_
+# INFORMATION) - all three are the *only* code-legitimate outcomes for
+# this exact allowed-decision-type set, so all three are gold-acceptable
+# (brief: "add comparability coverage for ... catalogue gap").
+for _case in cases:
+    if _case.get("catalogue_gap"):
+        _case["expected_comparability"] = [
+            "not_assessed",
+            "comparable_at_broader_level",
+            "insufficient_information",
+        ]
+
+# Misleading-similarity merchandise: the ground-truth-correct comparability
+# for a non-GPU item (mouse pad/t-shirt/keychain/sticker) is NOT_COMPARABLE_
+# PRODUCT_FORM - it must never be treated as comparable to a real GPU. This
+# is the same known residual risk already documented in the Sprint 3
+# report (these cases already fail decision_type_allowed); this label adds
+# a second, independent dimension to the *same* already-visible failure,
+# never a new one (brief: "any implementation failure produced by
+# stronger labels must remain visible").
+for _case in cases:
+    if "misleading_similarity" in _case.get("case_tags", []):
+        _case["expected_comparability"] = ["not_comparable_product_form"]
+
+# --------------------------------------------------------------------------- #
+# Additional Sprint 3 pre-merge correction item 5 gold-label completeness:
+# negative evidence labels (forbidden_evidence_types - the only labels that
+# make evidence_precision genuinely computable rather than reported
+# unavailable), avoidable-abstention coverage, harmful_false_match
+# coverage, and Claim-correctness coverage.
+# --------------------------------------------------------------------------- #
+_by_id = {c["case_id"]: c for c in cases}
+
+# A phone/short-ambiguous-string/charger-cable listing must never extract a
+# GPU product_family_token - none of these titles contain any GPU family
+# term at all (verified against data/pue/knowledge/gpu_terms_v0.1.json).
+for _cid in ("domain_01_phone", "domain_02_ambiguous_short", "domain_03_iphone_charger"):
+    _by_id[_cid]["forbidden_evidence_types"] = ["product_family_token"]
+# domain_04/05 mention AMD/ASUS (real GPU chipset-manufacturer/brand
+# aliases) legitimately, via a CPU/motherboard, not a GPU family term -
+# forbidding product_family_token specifically (not brand_token) is still
+# safe and correct for these two.
+for _cid in ("domain_04_cpu", "domain_05_motherboard"):
+    _by_id[_cid]["forbidden_evidence_types"] = ["product_family_token"]
+
+# None of the misleading-similarity titles contain a real, dash-shaped
+# manufacturer part number - forbidding mpn_token is safe and correct.
+for _cid in (
+    "misleading_01_mousepad",
+    "misleading_02_tshirt",
+    "misleading_03_keychain",
+    "misleading_04_sticker_decal",
+):
+    _by_id[_cid]["forbidden_evidence_types"] = ["mpn_token"]
+
+# Avoidable-abstention coverage: a clean, confident, MPN-bearing exact
+# match is never gold-avoidable-if-abstained's counterexample - if this
+# case ever abstains, that IS avoidable (the evidence is unambiguous).
+_exact_02 = _by_id["exact_02_asus_tuf_rtx4090"]
+_exact_02["allowed_decision_types"] = list(_exact_02["allowed_decision_types"]) + ["abstained"]
+_exact_02["avoidable_if_abstained"] = True
+
+# Harmful-false-match coverage: a mobile/laptop GPU falsely matched to one
+# of the specific desktop SKUs it is already forbidden from matching would
+# be a genuinely harmful false match (very different real-world value), not
+# merely a wrong identification.
+for _cid in ("mobile_01_rtx4090_laptop_gpu", "mobile_04_amd_rx7900m"):
+    _existing = list(_by_id[_cid].get("forbidden_harmful_outcomes", []))
+    if "harmful_false_match" not in _existing:
+        _by_id[_cid]["forbidden_harmful_outcomes"] = [*_existing, "harmful_false_match"]
+
+# Claim-correctness coverage: a title/structured-attribute PRODUCT_FAMILY
+# conflict is exactly the case pue/decisions.py's `contradicted_family_
+# claims` check targets - it deterministically requires a CONTRADICTED
+# Claim to reach its ABSTAINED/UNRESOLVED_CONTRADICTION outcome.
+_by_id["conflict_01_title_structured"]["require_contradicted_claim"] = True
+
+# Incomplete-product form coverage: these four titles explicitly describe
+# physical damage/incompleteness ("for parts or repair, not working",
+# "cracked PCB", "water damaged, untested", "bent PCIe pins") - verified,
+# consistent incomplete_product hypotheses, unlike "missing fans... sold
+# as-is" (damaged_03), which is a genuinely different, still-open case left
+# unlabelled rather than guessed.
+for _cid in (
+    "damaged_01_for_parts_rtx4090",
+    "damaged_02_cracked_pcb",
+    "damaged_04_water_damage",
+    "damaged_05_bent_pins",
+):
+    _by_id[_cid]["expected_product_form"] = "incomplete_product"
+
+
 dataset = {
     "dataset_schema_version": DATASET_SCHEMA_VERSION,
     "dataset_id": "gpu-release-benchmark-v0.1",

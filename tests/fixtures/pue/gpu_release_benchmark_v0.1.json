@@ -39,7 +39,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_02_asus_tuf_rtx4090",
@@ -52,7 +56,8 @@
       "difficulty": "easy",
       "annotation_confidence": "high",
       "allowed_decision_types": [
-        "identified"
+        "identified",
+        "abstained"
       ],
       "forbidden_decision_types": [
         "ambiguous",
@@ -72,7 +77,11 @@
         "exact_catalogue_product"
       ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "directly_comparable"
+      ],
+      "avoidable_if_abstained": true
     },
     {
       "case_id": "exact_03_asus_rog_rtx4090",
@@ -105,7 +114,10 @@
         "exact_catalogue_product"
       ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_04_msi_rtx4090_trio",
@@ -136,7 +148,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_05_gigabyte_rtx4090_master",
@@ -167,7 +183,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_06_zotac_rtx4090_trinity",
@@ -198,7 +218,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_07_rtx4080_fe",
@@ -229,7 +253,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_08_asus_tuf_rtx4080super",
@@ -262,7 +290,10 @@
         "exact_catalogue_product"
       ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_09_msi_rtx4080super_trio",
@@ -293,7 +324,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_10_rtx4070_fe",
@@ -324,7 +359,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_11_asus_dual_rtx4070",
@@ -357,7 +396,10 @@
         "exact_catalogue_product"
       ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_12_msi_rtx4070tisuper_trio",
@@ -388,7 +430,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_13_asus_dual_rtx3060_8g",
@@ -421,7 +467,10 @@
         "exact_catalogue_product"
       ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_14_asus_dual_rtx3060_12g",
@@ -454,7 +503,10 @@
         "exact_catalogue_product"
       ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_15_msi_rtx3060_gamingx_8g",
@@ -485,7 +537,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_16_msi_rtx3060_ventus_12g",
@@ -516,7 +572,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_17_gigabyte_rtx3060_windforce",
@@ -549,7 +609,10 @@
         "exact_catalogue_product"
       ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_18_amd_rx7900xtx_reference",
@@ -580,7 +643,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_19_sapphire_rx7900xtx_nitro",
@@ -611,7 +678,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_20_powercolor_rx7900xtx_reddevil",
@@ -642,7 +713,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_21_amd_rx7800xt_reference",
@@ -673,7 +748,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_22_sapphire_rx7800xt_nitro",
@@ -704,7 +783,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_23_intel_arca770_le",
@@ -735,7 +818,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_24_asrock_arca770_phantom",
@@ -766,7 +853,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_25_intel_arca750_le",
@@ -797,7 +888,11 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "ambig_01_rtx3060_12gb_no_brand",
@@ -956,7 +1051,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "forbidden_harmful_outcomes": [
+        "harmful_false_match"
+      ]
     },
     {
       "case_id": "mobile_02_dell_laptop_with_rtx4090",
@@ -1057,7 +1155,10 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "waterblock_03_bykski",
@@ -1080,7 +1181,10 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "waterblock_04_gpu_not_included",
@@ -1133,7 +1237,10 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "fan_02_generic_rtx4090_fan",
@@ -1156,7 +1263,10 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "fan_03_cooling_fans_for_rtx4090",
@@ -1178,7 +1288,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "backplate_01_nvidia_rtx4090_fe",
@@ -1201,7 +1314,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "backplate_02_generic_rtx4090",
@@ -1305,7 +1421,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "bracket_02_riser_cable",
@@ -1409,7 +1528,10 @@
       ],
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "packaging_03_retail_box_asus_tuf",
@@ -1454,7 +1576,8 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_product_form": "incomplete_product"
     },
     {
       "case_id": "damaged_02_cracked_pcb",
@@ -1474,7 +1597,8 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_product_form": "incomplete_product"
     },
     {
       "case_id": "damaged_03_missing_fans_incomplete",
@@ -1636,7 +1760,10 @@
       "require_multiple_hypotheses": true,
       "min_evidence_count": 3,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "insufficient_information"
+      ]
     },
     {
       "case_id": "bundle_03_gpu_and_riser",
@@ -1676,7 +1803,12 @@
       "catalogue_gap": true,
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed",
+        "comparable_at_broader_level",
+        "insufficient_information"
+      ]
     },
     {
       "case_id": "gap_02_rtx4060",
@@ -1696,7 +1828,12 @@
       "catalogue_gap": true,
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed",
+        "comparable_at_broader_level",
+        "insufficient_information"
+      ]
     },
     {
       "case_id": "gap_03_gtx1660super",
@@ -1716,7 +1853,12 @@
       "catalogue_gap": true,
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed",
+        "comparable_at_broader_level",
+        "insufficient_information"
+      ]
     },
     {
       "case_id": "gap_04_arca580",
@@ -1736,7 +1878,12 @@
       "catalogue_gap": true,
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed",
+        "comparable_at_broader_level",
+        "insufficient_information"
+      ]
     },
     {
       "case_id": "zero_candidate_01_unknown_brand",
@@ -1833,7 +1980,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "insufficient_information"
+      ]
     },
     {
       "case_id": "abstain_02_low_quality_title",
@@ -1876,7 +2026,13 @@
       "unsupported_domain": true,
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed"
+      ],
+      "forbidden_evidence_types": [
+        "product_family_token"
+      ]
     },
     {
       "case_id": "domain_02_ambiguous_short",
@@ -1899,7 +2055,13 @@
       "unsupported_domain": true,
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed"
+      ],
+      "forbidden_evidence_types": [
+        "product_family_token"
+      ]
     },
     {
       "case_id": "domain_03_iphone_charger",
@@ -1922,7 +2084,13 @@
       "unsupported_domain": true,
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed"
+      ],
+      "forbidden_evidence_types": [
+        "product_family_token"
+      ]
     },
     {
       "case_id": "conflict_01_title_structured",
@@ -1945,7 +2113,11 @@
       ],
       "min_evidence_count": 3,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "insufficient_information"
+      ],
+      "require_contradicted_claim": true
     },
     {
       "case_id": "conflict_02_brand_mismatch",
@@ -1990,7 +2162,13 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ],
+      "forbidden_evidence_types": [
+        "mpn_token"
+      ]
     },
     {
       "case_id": "misleading_02_tshirt",
@@ -2015,7 +2193,13 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ],
+      "forbidden_evidence_types": [
+        "mpn_token"
+      ]
     },
     {
       "case_id": "edge_01_empty_title",
@@ -2035,7 +2219,11 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "insufficient_information",
+        "not_assessed"
+      ]
     },
     {
       "case_id": "edge_02_malformed_input",
@@ -2055,7 +2243,10 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed"
+      ]
     },
     {
       "case_id": "exact_alias_01_asus_tuf_rtx4090_mpn",
@@ -2085,7 +2276,10 @@
         "exact_catalogue_product"
       ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_alias_02_gigabyte_aorus_mpn",
@@ -2113,7 +2307,11 @@
       "expected_identified_family": "rtx 4090",
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_alias_03_zotac_trinity_mpn",
@@ -2143,7 +2341,10 @@
         "exact_catalogue_product"
       ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_alias_04_sapphire_nitro_rx7900xtx_mpn",
@@ -2173,7 +2374,10 @@
         "exact_catalogue_product"
       ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_alias_05_asrock_arc_a770_mpn",
@@ -2201,7 +2405,11 @@
       "expected_identified_family": "arc a770",
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_alias_06_msi_rtx3060_ventus_mpn",
@@ -2229,7 +2437,11 @@
       "expected_identified_family": "rtx 3060",
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_alias_07_asus_dual_rtx4070_mpn",
@@ -2259,7 +2471,10 @@
         "exact_catalogue_product"
       ],
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "exact_alias_08_powercolor_reddevil_mpn",
@@ -2287,7 +2502,11 @@
       "expected_identified_family": "rx 7900 xtx",
       "min_evidence_count": 2,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "comparable_at_broader_level",
+        "directly_comparable"
+      ]
     },
     {
       "case_id": "family_only_05_rtx4080",
@@ -2412,7 +2631,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "forbidden_harmful_outcomes": [
+        "harmful_false_match"
+      ]
     },
     {
       "case_id": "mobile_05_laptop_amd_gpu_generic",
@@ -2519,7 +2741,10 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ]
     },
     {
       "case_id": "adapter_03_riser_cable_variant",
@@ -2585,7 +2810,8 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_product_form": "incomplete_product"
     },
     {
       "case_id": "damaged_05_bent_pins",
@@ -2605,7 +2831,8 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_product_form": "incomplete_product"
     },
     {
       "case_id": "not_included_03_manual_only",
@@ -2718,7 +2945,12 @@
       "catalogue_gap": true,
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed",
+        "comparable_at_broader_level",
+        "insufficient_information"
+      ]
     },
     {
       "case_id": "gap_06_rx7600",
@@ -2738,7 +2970,12 @@
       "catalogue_gap": true,
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed",
+        "comparable_at_broader_level",
+        "insufficient_information"
+      ]
     },
     {
       "case_id": "gap_07_arcb580",
@@ -2758,7 +2995,12 @@
       "catalogue_gap": true,
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed",
+        "comparable_at_broader_level",
+        "insufficient_information"
+      ]
     },
     {
       "case_id": "zero_candidate_03_generic_desc",
@@ -2777,7 +3019,11 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "insufficient_information",
+        "not_assessed"
+      ]
     },
     {
       "case_id": "ambiguous_03_asus_rtx4090_no_variant",
@@ -2816,7 +3062,10 @@
       ],
       "min_evidence_count": 1,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "insufficient_information"
+      ]
     },
     {
       "case_id": "domain_04_cpu",
@@ -2839,7 +3088,13 @@
       "unsupported_domain": true,
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_assessed"
+      ],
+      "forbidden_evidence_types": [
+        "product_family_token"
+      ]
     },
     {
       "case_id": "domain_05_motherboard",
@@ -2862,7 +3117,10 @@
       "unsupported_domain": true,
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "forbidden_evidence_types": [
+        "product_family_token"
+      ]
     },
     {
       "case_id": "conflict_03_capacity_mismatch",
@@ -2907,7 +3165,13 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ],
+      "forbidden_evidence_types": [
+        "mpn_token"
+      ]
     },
     {
       "case_id": "misleading_04_sticker_decal",
@@ -2932,7 +3196,13 @@
       ],
       "min_evidence_count": 0,
       "annotation_source": "sprint3_hand_authored",
-      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace."
+      "provenance": "Hand-authored synthetic listing title constructed for Sprint 3 benchmark coverage; not scraped from a live marketplace.",
+      "expected_comparability": [
+        "not_comparable_product_form"
+      ],
+      "forbidden_evidence_types": [
+        "mpn_token"
+      ]
     }
   ]
 }

@@ -194,6 +194,10 @@ def test_release_gate_passes_when_every_mandatory_check_passes() -> None:
         run.failures,
         mandatory_acceptance_pass=True,
         replay_equivalent=True,
+        capability_version="pue-0.1.0",
+        policy_version=run.context.policy_version,
+        knowledge_version=run.context.knowledge_version,
+        schema_version=run.context.schema_version,
     )
     assert gate.passed is True
 

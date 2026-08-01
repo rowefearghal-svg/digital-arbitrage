@@ -91,7 +91,11 @@ def compute_product_metrics(results: Sequence[CaseResult]) -> ProductMetrics:
 
     # exact identification accuracy: only cases with sufficient gold evidence
     # for exact identity (brief 6.4) - i.e. an explicit acceptable catalogue
-    # product id and an EXACT_CATALOGUE_PRODUCT expectation.
+    # product id and an EXACT_CATALOGUE_PRODUCT expectation. Correctness
+    # requires the Decision's *selected* Candidate to be one of the
+    # acceptable gold ids - retrieval rank is a separate, retrieval-only
+    # signal (Candidate recall@k below), never a proxy for identification
+    # correctness (Sprint 3 pre-merge correction item 3).
     exact_cases = [
         r
         for r in results
@@ -102,16 +106,18 @@ def compute_product_metrics(results: Sequence[CaseResult]) -> ProductMetrics:
         1
         for r in exact_cases
         if r.record.decision.identification_level.value == "exact_catalogue_product"
-        and r.top_acceptable_rank == 1
+        and r.selected_product_id in set(r.case.acceptable_catalogue_product_ids)
     )
 
     # hierarchical identification accuracy: any case with an expected
-    # identification level - correct if the achieved level is in the
-    # gold-acceptable set (broader-but-not-overclaiming counts, per
-    # maximum_justified_identification_level, already checked in
-    # evaluate_case's "correct" flag).
-    hier_cases = [r for r in results if r.case.expected_identification_levels]
-    hier_correct = sum(1 for r in hier_cases if r.correct)
+    # identification level - correct iff the achieved level is in the
+    # gold-acceptable set *and*, when that level implies a specific
+    # catalogue identity, the actually-selected Candidate is acceptable
+    # (``CaseResult.identification_hierarchy_correct`` - computed once in
+    # evaluate_case, independent of unrelated checks like evidence-count or
+    # hard-rejected-candidate assertions that must not gate this metric).
+    hier_cases = [r for r in results if r.identification_hierarchy_correct is not None]
+    hier_correct = sum(1 for r in hier_cases if r.identification_hierarchy_correct)
 
     # Candidate recall@k: only where an acceptable Candidate exists in the
     # tested catalogue (brief 6.4: catalogue-gap cases excluded).
@@ -216,22 +222,38 @@ class PipelineMetrics:
 def compute_pipeline_metrics(results: Sequence[CaseResult]) -> PipelineMetrics:
     from .enums import ClaimStatus, ContradictionSeverity
 
-    # Evidence precision/recall over cases with an explicit gold
-    # required_evidence_types set (the only field-level gold label
-    # available for Evidence in this benchmark schema).
-    evidence_cases = [r for r in results if r.case.required_evidence_types]
+    # Evidence recall: over cases with an explicit gold
+    # required_evidence_types set (a positive label - "this evidence type
+    # must appear").
+    recall_cases = [r for r in results if r.case.required_evidence_types]
     ev_tp = ev_fn = 0
-    for r in evidence_cases:
+    for r in recall_cases:
         required = set(r.case.required_evidence_types)
         present = {e.evidence_type.value for e in r.record.evidence}
         ev_tp += len(required & present)
         ev_fn += len(required - present)
-        # False positives are undefined without a "forbidden evidence type"
-        # gold label (not part of this schema); precision denominator is
-        # therefore every *labelled* evidence type actually produced, i.e.
-        # true positives are the only positively-labelled signal available.
-    evidence_precision = _metric(ev_tp, ev_tp)  # no false-positive gold label in this schema
     evidence_recall = _metric(ev_tp, ev_tp + ev_fn)
+
+    # Evidence precision: requires a genuine *negative* label - cases with
+    # an explicit gold forbidden_evidence_types set ("this evidence type
+    # must NOT appear"). Without any such label, there is no labelled
+    # false-positive signal at all, and precision must be reported
+    # unavailable (denominator 0 -> Metric.value is None) rather than
+    # fabricated as 1.0 by conflating "no labelled false positives exist"
+    # with "no false positives occurred" (Sprint 3 pre-merge correction
+    # item 5).
+    precision_cases = [r for r in results if r.case.forbidden_evidence_types]
+    prec_tp = prec_fp = 0
+    for r in precision_cases:
+        forbidden = set(r.case.forbidden_evidence_types)
+        present = {e.evidence_type.value for e in r.record.evidence}
+        prec_fp += len(forbidden & present)
+        # True positives for the precision denominator are every evidence
+        # type actually produced on a precision-labelled case that was not
+        # gold-forbidden - i.e. every produced evidence type not counted as
+        # a false positive above.
+        prec_tp += len(present - forbidden)
+    evidence_precision = _metric(prec_tp, prec_tp + prec_fp)
 
     claim_cases = [r for r in results if r.case.require_contradicted_claim]
     claim_hits = sum(
@@ -383,11 +405,28 @@ def compute_operational_metrics(
 @dataclass(frozen=True, slots=True)
 class DifferentialMetrics:
     """Benchmark-gold-grounded classifier/PUE differential (brief section
-    12): correctness here is determined by the benchmark's gold labels,
-    never by classifier/PUE agreement itself (which is the separate,
-    unlabelled Sprint 2 :class:`~digital_arbitrage.pue.comparison.ComparisonCategory`)."""
+    12): each system's correctness is graded *independently* against the
+    benchmark's gold labels (see
+    :func:`~digital_arbitrage.pue.benchmark_metrics.classifier_gold_correct`)
+    - never inferred from
+    :class:`~digital_arbitrage.pue.comparison.ComparisonCategory.AGREEMENT`,
+    which describes only whether the two systems happened to reach the same
+    *observable* conclusion, not whether either is correct (Sprint 3
+    pre-merge correction item 2: agreement and correctness are orthogonal -
+    two systems can agree and both be wrong, or disagree and both be
+    wrong)."""
 
+    total_compared: int
+    classifier_gradable: int
+    """Cases with a comparison record AND a clear, classifier-gradable gold
+    judgment (see ``classifier_gold_correct``)."""
+    classifier_ungradable: int
+    """Cases with a comparison record but no classifier-gradable gold
+    judgment (e.g. packaging/bundle cases the classifier has no concept
+    of) - excluded from every quadrant count below, never silently folded
+    into either correct or incorrect."""
     both_correct: int
+    both_wrong: int
     pue_corrects_classifier: int
     classifier_correct_pue_worsens: int
     pue_appropriately_abstains: int
@@ -396,11 +435,14 @@ class DifferentialMetrics:
     product_form_disagreements: int
     identity_specificity_differences: int
     classifier_declined_pue_classified: int
-    total_compared: int
 
     def to_dict(self) -> dict:
         return {
+            "total_compared": self.total_compared,
+            "classifier_gradable": self.classifier_gradable,
+            "classifier_ungradable": self.classifier_ungradable,
             "both_correct": self.both_correct,
+            "both_wrong": self.both_wrong,
             "pue_corrects_classifier": self.pue_corrects_classifier,
             "classifier_correct_pue_worsens": self.classifier_correct_pue_worsens,
             "pue_appropriately_abstains": self.pue_appropriately_abstains,
@@ -409,28 +451,33 @@ class DifferentialMetrics:
             "product_form_disagreements": self.product_form_disagreements,
             "identity_specificity_differences": self.identity_specificity_differences,
             "classifier_declined_pue_classified": self.classifier_declined_pue_classified,
-            "total_compared": self.total_compared,
         }
 
 
 def compute_differential_metrics(results: Sequence[CaseResult]) -> DifferentialMetrics:
+    from .benchmark_metrics import classifier_gold_correct
+
     compared = [r for r in results if r.comparison is not None]
-    both_correct = pue_corrects = classifier_worsens = 0
+    both_correct = both_wrong = pue_corrects = classifier_worsens = ungradable = 0
     appropriate_abstain = avoidable_abstain = prevents_harmful = 0
     form_disagreements = identity_diffs = declined_classified = 0
 
     for r in compared:
         comparison = r.comparison
         assert comparison is not None
-        classifier_correct = comparison.category == ComparisonCategory.AGREEMENT
+        classifier_correct = classifier_gold_correct(r.case, comparison.classifier_label)
         pue_correct = r.correct
 
-        if classifier_correct and pue_correct:
+        if classifier_correct is None:
+            ungradable += 1
+        elif classifier_correct and pue_correct:
             both_correct += 1
         elif (not classifier_correct) and pue_correct:
             pue_corrects += 1
         elif classifier_correct and not pue_correct:
             classifier_worsens += 1
+        else:
+            both_wrong += 1
 
         if r.is_justified_abstention:
             appropriate_abstain += 1
@@ -446,7 +493,11 @@ def compute_differential_metrics(results: Sequence[CaseResult]) -> DifferentialM
             declined_classified += 1
 
     return DifferentialMetrics(
+        total_compared=len(compared),
+        classifier_gradable=len(compared) - ungradable,
+        classifier_ungradable=ungradable,
         both_correct=both_correct,
+        both_wrong=both_wrong,
         pue_corrects_classifier=pue_corrects,
         classifier_correct_pue_worsens=classifier_worsens,
         pue_appropriately_abstains=appropriate_abstain,
@@ -455,7 +506,6 @@ def compute_differential_metrics(results: Sequence[CaseResult]) -> DifferentialM
         product_form_disagreements=form_disagreements,
         identity_specificity_differences=identity_diffs,
         classifier_declined_pue_classified=declined_classified,
-        total_compared=len(compared),
     )
 
 
@@ -489,16 +539,34 @@ def evaluate_release_gate(
     failures: Sequence[CaseFailure],
     *,
     mandatory_acceptance_pass: bool,
+    mandatory_acceptance_detail: str = "",
     replay_equivalent: bool,
+    replay_equivalent_detail: str = "",
+    capability_version: str = "",
+    policy_version: str = "",
+    knowledge_version: str = "",
+    schema_version: str = "",
 ) -> ReleaseGateReport:
-    """Evaluate every hard release-gate requirement (brief section 7)."""
+    """Evaluate every hard release-gate requirement (brief section 7).
+
+    ``mandatory_acceptance_pass``/``replay_equivalent`` must be the *real*
+    outcome of actually executing the mandatory acceptance/regression test
+    suite and an actual identical-version persisted replay (see
+    :mod:`digital_arbitrage.pue.release_pipeline`) - never a hardcoded
+    literal (Sprint 3 pre-merge correction item 1). The accompanying
+    ``*_detail`` strings must carry the real evidence (e.g. the pytest exit
+    code and command, or the per-case replay-equivalence outcomes) so the
+    check is auditable, not just asserted.
+    """
     checks: list[GateCheck] = []
 
     checks.append(
         GateCheck(
             "all_mandatory_acceptance_cases_pass",
             mandatory_acceptance_pass,
-            "tests/pue/test_acceptance.py + tests/pue/test_golden.py must pass.",
+            mandatory_acceptance_detail
+            or "tests/pue/test_acceptance.py + tests/pue/test_golden.py + "
+            "tests/pue/test_invariants.py must pass.",
         )
     )
 
@@ -570,26 +638,40 @@ def evaluate_release_gate(
         GateCheck(
             "deterministic_replay_equivalent",
             replay_equivalent,
-            "Replaying a persisted case under identical versions reproduces an "
+            replay_equivalent_detail
+            or "Replaying a persisted case under identical versions reproduces an "
             "equivalent Decision.",
         )
     )
 
+    # This structural invariant is exercised by tests/pue/test_invariants.py
+    # ::test_invariant_no_commercial_fields, which is included in the same
+    # mandatory-acceptance pytest run whose real, executed outcome is
+    # ``mandatory_acceptance_pass`` above - so this check derives from that
+    # same real evidence rather than being independently hardcoded True.
     checks.append(
         GateCheck(
             "no_commercial_data_in_product_identity_reasoning",
-            True,
+            mandatory_acceptance_pass,
             "Structural invariant enforced by tests/pue/test_invariants.py::"
             "test_invariant_no_commercial_fields (no price/profit/ROI field ever read by "
-            "pue/claims.py, pue/evaluation.py, or pue/decisions.py).",
+            "pue/claims.py, pue/evaluation.py, or pue/decisions.py); verified by the same "
+            "mandatory-acceptance pytest run above.",
         )
     )
 
+    version_fields = {
+        "capability_version": capability_version,
+        "policy_version": policy_version,
+        "knowledge_version": knowledge_version,
+        "schema_version": schema_version,
+    }
+    missing_versions = [name for name, value in version_fields.items() if not value]
     checks.append(
         GateCheck(
             "versions_identified_in_manifest",
-            True,
-            "See the release manifest's capability/policy/knowledge/schema version fields.",
+            not missing_versions,
+            f"missing: {missing_versions}" if missing_versions else str(version_fields),
         )
     )
 
@@ -649,6 +731,8 @@ def build_benchmark_report(
     mandatory_acceptance_pass: bool,
     replay_equivalent: bool,
     run_differential: bool,
+    mandatory_acceptance_detail: str = "",
+    replay_equivalent_detail: str = "",
     generated_at: str | None = None,
 ) -> BenchmarkReport:
     product_metrics = compute_product_metrics(results)
@@ -658,6 +742,12 @@ def build_benchmark_report(
     gate = evaluate_release_gate(
         results,
         failures,
+        mandatory_acceptance_detail=mandatory_acceptance_detail,
+        replay_equivalent_detail=replay_equivalent_detail,
+        capability_version=capability_version,
+        policy_version=policy_version,
+        knowledge_version=knowledge_version,
+        schema_version=schema_version,
         mandatory_acceptance_pass=mandatory_acceptance_pass,
         replay_equivalent=replay_equivalent,
     )
@@ -742,6 +832,34 @@ def report_to_dict(report: BenchmarkReport) -> dict:
             for r in report.results
         ],
     }
+
+
+#: Report sections that are *expected* to vary between two regenerations of
+#: an otherwise byte-identical release, and so must never be part of a
+#: reproducibility/content hash (Sprint 3 pre-merge correction item 4):
+#: ``generated_at`` is a wall-clock timestamp, and ``operational_metrics``
+#: is real, measured wall-clock timing (throughput/latency) - neither is
+#: semantic report content.
+VOLATILE_REPORT_KEYS = ("generated_at", "operational_metrics")
+
+
+def report_semantic_dict(report: BenchmarkReport) -> dict:
+    """The subset of :func:`report_to_dict` expected to be exactly
+    reproducible across regenerations from the same code, dataset, and
+    catalogue (given a deterministic id_factory/clock) - excludes
+    :data:`VOLATILE_REPORT_KEYS`. This is what the release-verification
+    path (:mod:`digital_arbitrage.pue.release_pipeline`) compares."""
+    d = report_to_dict(report)
+    return {k: v for k, v in d.items() if k not in VOLATILE_REPORT_KEYS}
+
+
+def canonical_report_hash(report: BenchmarkReport) -> str:
+    """Stable SHA-256 hash of :func:`report_semantic_dict` (see
+    :mod:`digital_arbitrage.pue.canonical`) - the value recorded as a
+    release manifest's ``release_report_hash``."""
+    from .canonical import canonical_json_hash
+
+    return canonical_json_hash(report_semantic_dict(report))
 
 
 def render_report_json(report: BenchmarkReport) -> str:

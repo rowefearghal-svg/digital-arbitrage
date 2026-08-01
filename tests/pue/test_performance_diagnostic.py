@@ -65,3 +65,61 @@ def test_render_diagnostic_text_contains_key_fields() -> None:
 def test_no_technical_failures_on_well_formed_synthetic_titles() -> None:
     result = run_performance_diagnostic(count=100, checkpoint_count=5)
     assert result.technical_failure_count == 0
+
+
+# --------------------------------------------------------------------------- #
+# Sprint 3 pre-merge correction item 6: bounded latency reservoir, honest
+# memory-growth claim.
+# --------------------------------------------------------------------------- #
+def test_latency_sample_is_bounded_even_for_a_large_listing_count() -> None:
+    """The diagnostic must not accumulate an O(N) latency list - the
+    reservoir sample size is capped regardless of ``count``."""
+    from digital_arbitrage.pue.performance import _MAX_LATENCY_SAMPLES
+
+    result = run_performance_diagnostic(count=5_000, checkpoint_count=5)
+    assert result.latency_sample_size == min(5_000, _MAX_LATENCY_SAMPLES)
+    assert result.latency_sample_size <= _MAX_LATENCY_SAMPLES
+
+
+def test_latency_sample_size_never_exceeds_listing_count_for_small_runs() -> None:
+    result = run_performance_diagnostic(count=50, checkpoint_count=5)
+    assert result.latency_sample_size == 50
+
+
+def test_possible_memory_growth_flag_is_reported_not_silently_dismissed() -> None:
+    """The result must carry an explicit, honestly-scoped growth signal
+    rather than asserting boundedness from raw linear checkpoint growth
+    (Sprint 3 pre-merge correction item 6) - a small run below the
+    reservoir-fill threshold has too few post-fill checkpoints to say
+    anything, and must default to False, not fabricate an assessment."""
+    result = run_performance_diagnostic(count=50, checkpoint_count=5)
+    assert isinstance(result.possible_memory_growth, bool)
+    assert result.possible_memory_growth is False
+
+
+def test_possible_memory_growth_is_computed_only_from_post_reservoir_fill_checkpoints() -> None:
+    """A run large enough for the reservoir to fill partway through must
+    still produce a well-defined (bool) signal, and the raw checkpoint
+    list must not be conflated with it - the two are reported separately."""
+    from digital_arbitrage.pue.performance import _MAX_LATENCY_SAMPLES
+
+    result = run_performance_diagnostic(count=_MAX_LATENCY_SAMPLES * 2, checkpoint_count=8)
+    assert isinstance(result.possible_memory_growth, bool)
+    assert len(result.memory_growth_checkpoints_bytes) == 8
+
+
+def test_reservoir_sample_size_is_deterministic_given_the_same_seed_and_count() -> None:
+    """The reservoir *selection algorithm* (which listing indices end up
+    sampled) is deterministic given the same seed; the measured wall-clock
+    latency *values* themselves are not (real timing), so only the
+    resulting sample size - not the latency numbers - is asserted here."""
+    a = run_performance_diagnostic(count=3_000, checkpoint_count=5, reservoir_seed=42)
+    b = run_performance_diagnostic(count=3_000, checkpoint_count=5, reservoir_seed=42)
+    assert a.latency_sample_size == b.latency_sample_size == 2000
+
+
+def test_render_diagnostic_text_reports_growth_flag_and_sample_size() -> None:
+    result = run_performance_diagnostic(count=20, checkpoint_count=4)
+    text = render_diagnostic_text(result)
+    assert "possible memory growth" in text
+    assert "reservoir sample" in text

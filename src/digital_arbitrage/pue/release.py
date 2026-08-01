@@ -48,6 +48,7 @@ _REQUIRED_FIELDS = (
     "catalogue_file_hash",
     "policy_code_git_commit",
     "release_benchmark_report_path",
+    "release_report_hash",
     "release_gate_passed",
     "release_date",
     "known_limitations",
@@ -69,6 +70,12 @@ class ReleaseManifest:
     catalogue_file_hash: str
     policy_code_git_commit: str
     release_benchmark_report_path: str
+    release_report_hash: str
+    """Canonical content hash of the bound release benchmark report (see
+    :func:`digital_arbitrage.pue.benchmark_report.canonical_report_hash`) -
+    excludes volatile fields (generation timestamp, measured operational
+    timing) so a regeneration from the same code/dataset/catalogue
+    reproduces the exact same hash (Sprint 3 pre-merge correction item 4)."""
     release_gate_passed: bool
     release_date: str
     known_limitations: tuple[str, ...]
@@ -88,6 +95,7 @@ class ReleaseManifest:
             "catalogue_file_hash": self.catalogue_file_hash,
             "policy_code_git_commit": self.policy_code_git_commit,
             "release_benchmark_report_path": self.release_benchmark_report_path,
+            "release_report_hash": self.release_report_hash,
             "release_gate_passed": self.release_gate_passed,
             "release_date": self.release_date,
             "known_limitations": list(self.known_limitations),
@@ -132,6 +140,7 @@ def build_release_manifest(
     benchmark_dataset_hash: str,
     catalogue_file_hash: str,
     release_benchmark_report_path: str,
+    release_report_hash: str,
     release_gate_passed: bool,
     release_date: str,
     known_limitations: tuple[str, ...] = (),
@@ -151,6 +160,7 @@ def build_release_manifest(
         catalogue_file_hash=catalogue_file_hash,
         policy_code_git_commit=policy_code_git_commit or current_git_commit(),
         release_benchmark_report_path=release_benchmark_report_path,
+        release_report_hash=release_report_hash,
         release_gate_passed=release_gate_passed,
         release_date=release_date,
         known_limitations=tuple(known_limitations),
@@ -196,6 +206,7 @@ def _manifest_from_dict(raw: Mapping[str, object], *, source: str) -> ReleaseMan
         catalogue_file_hash=str(raw["catalogue_file_hash"]),
         policy_code_git_commit=str(raw["policy_code_git_commit"]),
         release_benchmark_report_path=str(raw["release_benchmark_report_path"]),
+        release_report_hash=str(raw["release_report_hash"]),
         release_gate_passed=gate_passed,
         release_date=str(raw["release_date"]),
         known_limitations=tuple(str(x) for x in limitations),

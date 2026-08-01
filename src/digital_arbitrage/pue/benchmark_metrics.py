@@ -19,6 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 
+from ..classification.models import Classification
 from .benchmark import BenchmarkCase
 from .catalogue import CandidateRepository
 from .comparison import ClassifierPueComparison
@@ -80,6 +81,64 @@ _ACCESSORY_LIKE_FORMS = frozenset(
     }
 )
 
+#: Identification levels that imply a specific catalogue-product identity
+#: was chosen, not merely a family/model claim - only at these levels does
+#: "which Candidate was selected" have to agree with the gold-acceptable
+#: catalogue product ids (Sprint 3 pre-merge correction item 3).
+_SELECTION_REQUIRING_LEVELS = frozenset(
+    {IdentificationLevel.EXACT_CATALOGUE_PRODUCT.value, IdentificationLevel.VARIANT.value}
+)
+
+
+# --------------------------------------------------------------------------- #
+# Classifier gold-grounded correctness (Sprint 3 pre-merge correction item 2)
+# --------------------------------------------------------------------------- #
+def classifier_gold_correct(case: BenchmarkCase, classifier_label: str) -> bool | None:
+    """Grade the existing title classifier's verdict *independently*
+    against this benchmark case's gold labels - never against
+    :data:`~digital_arbitrage.pue.comparison.ComparisonCategory.AGREEMENT`,
+    which describes only whether the classifier and the PUE happened to
+    reach the same observable conclusion, not whether either is correct.
+
+    Returns ``None`` when this case's gold labels give no clear,
+    classifier-gradable judgment at all (the classifier has no concept of
+    packaging/bundle/incomplete-product distinctions, and many cases assert
+    nothing about product form) - such cases are excluded from the
+    classifier-correctness denominator, never silently counted either way.
+
+    Two classifier-gradable judgments only (brief: "particularly product
+    form and declined/non-declined semantics"):
+
+    1. Declined/non-declined: a case gold-labelled as *not* a genuine,
+       in-scope GPU product (misleading-similarity merchandise or an
+       unsupported-domain listing) is correctly classified only if the
+       classifier declines to treat it as a product match (``REJECTED`` or
+       ``UNKNOWN`` - never ``COMPLETE_PRODUCT``/``ACCESSORY``/``PART``).
+    2. Product form: for a case with a gold ``expected_product_form``, the
+       classifier is correct iff its coarse bucket (complete vs.
+       accessory/part) matches.
+    """
+    label = Classification(classifier_label)
+    if label in (Classification.COMPLETE_PRODUCT,):
+        bucket = "complete"
+    elif label in (Classification.ACCESSORY, Classification.PART):
+        bucket = "non_complete"
+    elif label is Classification.REJECTED:
+        bucket = "rejected"
+    else:
+        bucket = "unknown"
+
+    if "misleading_similarity" in case.case_tags or case.unsupported_domain:
+        return bucket in ("rejected", "unknown")
+
+    if case.expected_product_form == ProductForm.COMPLETE_PRODUCT.value:
+        return bucket == "complete"
+
+    if case.expected_product_form in _ACCESSORY_LIKE_FORMS:
+        return bucket == "non_complete"
+
+    return None
+
 
 # --------------------------------------------------------------------------- #
 # Per-case grading
@@ -110,7 +169,27 @@ class CaseResult:
     top_acceptable_rank: int | None
     """1-based retrieval rank of the best-ranked acceptable Candidate among
     ``record.candidates``, or ``None`` if no acceptable Candidate was
-    retrieved at all (see :func:`_acceptable_candidate_rank`)."""
+    retrieved at all (see :func:`_acceptable_candidate_rank`). This is a
+    pure *retrieval* signal - it belongs only in Candidate recall@k, never
+    in an identification-*correctness* metric (Sprint 3 pre-merge
+    correction item 3): the Decision may select a different Candidate than
+    the one retrieval ranked highest."""
+    selected_product_id: str | None
+    """The catalogue_product_id of the Candidate actually *selected* by
+    Decision Formation (``decision.selected_candidate_instance_id``), or
+    ``None`` if no Candidate was selected (e.g. PARTIALLY_IDENTIFIED never
+    selects one - see ``pue/decisions.py``). Identification-*correctness*
+    metrics (exact/hierarchical) must be computed against this field, never
+    against ``top_acceptable_rank``."""
+    identification_hierarchy_correct: bool | None
+    """Whether the achieved identification level is within
+    ``case.expected_identification_levels`` *and*, when that level implies
+    a specific catalogue identity (EXACT_CATALOGUE_PRODUCT or VARIANT) and
+    the case defines ``acceptable_catalogue_product_ids``, the actually
+    selected Candidate is one of them. ``None`` when the case asserts no
+    ``expected_identification_levels`` at all (not applicable - excluded
+    from the metric's denominator, never counted as either correct or
+    incorrect)."""
 
     @property
     def failed_checks(self) -> tuple[CheckOutcome, ...]:
@@ -351,6 +430,18 @@ def evaluate_case(
     ):
         harmful_errors.append("harmful_false_match")
 
+    identification_hierarchy_correct: bool | None = None
+    if case.expected_identification_levels:
+        level_ok = decision.identification_level.value in set(case.expected_identification_levels)
+        selection_ok = True
+        if (
+            level_ok
+            and decision.identification_level.value in _SELECTION_REQUIRING_LEVELS
+            and case.acceptable_catalogue_product_ids
+        ):
+            selection_ok = selected_product_id in set(case.acceptable_catalogue_product_ids)
+        identification_hierarchy_correct = level_ok and selection_ok
+
     return CaseResult(
         case=case,
         record=record,
@@ -362,6 +453,8 @@ def evaluate_case(
         is_justified_abstention=is_justified_abstention,
         is_technical_failure=is_technical_failure,
         top_acceptable_rank=_acceptable_candidate_rank(case, record),
+        selected_product_id=selected_product_id,
+        identification_hierarchy_correct=identification_hierarchy_correct,
     )
 
 
