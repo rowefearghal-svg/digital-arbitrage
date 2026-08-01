@@ -17,13 +17,13 @@
   ],
   "manifest_schema_version": "pue-release-manifest-0.1.0",
   "policy_code_content_hash": "520e2e233814f611c5c0fc48d0949edf06516b354616163c7d5807de5f32f76c",
-  "policy_code_git_commit": "fff6bd1d125717bed27d4ef317debd3642e8929f",
+  "policy_code_git_commit": "3f971c03aa5f522bb982b5af656b60ab4cf0f8a2",
   "policy_version": "gpu-policy-0.1.0",
   "release_benchmark_report_path": "data/pue/releases/pue-v0.1.0_benchmark_report.json",
   "release_date": "2026-08-01",
   "release_gate_passed": true,
   "release_id": "pue-v0.1.0",
-  "release_report_artifact_hash": "a7bbd65559e210b3efea5384c70c1ec209de8dd2507009a997b86a030ae48372",
+  "release_report_artifact_hash": "f215a65235640f18c46c66b6eafc4eda5e5dbae379b1a12ad5b9bf0bb4cf766a",
   "release_report_semantic_hash": "5cf96583b879cad9305757519c5f5853467d93b8b11f4954970bb7ae84af5753",
   "schema_version": "0.1"
 }

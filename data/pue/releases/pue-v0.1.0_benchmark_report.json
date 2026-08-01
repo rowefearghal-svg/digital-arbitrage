@@ -2403,19 +2403,19 @@
       "secondary_categories": []
     }
   ],
-  "generated_at": "2026-08-01T19:36:27.412294",
+  "generated_at": "2026-08-01T19:39:25.053550",
   "harmful_results": [],
   "knowledge_version": "gpu-seed-0.1.0",
   "operational_metrics": {
-    "listings_per_second": 1304.822,
-    "mean_decision_explanation_ms": 0.0528,
-    "mean_evaluation_ms": 0.1343,
-    "mean_extraction_ms": 0.1481,
+    "listings_per_second": 1320.092,
+    "mean_decision_explanation_ms": 0.0492,
+    "mean_evaluation_ms": 0.1382,
+    "mean_extraction_ms": 0.1458,
     "mean_persistence_ms": null,
-    "mean_reasoning_record_json_bytes": 17899.822,
-    "mean_retrieval_ms": 0.221,
-    "median_latency_ms": 0.5531,
-    "p95_latency_ms": 1.3967,
+    "mean_reasoning_record_json_bytes": 17899.8136,
+    "mean_retrieval_ms": 0.2274,
+    "median_latency_ms": 0.6644,
+    "p95_latency_ms": 1.2064,
     "technical_failure_rate": {
       "denominator": 118,
       "excluded": 0,
