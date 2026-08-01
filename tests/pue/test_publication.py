@@ -80,7 +80,12 @@ def test_publish_result_catalogue_product_id_is_none_without_a_selection(
 
 def test_publish_result_abstained_case_has_no_identity_claims(repository) -> None:
     context = build_default_context()
-    listing = make_normalized("Compatible with RTX 4090")
+    # "Compatible with RTX 4090" no longer abstains (Sprint 3 final narrow
+    # correction to the COMPATIBLE_ITEM decision branch: a compatibility-
+    # only listing is now CLASSIFIED, not ABSTAINED) - an empty/whitespace-
+    # only title (genuinely zero evidence of any kind) is a still-valid,
+    # still-genuinely-abstaining case.
+    listing = make_normalized("   ")
     record = process_one(listing, context, repository=repository)
     assert record.decision.decision_type == DecisionType.ABSTAINED
 

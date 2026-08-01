@@ -100,15 +100,12 @@ def test_release_benchmark_zero_harmful_errors_gate() -> None:
 
 
 def test_release_benchmark_every_abstention_is_classified() -> None:
-    """Every abstaining case must be hand-classified justified/avoidable,
-    with exactly one known, pre-existing exception:
-    ``compat_01_case_fits_rtx4090`` reaches ABSTAINED despite its own gold
-    label not even declaring that an allowed outcome at all (a
-    ``decision_type_allowed`` failure that predates this test's fix) - its
-    abstention cannot be meaningfully hand-adjudicated justified/avoidable
-    either. This pins that single known gap so any *additional* unlabelled
-    abstention is still caught as a regression (Sprint 3 final
-    release-integrity correction item 7)."""
+    """Every abstaining case must be hand-classified justified/avoidable
+    (Sprint 3 final release-integrity correction item 7).
+    ``compat_01_case_fits_rtx4090`` no longer abstains at all following the
+    Sprint 3 final narrow correction to the COMPATIBLE_ITEM decision
+    branch (it is now CLASSIFIED, matching its own gold label), so there
+    are no remaining known exceptions."""
     run = run_benchmark(DATASET, run_classifier=False)
     unclassified = [
         r.case.case_id
@@ -116,4 +113,4 @@ def test_release_benchmark_every_abstention_is_classified() -> None:
         if r.record.decision.decision_type.value == "abstained"
         and not (r.is_justified_abstention or r.is_avoidable_abstention)
     ]
-    assert unclassified == ["compat_01_case_fits_rtx4090"]
+    assert unclassified == []

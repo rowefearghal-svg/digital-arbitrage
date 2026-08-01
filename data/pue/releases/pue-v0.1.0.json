@@ -16,14 +16,14 @@
     "Classifier/PUE comparison is only produced for cases with an explicit search_query annotation (a buyer search-intent context, never derived from the listing's own title); cases without one are excluded from every classifier/differential metric."
   ],
   "manifest_schema_version": "pue-release-manifest-0.1.0",
-  "policy_code_content_hash": "974ec4a649e52a9b57bc92e0795ae092835fa45bef58b69d02aa389c7816bfa2",
-  "policy_code_git_commit": "5828b1db56a4b35ab6a3d3b306d531f547560209",
+  "policy_code_content_hash": "520e2e233814f611c5c0fc48d0949edf06516b354616163c7d5807de5f32f76c",
+  "policy_code_git_commit": "fff6bd1d125717bed27d4ef317debd3642e8929f",
   "policy_version": "gpu-policy-0.1.0",
   "release_benchmark_report_path": "data/pue/releases/pue-v0.1.0_benchmark_report.json",
   "release_date": "2026-08-01",
-  "release_gate_passed": false,
+  "release_gate_passed": true,
   "release_id": "pue-v0.1.0",
-  "release_report_artifact_hash": "9e04af5d73fed63bb014a9e08835525e3ac885e199e9eeccc43adb1313fc6a18",
-  "release_report_semantic_hash": "ff4dda4be95f323ad438073e05dd57e4e758dbd08abe26327b40c02870242be2",
+  "release_report_artifact_hash": "a7bbd65559e210b3efea5384c70c1ec209de8dd2507009a997b86a030ae48372",
+  "release_report_semantic_hash": "5cf96583b879cad9305757519c5f5853467d93b8b11f4954970bb7ae84af5753",
   "schema_version": "0.1"
 }

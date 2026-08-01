@@ -351,9 +351,41 @@ def form_decision(
 
     # -- compatible item, no sold-item noun -------------------------------- #
     if hypothesis.product_form == ProductForm.COMPATIBLE_ITEM:
+        # A "compatible with <family>" phrase with no accompanying sold-item
+        # noun (no accessory/component/replacement-part/packaging/graphics-
+        # card term) still describes exactly one coherent interpretation of
+        # what this listing is: a non-complete item sold on the basis of
+        # its compatibility with a GPU family, not the GPU itself - the
+        # same single-hypothesis situation as the accessory/component/
+        # replacement-part branch above, never a case of insufficient
+        # evidence to reason about at all. Only genuine ambiguity (more
+        # than one materially different interpretation) is handled by the
+        # ``len(hypotheses) > 1`` branch earlier in this function; a single
+        # COMPATIBLE_ITEM hypothesis must never unconditionally abstain
+        # (Sprint 3 final narrow correction: this previously made every
+        # such case unreachable for any positive product-form conclusion,
+        # contrary to ProductForm.COMPATIBLE_ITEM's own documented
+        # purpose).
         uncertainty = _compute_uncertainty(observation, hypothesis, [], False, False, False)
-        return _abstained(
-            state, policy, context, AbstentionReason.INSUFFICIENT_EVIDENCE, uncertainty
+        return Decision(
+            **_base_decision_kwargs(state, policy, context),
+            decision_type=DecisionType.CLASSIFIED,
+            identification_level=IdentificationLevel.PRODUCT_TYPE,
+            selected_hypothesis_id=hypothesis.hypothesis_id,
+            selected_candidate_instance_id=None,
+            product_form=ProductForm.COMPATIBLE_ITEM,
+            product_type=hypothesis.product_type,
+            identified_brand=hypothesis.brand,
+            identified_family=None,
+            identified_model=None,
+            identified_variant=None,
+            alternative_candidate_ids=(),
+            unresolved_fields=("product_type",),
+            contradiction_codes=(),
+            abstention_reason=None,
+            review_recommended=False,
+            comparability_status=ComparabilityStatus.NOT_COMPARABLE_PRODUCT_FORM,
+            uncertainty=uncertainty,
         )
 
     # -- bundle: never directly comparable to a single product ------------- #

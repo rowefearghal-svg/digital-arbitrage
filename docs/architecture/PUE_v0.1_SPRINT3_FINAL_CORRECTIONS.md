@@ -28,17 +28,15 @@ the checks genuinely derived from its own arguments (mandatory acceptance/replay
 decoupling it from the real dataset's own data-derived outcome; `test_release_gate_fails_when_a_mandatory_check_fails`/`test_release_gate_fails_on_replay_non_equivalence` already exercised
 real failure paths and continue to pass.
 
-**A previously-masked, genuine finding is now visible**: the real release dataset's
-`every_abstention_classified_justified_or_avoidable` check now **fails** on exactly one case,
+**A previously-masked, genuine finding was surfaced, then fixed at its root cause**: this
+correction initially revealed `every_abstention_classified_justified_or_avoidable` failing on
 `compat_01_case_fits_rtx4090` ("PC Case - fits RTX 4090 and other large graphics cards"), which
-reaches `ABSTAINED` despite that not even being in its own `allowed_decision_types` (a
-pre-existing, already-documented `decision_type_allowed` failure, not a new regression). Before
-this correction, the hardcoded-`True` bug this item fixes meant this could never be caught.
-`report.gate.passed` on the real dataset is therefore honestly **`False`** — pinned by
-`tests/pue/test_benchmark_report.py::test_release_gate_on_the_real_release_dataset_has_no_new_gaps`
-and `tests/pue/test_regression_suite.py::test_release_benchmark_every_abstention_is_classified`
-so any *additional* gap is still caught as a regression, while this one known gap remains
-visible rather than hidden or force-fixed.
+reached `ABSTAINED` despite that not even being in its own `allowed_decision_types`. Root-caused
+to an unconditional `ABSTAINED` return in `pue/decisions.py`'s `form_decision` whenever a single
+hypothesis resolved to `ProductForm.COMPATIBLE_ITEM` (a "compatible with `<family>`" phrase with
+no accompanying sold-item noun) - contrary to that spec-documented product form's own purpose (see
+the Sprint 3 final *narrow* correction below, addressing this at the source rather than leaving it
+as an accepted gap). `report.gate.passed` on the real dataset is now honestly **`True`**.
 
 ## 2. Explicit search/comparison context — never `build_search_profile(case.title)`
 
@@ -184,12 +182,59 @@ own prose numbers are not automatically regenerated and will drift after every d
 change — regenerating the machine-readable report via `scripts/gen_pue_release_v0_1_0.py` is the
 only way to get current, self-consistent numbers).
 
+## 9. Follow-up narrow correction: `compat_01_case_fits_rtx4090` root cause fixed
+
+Item 1 above surfaced `compat_01_case_fits_rtx4090` reaching `ABSTAINED` although its gold label
+(`allowed_decision_types: ["classified", "ambiguous"]`) never permitted that outcome. Root cause:
+`pue/decisions.py::form_decision`'s `ProductForm.COMPATIBLE_ITEM` branch unconditionally returned
+`ABSTAINED` (`AbstentionReason.INSUFFICIENT_EVIDENCE`) for *every* single-hypothesis
+compatibility-only listing (a "compatible with `<family>`" phrase with no accompanying sold-item
+noun), regardless of how coherent that one interpretation was - contrary to
+`ProductForm.COMPATIBLE_ITEM`'s own documented purpose and to spec section 21 row 22's intent
+("compatibility must not become identity" - never "must always abstain").
+
+Fixed by returning `CLASSIFIED` (`ProductForm.COMPATIBLE_ITEM`,
+`ComparabilityStatus.NOT_COMPARABLE_PRODUCT_FORM`, no identity fields populated) for this branch,
+mirroring the existing accessory/component/replacement-part `CLASSIFIED` pattern immediately above
+it in the same function - `AMBIGUOUS` remains available (and correct) whenever genuinely more than
+one hypothesis survives (the pre-existing `len(hypotheses) > 1` branch, unchanged). The gold label
+itself was **not** changed.
+
+`compat_01_case_fits_rtx4090`'s gold label is preserved unchanged and now passes. Updated spec
+section 21 row 22 and three Sprint 1 acceptance fixture cases
+(`case_22_compatibility_only_no_sold_item`, `case_31_for_rtx4090_boundary_regression`,
+`case_32_fits_rtx4090_boundary_regression`) whose gold labels encoded the old, now-corrected
+"ambiguous or abstained only" contract for this exact scenario - a deliberate, reviewed change to
+the acceptance contract, not an unrelated one, since they exercise the identical code path.
+`case_30_fits_rtx4090_precedence_regression` already permitted `classified` and needed no change.
+
+New regression test: `tests/pue/test_decisions.py::test_compatibility_only_listing_is_classified_not_abstained`
+runs the exact real benchmark title through the real `process_one` path and asserts
+`CLASSIFIED`/`ProductForm.COMPATIBLE_ITEM` (or, only if genuinely ambiguous, `AMBIGUOUS`), never
+`ABSTAINED`.
+
+**Side effect, not scope creep**: `compat_03_psu_compatible_wattage` (an unambiguous PSU listing;
+item 7's `"avoidable"` finding) also goes through this exact same `ProductForm.COMPATIBLE_ITEM`
+branch and is now correctly `CLASSIFIED` too, resolving that finding at its root cause rather than
+merely labelling it. Three existing comparison/publication tests using "Compatible with RTX 4090"
+as an ABSTAINED example (`test_category_pue_abstained`,
+`test_build_comparison_report_counts_are_deterministic_and_exhaustive`,
+`test_publish_result_abstained_case_has_no_identity_claims`) were updated to use a genuinely still-
+abstaining input (an empty/whitespace-only title) instead - the same code path they were built to
+exercise no longer exists for that specific input, so pinning the same *behaviour* required a
+different input, not a changed assertion.
+
+**Explicitly out of scope, unchanged**: `bracket_02_riser_cable` and `adapter_03_riser_cable_variant`
+("... Compatible with RTX 4090" riser-cable titles) remain pre-existing, already-documented
+`decision_type_allowed` failures - they take a different code path (their "riser cable" phrasing is
+not currently recognized as a `product_type_term`) and are unaffected by this narrow correction.
+
 ## Verification
 
 ```
-python -m pytest -q             -> 919 passed
+python -m pytest -q             -> 920 passed
 python -m ruff check .          -> All checks passed!
-python -m ruff format --check . -> 185 files already formatted
+python -m ruff format --check . -> 186 files already formatted
 python -m mypy src               -> Success: no issues found in 104 source files
 ```
 
@@ -197,10 +242,8 @@ Dataset, benchmark report, and release manifest regenerated from a clean checkou
 `python scripts/gen_pue_benchmark_dataset.py` and `python scripts/gen_pue_release_v0_1_0.py`;
 verified via `python scripts/verify_pue_release.py data/pue/releases/pue-v0.1.0.json`.
 
-**Release gate on the real dataset is honestly `False`** (see item 1) — this is the correct,
-intended outcome of these corrections, not a regression to fix around. `compat_01_case_fits_
-rtx4090`'s gold label needs reconciling with its actual `ABSTAINED` behaviour (either the decision
-policy should not abstain on this unambiguous non-GPU listing, or `abstained` needs adding to its
-`allowed_decision_types` with a hand-adjudicated classification) as explicit follow-up work.
+**Release gate on the real dataset is honestly `True`** — following item 9's root-cause fix, every
+release-gate check (including `every_abstention_classified_justified_or_avoidable`) genuinely
+passes with no remaining known gaps.
 
 Not merged; Sprint 4 not started.

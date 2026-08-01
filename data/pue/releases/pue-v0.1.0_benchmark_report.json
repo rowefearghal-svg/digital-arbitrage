@@ -1095,17 +1095,15 @@
       "case_tags": [
         "compatibility_only"
       ],
-      "comparability_status": "insufficient_information",
-      "correct": false,
-      "decision_type": "abstained",
-      "failed_checks": [
-        "decision_type_allowed"
-      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
       "harmful_errors": [],
-      "identification_level": "unknown",
+      "identification_level": "product_type",
       "is_avoidable_abstention": false,
       "is_justified_abstention": false,
-      "product_form": "unknown",
+      "product_form": "compatible_item",
       "reasoning_record_case_id": "release-00001689"
     },
     {
@@ -1972,17 +1970,15 @@
       "case_tags": [
         "compatibility_only"
       ],
-      "comparability_status": "insufficient_information",
-      "correct": false,
-      "decision_type": "abstained",
-      "failed_checks": [
-        "avoidable_abstention_did_not_occur"
-      ],
+      "comparability_status": "not_comparable_product_form",
+      "correct": true,
+      "decision_type": "classified",
+      "failed_checks": [],
       "harmful_errors": [],
-      "identification_level": "unknown",
-      "is_avoidable_abstention": true,
+      "identification_level": "product_type",
+      "is_avoidable_abstention": false,
       "is_justified_abstention": false,
-      "product_form": "unknown",
+      "product_form": "compatible_item",
       "reasoning_record_case_id": "release-00002927"
     },
     {
@@ -2224,7 +2220,7 @@
       "reasoning_record_case_id": "release-00003223"
     }
   ],
-  "correct_count": 100,
+  "correct_count": 102,
   "dataset_file_hash": "c30c4e547c3bbd9f0a3c7d5ed6799ffc380e2ea2403bea816873d5127c384aa7",
   "dataset_id": "gpu-release-benchmark-v0.1",
   "differential_metrics": {
@@ -2244,7 +2240,7 @@
   },
   "failure_counts_by_category": {
     "claim_failure": 0,
-    "decision_policy_failure": 16,
+    "decision_policy_failure": 14,
     "evaluation_failure": 0,
     "evidence_failure": 0,
     "explanation_failure": 0,
@@ -2270,15 +2266,6 @@
       "primary_category": "decision_policy_failure",
       "related_object_ids": [
         "release-00001651"
-      ],
-      "secondary_categories": []
-    },
-    {
-      "case_id": "compat_01_case_fits_rtx4090",
-      "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
-      "primary_category": "decision_policy_failure",
-      "related_object_ids": [
-        "release-00001718"
       ],
       "secondary_categories": []
     },
@@ -2373,15 +2360,6 @@
       "secondary_categories": []
     },
     {
-      "case_id": "compat_03_psu_compatible_wattage",
-      "explanation": "Avoidable abstention: gold annotation holds the available evidence supported a non-abstaining outcome.",
-      "primary_category": "decision_policy_failure",
-      "related_object_ids": [
-        "release-00002956"
-      ],
-      "secondary_categories": []
-    },
-    {
       "case_id": "bundle_05_two_cards",
       "explanation": "Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace.",
       "primary_category": "decision_policy_failure",
@@ -2425,19 +2403,19 @@
       "secondary_categories": []
     }
   ],
-  "generated_at": "2026-08-01T19:11:33.221259",
+  "generated_at": "2026-08-01T19:36:27.412294",
   "harmful_results": [],
   "knowledge_version": "gpu-seed-0.1.0",
   "operational_metrics": {
-    "listings_per_second": 1602.035,
-    "mean_decision_explanation_ms": 0.0392,
-    "mean_evaluation_ms": 0.1176,
-    "mean_extraction_ms": 0.1171,
+    "listings_per_second": 1304.822,
+    "mean_decision_explanation_ms": 0.0528,
+    "mean_evaluation_ms": 0.1343,
+    "mean_extraction_ms": 0.1481,
     "mean_persistence_ms": null,
-    "mean_reasoning_record_json_bytes": 17898.178,
-    "mean_retrieval_ms": 0.1869,
-    "median_latency_ms": 0.5135,
-    "p95_latency_ms": 0.9335,
+    "mean_reasoning_record_json_bytes": 17899.822,
+    "mean_retrieval_ms": 0.221,
+    "median_latency_ms": 0.5531,
+    "p95_latency_ms": 1.3967,
     "technical_failure_rate": {
       "denominator": 118,
       "excluded": 0,
@@ -2467,9 +2445,9 @@
       "value": 1.0
     },
     "decision_distribution": {
-      "abstained": 4,
+      "abstained": 2,
       "ambiguous": 5,
-      "classified": 26,
+      "classified": 28,
       "identified": 11,
       "outside_supported_domain": 12,
       "partially_identified": 59,
@@ -2505,8 +2483,8 @@
     "abstention_rate": {
       "denominator": 118,
       "excluded": 0,
-      "numerator": 4,
-      "value": 0.0339
+      "numerator": 2,
+      "value": 0.0169
     },
     "accessory_to_complete_product_error_rate": {
       "denominator": 29,
@@ -2517,8 +2495,8 @@
     "avoidable_abstention_rate": {
       "denominator": 2,
       "excluded": 0,
-      "numerator": 1,
-      "value": 0.5
+      "numerator": 0,
+      "value": 0.0
     },
     "candidate_recall_at_1": {
       "denominator": 37,
@@ -2621,9 +2599,9 @@
       },
       {
         "blocking": true,
-        "detail": "unclassified: ['compat_01_case_fits_rtx4090']",
+        "detail": "unclassified: []",
         "name": "every_abstention_classified_justified_or_avoidable",
-        "passed": false
+        "passed": true
       },
       {
         "blocking": true,
@@ -2650,7 +2628,7 @@
         "passed": true
       }
     ],
-    "passed": false
+    "passed": true
   },
   "schema_version": "0.1",
   "total_cases": 118

@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
-from digital_arbitrage.pue.enums import AbstentionReason, DecisionType
+from digital_arbitrage.pue.enums import (
+    AbstentionReason,
+    ComparabilityStatus,
+    DecisionType,
+    ProductForm,
+)
 from digital_arbitrage.pue.orchestration import process_one
 
 from .conftest import make_normalized
@@ -45,6 +50,33 @@ def test_outside_domain_for_non_gpu_listing(deterministic_context, repository) -
 def test_no_escalated_decision_type_exists() -> None:
     assert not hasattr(DecisionType, "ESCALATED")
     assert "ESCALATED" not in DecisionType.__members__
+
+
+def test_compatibility_only_listing_is_classified_not_abstained(
+    deterministic_context, repository
+) -> None:
+    """A "compatible with <GPU family>" phrase with no accompanying
+    sold-item noun (no accessory/component/replacement-part/packaging/
+    graphics-card term) describes exactly one coherent interpretation -
+    a non-complete item sold on its compatibility with a GPU family, not
+    the GPU itself - and must be CLASSIFIED as ProductForm.COMPATIBLE_ITEM
+    (or, only if genuinely more than one materially different
+    interpretation remains plausible, AMBIGUOUS), never ABSTAINED (Sprint
+    3 final narrow correction: this real, exact benchmark title
+    previously abstained unconditionally whenever a single hypothesis
+    resolved to COMPATIBLE_ITEM, contrary to that ProductForm's own
+    documented purpose)."""
+    record = process_one(
+        make_normalized("PC Case - fits RTX 4090 and other large graphics cards"),
+        deterministic_context,
+        repository=repository,
+    )
+    decision = record.decision
+    assert decision.decision_type in (DecisionType.CLASSIFIED, DecisionType.AMBIGUOUS)
+    if decision.decision_type == DecisionType.CLASSIFIED:
+        assert decision.product_form == ProductForm.COMPATIBLE_ITEM
+        assert decision.product_form != ProductForm.COMPLETE_PRODUCT
+        assert decision.comparability_status == ComparabilityStatus.NOT_COMPARABLE_PRODUCT_FORM
 
 
 def test_decision_never_names_a_hard_rejected_candidate_as_selected(

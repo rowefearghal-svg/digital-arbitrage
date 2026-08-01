@@ -2,14 +2,14 @@
 
 - **Dataset:** gpu-release-benchmark-v0.1 (benchmark version gpu-release-benchmark-0.1.0)
 - **Dataset file hash (sha256):** `c30c4e547c3bbd9f0a3c7d5ed6799ffc380e2ea2403bea816873d5127c384aa7`
-- **Generated:** 2026-08-01T19:11:33.221259
+- **Generated:** 2026-08-01T19:36:27.412294
 - **Capability version:** pue-0.1.0
 - **Policy version:** gpu-policy-0.1.0
 - **Knowledge version:** gpu-seed-0.1.0
 - **Schema version:** 0.1
-- **Total cases:** 118 (100 correct)
+- **Total cases:** 118 (102 correct)
 
-## Release gate: FAIL
+## Release gate: PASS
 
 | Gate check | Result | Detail |
 |---|---|---|
@@ -18,7 +18,7 @@
 | zero_packaging_to_complete_product_errors | PASS | 0 case(s): [] |
 | retrieval_and_decision_quality_reported_independently | PASS | candidate_recall_at_1/5/10=['36/37', '36/37', '36/37']; exact/hierarchical_identification_accuracy=['11/11', '13/13'] |
 | every_wrong_decision_has_a_traceable_failure_stage | PASS | untraced: [] |
-| every_abstention_classified_justified_or_avoidable | FAIL | unclassified: ['compat_01_case_fits_rtx4090'] |
+| every_abstention_classified_justified_or_avoidable | PASS | unclassified: [] |
 | every_harmful_result_individually_listed | PASS | 0 harmful case(s) - zero-count trivially satisfies adjudication. |
 | deterministic_replay_equivalent | PASS | release-replay-verify-00000001: equivalent=True; release-replay-verify-00000043: equivalent=True; release-replay-verify-00000078: equivalent=True |
 | no_commercial_data_in_product_identity_reasoning | PASS | Structural invariant enforced by tests/pue/test_invariants.py::test_invariant_no_commercial_fields (no price/profit/ROI field ever read by pue/claims.py, pue/evaluation.py, or pue/decisions.py); verified by the same mandatory-acceptance pytest run above. |
@@ -38,8 +38,8 @@
 | accessory_to_complete_product_error_rate | 0.0 | 0/29 (0) |
 | packaging_to_complete_product_error_rate | 0.0 | 0/6 (0) |
 | partial_identification_correctness | 0.8167 | 49/60 (0) |
-| abstention_rate | 0.0339 | 4/118 (0) |
-| avoidable_abstention_rate | 0.5 | 1/2 (0) |
+| abstention_rate | 0.0169 | 2/118 (0) |
+| avoidable_abstention_rate | 0.0 | 0/2 (0) |
 | comparability_accuracy | 0.8667 | 65/75 (0) |
 | explanation_faithfulness | 1.0 | 118/118 (0) |
 
@@ -53,20 +53,20 @@
 - **hard_contradiction_detection_rate:** 1.0 (3/3)
 - **classifier_pue_disagreement_rate:** 0.8364 (46/55)
 - **candidate_count_mean / median:** 6.39 / 10.0
-- **decision_distribution:** {'partially_identified': 59, 'identified': 11, 'classified': 26, 'ambiguous': 5, 'abstained': 4, 'outside_supported_domain': 12, 'processing_failed': 1}
+- **decision_distribution:** {'partially_identified': 59, 'identified': 11, 'classified': 28, 'ambiguous': 5, 'outside_supported_domain': 12, 'abstained': 2, 'processing_failed': 1}
 
 ## Operational metrics
 
-- **listings_per_second:** 1602.035
-- **median_latency_ms:** 0.5135
-- **p95_latency_ms:** 0.9335
-- **mean_extraction_ms:** 0.1171
-- **mean_retrieval_ms:** 0.1869
-- **mean_evaluation_ms:** 0.1176
-- **mean_decision_explanation_ms:** 0.0392
+- **listings_per_second:** 1304.822
+- **median_latency_ms:** 0.5531
+- **p95_latency_ms:** 1.3967
+- **mean_extraction_ms:** 0.1481
+- **mean_retrieval_ms:** 0.221
+- **mean_evaluation_ms:** 0.1343
+- **mean_decision_explanation_ms:** 0.0528
 - **mean_persistence_ms:** None
 - **technical_failure_rate:** 0.0085 (1/118)
-- **mean_reasoning_record_json_bytes:** 17898.178
+- **mean_reasoning_record_json_bytes:** 17899.822
 
 ## Classifier vs PUE differential
 
@@ -95,7 +95,7 @@
 | retrieval_failure | 1 |
 | knowledge_failure | 1 |
 | evaluation_failure | 0 |
-| decision_policy_failure | 16 |
+| decision_policy_failure | 14 |
 | explanation_failure | 0 |
 | runtime_failure | 0 |
 
@@ -109,7 +109,6 @@ _None._
 |---|---|---|---|
 | bracket_02_riser_cable | decision_policy_failure |  | Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace. |
 | not_included_01_case_only | decision_policy_failure |  | Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace. |
-| compat_01_case_fits_rtx4090 | decision_policy_failure |  | Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace. |
 | compat_02_cooler_compatible | decision_policy_failure |  | Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace. |
 | bundle_02_rtx4090_with_waterblock | decision_policy_failure |  | Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace. |
 | bundle_03_gpu_and_riser | decision_policy_failure |  | Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace. |
@@ -119,7 +118,6 @@ _None._
 | mobile_04_amd_rx7900m | retrieval_failure |  | An acceptable Candidate exists in the knowledge base but was never retrieved for this case. |
 | adapter_03_riser_cable_variant | decision_policy_failure |  | Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace. |
 | not_included_03_manual_only | decision_policy_failure |  | Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace. |
-| compat_03_psu_compatible_wattage | decision_policy_failure |  | Avoidable abstention: gold annotation holds the available evidence supported a non-abstaining outcome. |
 | bundle_05_two_cards | decision_policy_failure |  | Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace. |
 | gap_05_rtx4090ti | knowledge_failure |  | Gold-labelled catalogue gap (no acceptable Candidate exists in the tested knowledge version 'gpu-seed-0.1.0'); the wrong/avoidable outcome traces to missing knowledge coverage, not a retrieval or evaluation defect. |
 | abstain_03_two_families_conflict | decision_policy_failure |  | Decision Formation reached a gold-disallowed outcome despite an otherwise-unremarkable reasoning trace. |
