@@ -1,0 +1,28 @@
+{
+  "manifest_id": "gpu-collection-v0.1",
+  "version": "0.1.0",
+  "description": "GPU product-family collection manifest aligned with the PUE v0.1 live-shadow queries.",
+  "queries": [
+    {
+      "query_id": "q-rtx-4090",
+      "search_text": "RTX 4090",
+      "providers": ["ebay_browse", "stockx"],
+      "max_results_per_provider": 50,
+      "detail_top_n": 25
+    },
+    {
+      "query_id": "q-rtx-4080",
+      "search_text": "RTX 4080",
+      "providers": ["ebay_browse", "stockx"],
+      "max_results_per_provider": 50,
+      "detail_top_n": 25
+    },
+    {
+      "query_id": "q-rx-7900-xtx",
+      "search_text": "RX 7900 XTX",
+      "providers": ["ebay_browse", "stockx"],
+      "max_results_per_provider": 50,
+      "detail_top_n": 25
+    }
+  ]
+}

@@ -1025,3 +1025,31 @@
   the natural Sprint 2/3 follow-up once the shadow benchmark shows the PUE
   is safe to trust (spec section 26, Sprint 3 "recommendation on whether PUE
   product-form output may affect downstream comparability").
+
+### ADR-031: Append-only market-data store beside the existing databases
+
+- **Date:** 2026-09-20
+- **Status:** Accepted
+- **Context:** `history.db` stores ranked-opportunity snapshots and
+  `pue_shadow.db` stores PUE reasoning; neither preserves provider-native
+  entities, listing-level history, raw responses, or collection coverage.
+  The demand-prediction work needs durable, honest market history
+  (docs/MARKET_DATA_COLLECTION_DESIGN.md).
+- **Decision:** Add a third per-concern database, `market_data.db`
+  (`market_data/` package): provider-native `provider_entities` keyed by
+  (provider, entity_type, provider_entity_id) - listings, catalogue products,
+  variants and item groups stay distinct and are never merged; append-only
+  `observations` deduped on (entity, run, source_kind, content_hash); raw
+  payloads deduped on sha256 behind a redaction layer that structurally
+  excludes request headers and content-scrubs secrets; `collection_tasks`
+  per request for pagination coverage, retries and restartability;
+  `request_usage` for a shared daily request budget; `entity_links` for
+  PUE/cross-provider candidate links. The collector is a separate
+  `arb collect` command with its own request profile (auction-inclusive
+  filter, EXTENDED fieldgroups) - `arb scan`, scoring and PUE are untouched.
+- **Consequences:** Evidence quality is explicit (`active` / `ended` /
+  `disappeared` / `confirmed_sale` / `inferred_outcome` / `unknown`);
+  disappearance is never a sale, missing is never zero, and provider
+  estimates (`estimatedSoldQuantity`) stay labelled as estimates. Sold-price
+  ground truth remains unavailable (Marketplace Insights is restricted);
+  manual imports get provenance + verification status when that lands.

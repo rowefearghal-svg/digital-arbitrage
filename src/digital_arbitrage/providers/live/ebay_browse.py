@@ -21,7 +21,7 @@ import os
 import urllib.parse
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from ...product_scanner.models import Condition, Listing
 from .auth import OAuthClientCredentialsAuthProvider
@@ -106,6 +106,17 @@ class EbayBrowseConfig(LiveProviderConfig):
     marketplace_id: str = "EBAY_IE"
     oauth_token_url: str = DEFAULT_OAUTH_TOKEN_URL
     oauth_scope: str = DEFAULT_OAUTH_SCOPE
+    #: Optional ``filter`` expression for item_summary/search (e.g.
+    #: ``buyingOptions:{AUCTION|FIXED_PRICE}``). Off by default so existing
+    #: scan behaviour is unchanged; the collector opts in.
+    search_filter: str | None = None
+    #: Optional ``fieldgroups`` value (e.g. ``EXTENDED`` for shortDescription +
+    #: itemLocation.city, or refinement groups for market histograms).
+    search_fieldgroups: str | None = None
+    #: Optional ``sort`` value (``price``, ``newlyListed``, ``endingSoonest``...).
+    search_sort: str | None = None
+    #: Optional ``X-EBAY-C-ENDUSERCTX`` value for delivery-location-aware results.
+    enduserctx: str | None = None
 
     def __post_init__(self) -> None:
         # Explicit super() is required: ``@dataclass(slots=True)`` rebuilds the
@@ -157,16 +168,43 @@ class EbayBrowseProvider(LiveProvider):
     def build_request(self, query: str, *, page: int, page_size: int) -> HttpRequest:
         config = self.ebay_config
         offset = (page - 1) * page_size
+        params = {
+            "q": query[: self.MAX_QUERY_LENGTH],
+            "limit": str(page_size),
+            "offset": str(offset),
+        }
+        if config.search_filter:
+            params["filter"] = config.search_filter
+        if config.search_fieldgroups:
+            params["fieldgroups"] = config.search_fieldgroups
+        if config.search_sort:
+            params["sort"] = config.search_sort
+        headers = {"X-EBAY-C-MARKETPLACE-ID": config.marketplace_id}
+        if config.enduserctx:
+            headers["X-EBAY-C-ENDUSERCTX"] = config.enduserctx
         return HttpRequest(
             method="GET",
             url=resolve_url(config.base_url, self.SEARCH_PATH),
-            params={
-                "q": query[: self.MAX_QUERY_LENGTH],
-                "limit": str(page_size),
-                "offset": str(offset),
-            },
-            headers={"X-EBAY-C-MARKETPLACE-ID": config.marketplace_id},
+            params=params,
+            headers=headers,
         )
+
+    #: Browse item-detail path prefix; an item id is appended (URL-escaped).
+    ITEM_PATH_PREFIX: ClassVar[str] = "/buy/browse/v1/item/"
+
+    def get_item(self, item_id: str, *, fieldgroups: str | None = None) -> dict[str, Any]:
+        """Fetch a single item's detail via ``GET /buy/browse/v1/item/{item_id}``.
+
+        Used by the market-data collector for enrichment (``description``,
+        ``localizedAspects``, ``estimatedAvailabilities`` with
+        ``estimatedSoldQuantity``, ``sellerItemRevision``...). Pass
+        ``fieldgroups="COMPACT"`` for the cheap change-detection payload.
+        Returns the parsed JSON payload.
+        """
+        path = self.ITEM_PATH_PREFIX + urllib.parse.quote(item_id, safe="")
+        params = {"fieldgroups": fieldgroups} if fieldgroups else None
+        response = self._client.get(path, params=params)
+        return ensure_mapping(parse_json(response, provider=self.name), provider=self.name)
 
     def parse_response(self, response: HttpResponse, *, query: str) -> Page[Listing]:
         payload = ensure_mapping(parse_json(response, provider=self.name), provider=self.name)

@@ -176,6 +176,52 @@ class StockXProvider(LiveProvider):
             },
         )
 
+    def get_product(self, product_id: str) -> dict[str, object]:
+        """Fetch one catalogue product via ``GET /v2/catalog/products/{id}``."""
+        response = self._client.get(f"/v2/catalog/products/{product_id}")
+        return cast(
+            dict[str, object],
+            ensure_mapping(parse_json(response, provider=self.name), provider=self.name),
+        )
+
+    def get_product_market_data(self, product_id: str) -> list[dict[str, object]]:
+        """Fetch per-variant market data via
+        ``GET /v2/catalog/products/{id}/market-data``.
+
+        One entry per variant: ``variantId``, ``lowestAskAmount``,
+        ``highestBidAmount``, ``sellFasterAmount``, ``earnMoreAmount`` and the
+        standard/flex/direct market splits. These are order-book quotes and
+        provider guidance - never achieved sale prices.
+        """
+        response = self._client.get(
+            _market_data_path(product_id),
+            params={"currencyCode": self.stockx_config.currency_code},
+        )
+        return cast(
+            list[dict[str, object]],
+            ensure_list(
+                parse_json(response, provider=self.name),
+                context="market-data",
+                provider=self.name,
+            ),
+        )
+
+    def get_product_variants(self, product_id: str) -> list[dict[str, object]]:
+        """Fetch variant identity via ``GET /v2/catalog/products/{id}/variants``.
+
+        Per-variant ``variantId``, ``variantName``, ``variantValue`` (size),
+        ``gtins`` and eligibility flags. Opt-in in the collector config.
+        """
+        response = self._client.get(f"/v2/catalog/products/{product_id}/variants")
+        return cast(
+            list[dict[str, object]],
+            ensure_list(
+                parse_json(response, provider=self.name),
+                context="variants",
+                provider=self.name,
+            ),
+        )
+
     def parse_response(self, response: HttpResponse, *, query: str) -> Page[Listing]:
         payload = ensure_mapping(parse_json(response, provider=self.name), provider=self.name)
         raw_products = payload.get("products")
@@ -205,18 +251,7 @@ class StockXProvider(LiveProvider):
         extra = self._build_extra(product)
 
         try:
-            market_response = self._client.get(
-                _market_data_path(product_id),
-                params={"currencyCode": self.stockx_config.currency_code},
-            )
-            market_payload = cast(
-                list[dict[str, object]],
-                ensure_list(
-                    parse_json(market_response, provider=self.name),
-                    context="market-data",
-                    provider=self.name,
-                ),
-            )
+            market_payload = self.get_product_market_data(product_id)
             variant_count = len(market_payload)
             price, highest_bid = _min_lowest_ask(market_payload)
             extra["variant_count"] = str(variant_count)

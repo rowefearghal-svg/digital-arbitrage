@@ -40,6 +40,9 @@ from .pipeline import ArbitragePipeline, PipelineConfig, recommendation_rank
 #: Default location for the scan-history database (override with --db).
 DEFAULT_DB_PATH = Path.home() / ".digital_arbitrage" / "history.db"
 
+#: Default location for the market-data store (override with --db).
+DEFAULT_MARKET_DB = Path.home() / ".digital_arbitrage" / "market_data.db"
+
 # Columns shown in the fixed-width table and markdown output.
 _COLUMNS: tuple[tuple[str, str], ...] = (
     ("recommendation", "RECOMMENDATION"),
@@ -641,6 +644,80 @@ def build_parser() -> argparse.ArgumentParser:
         "--debug", action="store_true", help="Show a full traceback on error."
     )
 
+    collect = subparsers.add_parser(
+        "collect",
+        help=(
+            "Run a bounded market-data collection over a query manifest into the "
+            "market_data.db store (read-only; does not change scan/PUE behaviour)."
+        ),
+    )
+    collect.add_argument(
+        "--manifest",
+        default=None,
+        help="Collection manifest JSON (required unless [collection].manifest is set).",
+    )
+    collect.add_argument(
+        "--config",
+        default=None,
+        help="TOML config with a [collection] table (optional).",
+    )
+    collect.add_argument(
+        "-p",
+        "--provider",
+        action="append",
+        dest="providers",
+        default=None,
+        metavar="NAME",
+        help="Restrict collection to provider(s) (repeatable).",
+    )
+    collect.add_argument(
+        "--db",
+        default=None,
+        help=f"Market-data database path (default: {DEFAULT_MARKET_DB}).",
+    )
+    collect.add_argument(
+        "--detail-budget",
+        type=int,
+        default=None,
+        help="Max eBay getItem detail calls this run (default: 150).",
+    )
+    collect.add_argument(
+        "--no-detail",
+        action="store_true",
+        help="Skip eBay item-detail enrichment entirely.",
+    )
+    collect.add_argument(
+        "--stockx-variants",
+        action="store_true",
+        help="Also call the StockX variants endpoint per product (+1 call each).",
+    )
+    collect.add_argument(
+        "--ebay-marketplace",
+        default=None,
+        help="eBay marketplace id (default: EBAY_IE).",
+    )
+    collect.add_argument("--debug", action="store_true", help="Show a full traceback on error.")
+
+    collect_report = subparsers.add_parser(
+        "collect-report",
+        help="Show the completeness/coverage report for a collection run.",
+    )
+    collect_report.add_argument("run_id", help="Run id printed by `arb collect`.")
+    collect_report.add_argument(
+        "-f", "--format", choices=("json", "markdown"), default="markdown"
+    )
+    collect_report.add_argument(
+        "--db",
+        default=None,
+        help=f"Market-data database path (default: {DEFAULT_MARKET_DB}).",
+    )
+    collect_report.add_argument(
+        "--output", default=None, help="Also write the report to this file."
+    )
+    collect_report.add_argument(
+        "--debug", action="store_true", help="Show a full traceback on error."
+    )
+
     return parser
 
 
@@ -924,6 +1001,72 @@ def _run_pue(args: argparse.Namespace) -> int:
     return 1
 
 
+def _run_collect(args: argparse.Namespace) -> int:
+    """Bounded market-data collection. Read-only; separate from `arb scan`."""
+    from dataclasses import replace as _dc_replace
+
+    from ..market_data import (
+        CollectionRunner,
+        MarketDataStore,
+        load_collection_manifest,
+    )
+    from ..market_data.collector import DEFAULT_MARKET_DB, CollectionConfig
+    from ..market_data.config import load_collection_config
+
+    file_cfg = load_collection_config(args.config) if args.config else {}
+    config: CollectionConfig = file_cfg.get("collection_config") or CollectionConfig()
+    if args.detail_budget is not None:
+        config = _dc_replace(config, detail_fetch_top_n=args.detail_budget)
+    if args.no_detail:
+        config = _dc_replace(config, detail_fetch_top_n=0)
+    if args.stockx_variants:
+        config = _dc_replace(config, fetch_stockx_variants=True)
+    if args.ebay_marketplace:
+        config = _dc_replace(config, ebay_marketplace_id=args.ebay_marketplace)
+
+    manifest_path = args.manifest or file_cfg.get("manifest")
+    if not manifest_path:
+        print("error: a collection manifest is required (--manifest or "
+              "[collection].manifest)", file=sys.stderr)
+        return 1
+    manifest = load_collection_manifest(manifest_path)
+    db_path = args.db or file_cfg.get("db_path") or DEFAULT_MARKET_DB
+
+    with MarketDataStore(db_path) as store:
+        runner = CollectionRunner(store, config)
+        run_id = runner.collect(
+            manifest,
+            providers_filter=set(args.providers) if args.providers else None,
+        )
+        row = store.run_row(run_id) or {}
+    print(f"collection run: {run_id}", file=sys.stderr)
+    print(f"status: {row.get('status')}", file=sys.stderr)
+    print(f"inspect with: arb collect-report {run_id} --db {db_path}", file=sys.stderr)
+    return 0 if row.get("status") in ("SUCCESS", "PARTIAL_SUCCESS") else 1
+
+
+def _run_collect_report(args: argparse.Namespace) -> int:
+    from ..market_data.collector import DEFAULT_MARKET_DB
+    from ..market_data.report import build_report, render_markdown
+    from ..market_data.store import MarketDataStore
+
+    db_path = args.db or DEFAULT_MARKET_DB
+    with MarketDataStore(db_path) as store:
+        if store.run_row(args.run_id) is None:
+            print(f"error: run {args.run_id!r} not found in {db_path}", file=sys.stderr)
+            return 1
+        report = build_report(store, args.run_id)
+    text = (
+        json.dumps(report, indent=2, default=str)
+        if args.format == "json"
+        else render_markdown(report)
+    )
+    print(text)
+    if args.output:
+        Path(args.output).write_text(text, encoding="utf-8")
+    return 0
+
+
 _COMMANDS: dict[str, Callable[[argparse.Namespace], int]] = {
     "scan": _run_scan,
     "auth": _run_auth,
@@ -931,6 +1074,8 @@ _COMMANDS: dict[str, Callable[[argparse.Namespace], int]] = {
     "show": _run_show,
     "compare": _run_compare,
     "pue": _run_pue,
+    "collect": _run_collect,
+    "collect-report": _run_collect_report,
 }
 
 
